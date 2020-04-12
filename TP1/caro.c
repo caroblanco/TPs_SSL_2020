@@ -60,7 +60,7 @@ int main(){
                             }
                         }
                         if (noRec==0){
-                            fpust(" --> numero hexadecimal \n", salida);
+                            fputs(" --> numero hexadecimal \n", salida);
                         }
                         else{
                             fputs(" --> Numero no reconocido \n",salida);
@@ -82,7 +82,7 @@ int main(){
                             }
                         }
                         if (noRec==0){
-                            fpust(" --> numero octal \n", salida);
+                            fputs(" --> numero octal \n", salida);
                         }
                         else{
                             fputs(" --> Numero no reconocido \n",salida);
