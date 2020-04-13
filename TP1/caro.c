@@ -9,8 +9,8 @@ int main(){
     FILE *archivo;
     FILE *salida;
 
-    archivo = fopen ("numeros.txt", "rb");
-    salida = fopen ("num_salida.txt", "rb+");
+    archivo = fopen ("numeros.txt", "r+");
+    salida = fopen ("num_salida.txt", "wb+");
 
     if(!archivo){
         printf ("no se pudo leer el archivo");
@@ -68,7 +68,6 @@ int main(){
                         else{
                             fputs(" --> Numero no reconocido \n",salida);
                         }
-
                     }
                     else if (caracterASCII>= 48 && caracterASCII<=55){  //octal
                         fwrite (&caracter, sizeof(caracter), 1, salida);
@@ -91,14 +90,23 @@ int main(){
                             fputs(" --> Numero no reconocido \n",salida);
                         }
                     }
+                    else{
+                        fwrite (&caracter, sizeof(caracter), 1, salida);
+                        while (fread(&caracter, sizeof(caracter), 1, archivo) && caracter != ','){
+                            fwrite (&caracter, sizeof(caracter), 1, salida);
+                        }
+                        fputs(" --> Numero no reconocido \n",salida);
+                    }
                 }
             }
-            else if(caracter != ','){ //no reconocido
-                fwrite (&caracter, sizeof(caracter), 1, salida);
-                while (fread(&caracter, sizeof(caracter), 1, archivo) && caracter != ','){
+            else{
+                if(caracter != ','){ //no reconocido
                     fwrite (&caracter, sizeof(caracter), 1, salida);
-                }
-                fputs(" --> Numero no reconocido \n",salida);
+                    while (fread(&caracter, sizeof(caracter), 1, archivo) && caracter != ','){
+                        fwrite (&caracter, sizeof(caracter), 1, salida);
+                    }
+                    fputs(" --> Numero no reconocido \n",salida);
+            }
             }
         }
     }
