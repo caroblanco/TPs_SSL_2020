@@ -32,6 +32,23 @@ int aQueColumnaVoy(char cCaracter, FILE *salida){
         }
     return columna;
 }
+void switch (estado)
+                {
+                case 1:
+                    fputs("--> Es Decimal \n", salida);
+                    break;
+                case 4:
+                    fputs("--> Es Hexadecimal \n", salida);
+                    break;
+                case 2:
+                    fputs("--> Es 0 \n", salida);
+                    break;
+                case 5:
+                    fputs("--> Es Octal \n", salida);
+                    break;
+                default:
+                    fputs("--> No Fue Reconocido \n", salida);
+                    break;
 
 int main(){
 
