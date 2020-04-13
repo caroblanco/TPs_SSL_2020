@@ -6,8 +6,11 @@ int main(){
 
     char caracter, muestra ;
     int caracterASCII, noRec = 0;
-    FILE *archivo = fopen ("numeros.txt", "rb+");
-    FILE *salida = fopen ("num_salida.txt", "rb+");
+    FILE *archivo;
+    FILE *salida;
+
+    archivo = fopen ("numeros.txt", "rb");
+    salida = fopen ("num_salida.txt", "rb+");
 
     if(!archivo){
         printf ("no se pudo leer el archivo");
@@ -16,13 +19,13 @@ int main(){
         while(fread(&caracter, sizeof(caracter), 1, archivo)){
 
             caracterASCII = caracter;
-            
+
             if(caracterASCII <=57 && caracterASCII>=49){ //empieza con un num del 1-9 -> decimal
 
                 fwrite (&caracter, sizeof(caracter), 1, salida);
 
                 while(fread(&caracter, sizeof(caracter), 1, archivo) && caracter != ','){
-                    
+
                     caracterASCII = caracter;
 
                     if(caracter<=57 && caracter >=48){  //usa de 0-9 -> decimal
@@ -40,12 +43,12 @@ int main(){
                 }
             }
             else if(caracterASCII == 48){  //octal o hexa
-                
+
                 fwrite (&caracter, sizeof(caracter), 1, salida);
-                
+
                 if (fread(&caracter, sizeof(caracter), 1, archivo) && caracter != ','){
                     caracterASCII = caracter;
-                    
+
                     if(caracterASCII == 88 || caracterASCII == 120){  //hexa
                         fwrite (&caracter, sizeof(caracter), 1, salida);
                         noRec = 0;
@@ -70,7 +73,7 @@ int main(){
                     else if (caracterASCII>= 48 && caracterASCII<=55){  //octal
                         fwrite (&caracter, sizeof(caracter), 1, salida);
                         noRec = 0;
-                       
+
                         while (fread(&caracter, sizeof(caracter), 1, archivo) && caracter != ','){
                             caracterASCII = caracter;
                             if(caracterASCII>= 48 && caracterASCII<=55){
@@ -90,7 +93,7 @@ int main(){
                     }
                 }
             }
-            else{ //no reconocido
+            else if(caracter != ','){ //no reconocido
                 fwrite (&caracter, sizeof(caracter), 1, salida);
                 while (fread(&caracter, sizeof(caracter), 1, archivo) && caracter != ','){
                     fwrite (&caracter, sizeof(caracter), 1, salida);
@@ -98,12 +101,6 @@ int main(){
                 fputs(" --> Numero no reconocido \n",salida);
             }
         }
-    }
-    
-    rewind (salida);
-    
-    while ((muestra = fgetc(archivo)) != EOF) {
-        printf("%c",muestra);
     }
 
     fclose(archivo);
