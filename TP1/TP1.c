@@ -32,32 +32,35 @@ int aQueColumnaVoy(char cCaracter, FILE *salida){
         }
     return columna;
 }
-void switch (estado)
-                {
-                case 1:
-                    fputs("--> Es Decimal \n", salida);
-                    break;
-                case 4:
-                    fputs("--> Es Hexadecimal \n", salida);
-                    break;
-                case 2:
-                    fputs("--> Es 0 \n", salida);
-                    break;
-                case 5:
-                    fputs("--> Es Octal \n", salida);
-                    break;
-                default:
-                    fputs("--> No Fue Reconocido \n", salida);
-                    break;
+void tipodevariable(int estado, FILE *salida){
+    switch (estado){
+        case 1:
+            fputs("--> Es Decimal \n", salida);
+            break;
+        case 4:
+            fputs("--> Es Hexadecimal \n", salida);
+            break;
+        case 2:
+            fputs("--> Es 0 \n", salida);
+            break;
+        case 5:
+            fputs("--> Es Octal \n", salida);
+            break;
+        default:
+            fputs("--> No Fue Reconocido \n", salida);
+            break;
+    }
+    return 0;
+}
 
 int main(){
 
     int TT [7][6] =
    {
     //   0   1-7  8-9  x-X  lets error
-        {2,   1,   1,   6,   6,   6},   //q0
-        {1,   1,   1,   6,   6,   6},   //q1
-        {3,   5,   6,   3,   6,   6},   //q2
+        {2,   1,   1,   6,   6,   6},   //q0 
+        {1,   1,   1,   6,   6,   6},   //q1 
+        {3,   5,   6,   3,   6,   6},   //q2 
         {4,   4,   4,   6,   4,   6},   //q3
         {4,   4,   4,   6,   4,   6},   //q4
         {5,   5,   6,   6,   6,   6},   //q5
@@ -83,46 +86,11 @@ int main(){
                  estado = TT[estado][aQueColumnaVoy(caracter,salida)];
             }
             else {
-                switch (estado)
-                {
-                case 1:
-                    fputs("--> Es Decimal \n", salida);
-                    break;
-                case 4:
-                    fputs("--> Es Hexadecimal \n", salida);
-                    break;
-                case 2:
-                    fputs("--> Es 0 \n", salida);
-                    break;
-                case 5:
-                    fputs("--> Es Octal \n", salida);
-                    break;
-                default:
-                    fputs("--> No Fue Reconocido \n", salida);
-                    break;
-                }
-
+                tipodevariable(estado,salida);
                 estado = 0;
             }
         }
-        switch (estado)
-                {
-                case 1:
-                    fputs("--> Es Decimal \n", salida);
-                    break;
-                case 4:
-                    fputs("--> Es Hexadecimal \n", salida);
-                    break;
-                case 2:
-                    fputs("--> Es 0 \n", salida);
-                    break;
-                case 5:
-                    fputs("--> Es Octal \n", salida);
-                    break;
-                default:
-                    fputs("--> No Fue Reconocido \n", salida);
-                    break;
-                }
+        tipodevariable(estado,salida);
     }
 
     fclose(archivo);
