@@ -2,14 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-void masApertura (){
-    push cimaDeLaPila;
-    push R;
-}
-
-void 
-
-int aQueColumnaVoy (char cCaracter, ){
+int aQueColumnaVoy (char cCaracter){
     
     int columna;
 
@@ -43,46 +36,43 @@ int aQueColumnaVoy (char cCaracter, ){
     }
     return columna; 
 }
-
-/* donde esta el error
-void tipodevariable(int estado){
-    switch (estado){
-        case 1:
-            fputs("--> Es Decimal \n", );
-            break;
-        case 4:
-            fputs("--> Es Hexadecimal \n", );
-            break;
-        case 2:
-            fputs("--> Es 0 \n", );
-            break;
-        case 5:
-            fputs("--> Es Octal \n", );
-            break;
-        default:
-            fputs("--> No Fue Reconocido \n", );
-            break;
-    }
-    return 0;
-}
-*/
+typedef struct 
+{
+    int estado;
+    char cimapila;
+} otracosa ;
 
 int main(){
 
-    int TT [7][6] = 
-    {
+    int EE [6][6] =
+        {
     //   0   1-9  ops   (    )   error
-        {7,   1,   7,   2,   7,   7},  //q0,$        0     
-        {1,   1,   0,   7,   7,   7},  //q1,$        1     
+        {7,   1,   7,   2,   7,   7},  //q0,$        0     EE.estado = 7 EE.cimapila = 'E'
+        {1,   1,   0,   7,   7,   7},  //q1,$        1     :3
         {7,   3,   7,   2,   7,   7},  //q0,R        2    
         {3,   3,   2,   7,   5,   7},  //q1,R        3    
-        {7,   7,   2,   7,   5,   7},  //q2,R        4       
-        {7,   7,   0,   7,   7,   7},  //q2,$        5 
-        {7,   7,   7,   7,   7,   7}   //error       6 
-    };
+        {7,   7,   2,   7,   5,   7},  //q2,R        4    
+        {7,   7,   0,   7,   7,   7},  //q2,$        5    
+        {7,   7,   7,   7,   7,   7}   //error       6  
+        };
+    char PP [6][6] =
+        {
+        // 0    1-9    ops     (     )     error
+        {'E',   '$',   'E',   'R',  'E',   'E'},  //q0,$        0     
+        {'$',   '$',   '$',   'E',  'E',   'E'},  //q1,$        1     
+        {'E',   'R',   'E',   'R',  'E',   'E'},  //q0,R        2     
+        {'R',   'R',   'R',   'E',  '$',   'E'},  //q1,R        3    
+        {'E',   'E',   'R',   'E',  '$',   'E'},  //q2,R        4    
+        {'E',   'E',   '$',   'E',  'E',   'E'},  //q2,$        5    
+        {'E',   'E',   'E',   'E',  'E',   'E'}   //error       6  
+        };
     
+   
+   
     char caracter, muestra, tipo;
     int caracterASCII, noReconocido = 0, estado = 0, columna;
+    otracosa posicionCompleta; 
+    char expresion[100];
     
     FILE* consola_entrada;
     FILE* consola_salida;
@@ -90,18 +80,16 @@ int main(){
     consola_entrada = stdin; //"archivo" de la consola para ingresar datos
     consola_salida = stdout; //"archivo" de la consola para mostrar datos
     
-    char expresion[50];
-    
-
     printf("Ingrese una expresion: "); //seria lo mismo que fprintf(stdout,"Ingrese una expresion: ");
     fscanf(consola_entrada, "%s", &expresion);
-    
     printf ("%s",expresion);
     
     for(int i = 0; i < strlen(expresion); i++)
     {
         fputc(expresion[i],consola_salida);
-        aQueColumnaVoy(caracter);
+        if(expresion[i] != " ")
+            estado = [estado][aQueColumnaVoy(caracter)];
+        
     }
 
     if(){
@@ -111,7 +99,7 @@ int main(){
         while(fread(&caracter, sizeof(caracter), 1, archivo))
         {
             fputc(caracter, salida);
-            aQueColumnaVoy(caracter, salida);
+            aQueColumnaVoy(caracter, salida);// 
             estado = TT[estado][aQueColumnaVoy(caracter,salida)];
             pop cimaDeLaPila
             if (estado == 2 || )
@@ -141,46 +129,171 @@ int main(){
     
     return 0;
 }
-   
-    /*
-    PUSH: inserto un elemento en la lista, puede ser delante de todo o atrás
-	Inserto al principio
-		Nodo *lista = new nodo() ; lista->dato = 5 ; lista->sgte = NULL;
-		Nodo *push = new nodo() ; push->dato = 3 ;
-		Push->sgte = lista;
-		Lista = push;
-		
-	Inserto al final
-	Void push (nodo *&lista, int elemento) // AgregrarNodoAlFinal {
-Nodo *paux ;  se usa un auxiliar para no perder la lista
-		If (lista){  si existe lista, lista != NULL
-			Paux = obtenerultimo(lista);  busco el ultimo y lo asigno a paux
-			Paux->sgte = new nodo();  creo un nodo luego del ultimo
-			Paux = paux->sgte;  paux apunta al Nuevo nodo
-			Paux->dato = elemento;
-			Paux->sgte = NULL;  crea un Nuevo ultimo nodo
-		} else{ si lista = NULL, no hay info, creo el primer nodo
-			Lista = new nodo();  lista apunta a un espacio
-			Lista->dato = elemento;
-			Lista->sgte = NULL;  lo que le sigue a donde apunta lista es NULL
-		} }
+   // estructura de la pila
+struct pila
+{
+	int cantidadElementos;	// capacidad de la pila
+	int top;		
+	char *items;
+};
 
-	POP: quito un elemento, saco el ultimo que entro y lo devuelvo
-	Int pop(nodo *&lista){
-nodo *anterior , *paux ; int elemento ; 
-		Anterior = NULL ; paux = lista;
-		While(paux && paux->sgte){
-			Anterior = paux;
-			Paux = paux->sgte;
-		}
-		If(paux){
-			Elemento = paux->dato;  elemento a devolver
-			Delete paux;  borro paux
-			If(anterior != NULL)  se entro al while
-				Anterior->sgte = NULL;  anterior apunta a NULL, es el nuevo ultimo
-			Else  paux = NULL, cuando queda solo un elemento, no se entra al while
-				Lista = NULL;   borro la lista
-			Return elemento;  devuelve el elemento que saco
-		} else{
-			Cout<<”ERROR: LISTA VACIA”<<endl;
-		} }
+// funcion para crear la pila
+struct pila* NuevaPila(int cantidadElementos)
+{
+	struct pila *pt = (struct pila*)malloc(sizeof(struct pila));
+
+	pt->cantidadElementos = cantidadElementos;
+	pt->top = -1;
+	pt->items = (char*)malloc(sizeof(char) * cantidadElementos);
+
+	return pt;
+}
+
+// funcion para ver cuantos elementos tiene la pila
+int CantidadElementosPila(struct pila *pt)
+{
+	return pt->top + 1;
+}
+
+// funcion para ver si la pila esta vacia
+int EstaVacia(struct pila *pt)
+{
+	return pt->top == -1;	
+}
+
+// funcion para ver si la pila esta llena
+int EstaLlena(struct pila *pt)
+{
+	return pt->top == pt->cantidadElementos - 1;	
+}
+
+// funcion para añadir un elemento a la pila
+void Push(struct pila *pt, int x)
+{
+	//Si esta llena, tirar un error
+	if (EstaLlena(pt))
+	{
+		printf("OverFlow\nProgram Terminated\n");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("Push %c\n", x);
+	
+	//añadir elemento
+	pt->items[++pt->top] = x;
+}
+
+
+
+// quita el elemento de arriba de la pila
+int Pop(struct pila *pt)
+{
+	// se fija si esta vacia
+	if (EstaVacia(pt))
+	{
+		printf("UnderFlow\nProgram Terminated\n");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("Pop %c\n", Peek(pt));
+
+	
+	// decrementa el tamaño de la pila (quita el elemento) y lo devuelve
+	return pt->items[pt->top--];
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//Devuelve el elemento de arriba de la pila (no lo saca)
+\*int Peek(struct pila *pt)
+{
+	// si no esta vacia
+	if (!EstaVacia(pt))
+		return pt->items[pt->top];
+	else
+		exit(EXIT_FAILURE);
+}
+
+/*
