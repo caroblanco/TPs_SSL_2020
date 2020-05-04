@@ -2,15 +2,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-void masApertura
-{
+void masApertura (){
     push cimaDeLaPila;
     push R;
 }
 
 void 
 
-int aQueColumnaVoy (char cCaracter, ) {
+int aQueColumnaVoy (char cCaracter, ){
     
     int columna;
 
@@ -94,10 +93,10 @@ int main(){
     char expresion[50];
     
 
-    printf("Ingrese una expresion: ");//seria lo mismo que fprintf(stdout,"Ingrese una expresion: ");
+    printf("Ingrese una expresion: "); //seria lo mismo que fprintf(stdout,"Ingrese una expresion: ");
     fscanf(consola_entrada, "%s", &expresion);
     
-    printf("%s",expresion);
+    printf ("%s",expresion);
     
     for(int i = 0; i < strlen(expresion); i++)
     {
@@ -134,24 +133,14 @@ int main(){
                 tipodevariable(estado,salida);
                 estado = 0;
             }
-        }
-        }
-        tipodevariable(estado,salida);
+    tipodevariable(estado,salida);
     }
 
-    fclose(archivo);
-    fclose(salida);
+    fclose(consola_entrada);
+    fclose(consola_salida);
+    
     return 0;
 }
-   
-   
-   
-   
-   
-   
-   
-   
-   
    
     /*
     PUSH: inserto un elemento en la lista, puede ser delante de todo o atrás
@@ -195,37 +184,3 @@ nodo *anterior , *paux ; int elemento ;
 		} else{
 			Cout<<”ERROR: LISTA VACIA”<<endl;
 		} }
-
-    
-    
-    
-    
-    char caracter;
-    int caracterASCII, noReconocido = 0, estado = 0, columna;
-    char* expresion;
-    
-    printf ("Por favor, ingrese una expresion\n");
-    
-    
-    // strlen("hola") = 4 
-    for(int i = 0; i< strlen(expresion); i++)
-    {
-        
-    }
-
-    while( ){
-            if (caracter !=  ' '){
-                 
-            }
-            else {
-                tipodevariable(estado,);
-                estado = 0;
-            }
-    }
-        tipodevariable(estado,salida);
-    
-
-    return 0;
-}
-aQueColumnaVoy(caracter, salida);
-estado = TT[estado][aQueColumnaVoy(caracter,)]; */
