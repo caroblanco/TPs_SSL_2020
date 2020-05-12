@@ -2,35 +2,76 @@
 #include <stdlib.h>
 #include <string.h>
 
-int aQueColumnaVoy (char cCaracter){
+typedef struct _nodo {
+   int valor;
+   struct _nodo *siguiente;
+} tipoNodo;
+
+typedef tipoNodo * pNodo;
+typedef tipoNodo * Pila; 
+
+void push(Pila *pila, char v) {
+   pNodo nuevo;
+ 
+   /* Crear un nodo nuevo */
+   nuevo = (pNodo)malloc(sizeof(tipoNodo));
+   nuevo->valor = v;
+   
+   /* Añadimos la pila a continuación del nuevo nodo */
+   nuevo->siguiente = *pila;
+   /* Ahora, el comienzo de nuestra pila es en nuevo nodo */
+   *pila = nuevo;
+}
+
+char pop(Pila *pila) {
+   pNodo nodo; /* variable auxiliar para manipular nodo */
+   char v;      /* variable auxiliar para retorno */
+   
+   /* Nodo apunta al primer elemento de la pila */
+   nodo = *pila;
+   if(!nodo) return 0; /* Si no hay nodos en la pila retornamos 0 */
+   /* Asignamos a pila toda la pila menos el primer elemento */
+   *pila = nodo->siguiente;
+   /* Guardamos el valor de retorno */
+   v = nodo->valor; 
+   /* Borrar el nodo */
+   free(nodo);
+   return v;
+}
+
+int aQueColumnaVoy (char cCaracter, Pila *pila, char cimaPila){
     
     int columna;
 
+    // Push(&pila, 10);
+    // printf("%d, ", Pop(&pila)); 
+   
     if (cCaracter == '0') 
     {
         columna = 0;
-        push cimaPila;
+        push (&pila, cimaPila);
     }
     else if (cCaracter >= '1' &&  cCaracter <= '9') 
     {
         columna = 1;
-        push cimaPila;
+        push (&pila,cimaPila);
     }
     else if (cCaracter == '+' || cCaracter == '-' || cCaracter == '*' || cCaracter == '/')
     {
         columna = 2;
-        push cimaPila;
+        push (&pila,cimaPila);
         
     }
     else if (cCaracter == '(') 
     {
         columna = 3;
-        push cimaPila;
-        push R;
+        push (&pila,cimaPila);
+        push (&pila,cimaPila);
     }
     else if (cCaracter == ')')
     {
-        columna = 4;        
+        columna = 4;
+        push (&pila,cimaPila);
     }
     else
     {
@@ -40,79 +81,86 @@ int aQueColumnaVoy (char cCaracter){
 }
 
 int main(){
-// CI = 0 CIMA DE LA PILA = $
+int TT [2][4][6];
+// CI = 0 CIMA DE LA PILA = $       (ﾉ^_^)ﾉ    
 //        CI  E  C                 C: 0 => 0    1 => 1-9  2=>{+,-,/,*} 3=>(  4=>)  5=>ERROR
-        TT[0][0][0] =  3     // $, q0 , 0
-        TT[0][0][1] =  1     // $, q0 , 1
-        TT[0][0][2] =  3     // $, q0 , 2
-        TT[0][0][3] =  0     // $, q0 , 3
-        TT[0][0][4] =  3     // $, q0 , 4
-        TT[0][0][5] =  3     // $, q0 , 5
-        TT[0][1][0] =  1     // $, q1 , 0
-        TT[0][1][1] =        // $, q1 , 1                       qo cuando puedo poner numero o parentesis de apertura
-        TT[0][1][2] =        // $, q1 , 2                       q1 cuando puedo poner cero o numero o parentesis de cierre u operacion
-        TT[0][1][3] =        // $, q1 , 3                       q2 cuando puedo poner operaciones o parentesis de cierre
-        TT[0][1][4] =        // $, q1 , 4
-        TT[0][1][5] =  3     // $, q1 , 5
-        TT[0][2][0] =        // $, q2 , 0
-        TT[0][2][1] =        // $, q2 , 1
-        TT[0][2][2] =        // $, q2 , 2
-        TT[0][2][3] =        // $, q2 , 3
-        TT[0][2][4] =        // $, q2 , 4
-        TT[0][2][5] =  3     // $, q2 , 5
-        TT[0][3][0] =        // $, q3 , 0
-        TT[0][3][1] =        // $, q3 , 1
-        TT[0][3][2] =        // $, q3 , 2
-        TT[0][3][3] =        // $, q3 , 3
-        TT[0][3][4] =        // $, q3 , 4
-        TT[0][3][5] =  3     // $, q3 , 5
+        
+        TT[0][0][0] =3;        // $, q0 , 0
+        TT[0][0][1] =1;       // $, q0 , 1
+        TT[0][0][2] =3;        // $, q0 , 2
+        TT[0][0][3] =0;        // $, q0 , 3
+        TT[0][0][4] =3;        // $, q0 , 4
+        TT[0][0][5] =3;        // $, q0 , 5
+        TT[0][1][0] =1;        // $, q1 , 0
+        TT[0][1][1] =1;        // $, q1 , 1                       
+        TT[0][1][2] =0;        // $, q1 , 2                      
+        TT[0][1][3] =3;        // $, q1 , 3                       
+        TT[0][1][4] =3;        // $, q1 , 4
+        TT[0][1][5] =3;        // $, q1 , 5
+        TT[0][2][0] =3;        // $, q2 , 0
+        TT[0][2][1] =3;        // $, q2 , 1
+        TT[0][2][2] =0;        // $, q2 , 2
+        TT[0][2][3] =3;        // $, q2 , 3
+        TT[0][2][4] =3;        // $, q2 , 4
+        TT[0][2][5] =3;        // $, q2 , 5
+        TT[0][3][0] =3;        // $, q3 , 0 
+        TT[0][3][1] =3;        // $, q3 , 1
+        TT[0][3][2] =3;        // $, q3 , 2
+        TT[0][3][3] =3;        // $, q3 , 3
+        TT[0][3][4] =3;        // $, q3 , 4
+        TT[0][3][5] =3;        // $, q3 , 5
 // CI = 1 CIMA DE LA PILA ES R
 //        CI  E  C                 C: 0 => 0    1 => 1-9  2=>{+,9} 3=>(  4=>) 
-        TT[1][0][0] =        // R, q0 , 0
-        TT[1][0][1] =        // R, q0 , 1
-        TT[1][0][2] =        // R, q0 , 2
-        TT[1][0][3] =        // R, q0 , 3
-        TT[1][0][4] =        // R, q0 , 4
-        TT[1][0][5] =  3     // R, q0 , 5
-        TT[1][1][0] =        // R, q1 , 0
-        TT[1][1][1] =        // R, q1 , 1
-        TT[1][1][2] =        // R, q1 , 2
-        TT[1][1][3] =        // R, q1 , 3
-        TT[1][1][4] =        // R, q1 , 4
-        TT[1][1][5] =  3     // R, q1 , 5
-        TT[1][2][0] =        // R, q2 , 0
-        TT[1][2][1] =        // R, q2 , 1
-        TT[1][2][2] =        // R, q2 , 2
-        TT[1][2][3] =        // R, q2 , 3
-        TT[1][2][4] =        // R, q2 , 4
-        TT[1][2][5] =  3     // R, q2 , 5
-        TT[1][3][0] =        // R, q3 , 0
-        TT[1][3][1] =        // R, q3 , 1
-        TT[1][3][2] =        // R, q3 , 2
-        TT[1][3][3] =        // R, q3 , 3
-        TT[1][3][4] =        // R, q3 , 4
-        TT[1][3][5] =  3     // R, q3 , 5 
+        TT[1][0][0] =3;        // R, q0 , 0
+        TT[1][0][1] =1;        // R, q0 , 1
+        TT[1][0][2] =3;        // R, q0 , 2
+        TT[1][0][3] =0;        // R, q0 , 3
+        TT[1][0][4] =3;        // R, q0 , 4
+        TT[1][0][5] =3;        // R, q0 , 5
+        TT[1][1][0] =1;        // R, q1 , 0
+        TT[1][1][1] =1;        // R, q1 , 1
+        TT[1][1][2] =0;        // R, q1 , 2
+        TT[1][1][3] =3;        // R, q1 , 3
+        TT[1][1][4] =2;        // R, q1 , 4
+        TT[1][1][5] =3;        // R, q1 , 5
+        TT[1][2][0] =3;        // R, q2 , 0
+        TT[1][2][1] =3;        // R, q2 , 1
+        TT[1][2][2] =0;        // R, q2 , 2
+        TT[1][2][3] =3;        // R, q2 , 3
+        TT[1][2][4] =2;        // R, q2 , 4  
+        TT[1][2][5] =3;        // R, q2 , 5  
+        TT[1][3][0] =3;        // R, q3 , 0 
+        TT[1][3][1] =3;        // R, q3 , 1 
+        TT[1][3][2] =3;        // R, q3 , 2 
+        TT[1][3][3] =3;        // R, q3 , 3 
+        TT[1][3][4] =3;        // R, q3 , 4 
+        TT[1][3][5] =3;        // R, q3 , 5 
     
 
-char expresion[100], caracter, cimaPila;
-int estado = 0, columna = 0;
+char expresion[50], caracter, cimaPila;
+int estado = 0, columna = 0, ci = 100;
+Pila *pila = NULL;
 
+printf ("Porfis ingrese una expresion \n");
+scanf ("%c",expresion);
 
-for (int i=0, i<100 , i++) //recorremos la expresion
+for (int i=0; i<50 ; i++) //recorremos la expresion
 {
     
-    caracter = expresion[i]
+    caracter = expresion[i];
+    columna = aQueColumnaVoy(caracter, &pila, cimaPila);
 
-    if (estado != 3 && columna != 5 )  //osea, no hay error
+    if (estado != 3 && columna != 5 )  //osea, no hay error   
     {
-        cimaPila = pop pila;
+        cimaPila = pop (&pila);
         if (cimaPila == 'R'){
             ci = 1;
         } else {
             ci = 0;
         }
             
-        estado = TT[ci][estado][aQueColumnaVoy(caracter)];
-        
+        estado = TT[ci][estado][columna];
+        printf ("%c", caracter);
     }
+}
 }
