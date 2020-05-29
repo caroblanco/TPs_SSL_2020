@@ -192,5 +192,6 @@ for(int i=0; i<contador; i++) //recorremos la expresion
 if (error != 1){
     printf (" NO HAY ERROR SINTACTICO :)");
 }
+printf("~(o_o~) \n~(o_o)~ \n(~o_o)~  \n~(o_o~) \n~(o_o)~ \n(~o_o)~ ");
 }
-// ~(o_o~) ~(o_o)~ (~o_o)~  ~(o_o~) ~(o_o)~ (~o_o)~ 
+ 
