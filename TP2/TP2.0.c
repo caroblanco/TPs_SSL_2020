@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -190,8 +189,8 @@ for(int i=0; i<contador; i++) //recorremos la expresion
     }
 }
 if (error != 1){
-    printf (" NO HAY ERROR SINTACTICO :)");
+    printf (" NO HAY ERROR SINTACTICO :) \n");
 }
-printf("~(o_o~) \n~(o_o)~ \n(~o_o)~  \n~(o_o~) \n~(o_o)~ \n(~o_o)~ ");
+printf("\nT ~(o_o~) \nE ~(o_o)~ \nR (~o_o)~ \nM ~(o_o)~ \nI ~(o_o~) \nN ~(o_o)~ \nA (~o_o)~ \nM ~(o_o)~ \nO ~(o_o~) \nS ~(o_o)~ \n");
 }
  
