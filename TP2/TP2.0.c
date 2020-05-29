@@ -6,7 +6,7 @@
  struct tipoNodo {
    char valor;
    struct _nodo * siguiente;
-}  ;
+};
 
 typedef struct tipoNodo * pNodo;
 typedef struct tipoNodo * Pila;
@@ -14,30 +14,25 @@ typedef struct tipoNodo * Pila;
 
 Pila push(Pila *pila, char v) {
    pNodo nuevo;
-
-   /* Crear un nodo nuevo */
    nuevo = (pNodo)malloc(sizeof(Pila));
    nuevo->valor = v;
 
-   /* Añadimos la pila a continuación del nuevo nodo */
    nuevo->siguiente = pila;
-   /* Ahora, el comienzo de nuestra pila es en nuevo nodo */
+  
    pila = nuevo;
-   return pila; //EN EL CODIGO ORIGINAL ESTABA PERO CREO QUE ES PRESCINDIBLE
+   return pila;
 }
 
 char pop(Pila *pila) {
-   pNodo nodo; /* variable auxiliar para manipular nodo */
-   char v;      /* variable auxiliar para retorno */
+   pNodo nodo;
+   char v;     
 
-   /* Nodo apunta al primer elemento de la pila */
    nodo = pila;
-   if(!nodo) return 0; /* Si no hay nodos en la pila retornamos 0 */
-   /* Asignamos a pila toda la pila menos el primer elemento */
+   if(!nodo) return 0; 
+   
    pila = nodo->siguiente;
-   /* Guardamos el valor de retorno */
+
    v = nodo->valor;
-   /* Borrar el nodo */
 
    return v;
 }
@@ -161,18 +156,18 @@ int TT [2][4][6];
 
 
 char expresion[3], caracter, cimaPila;
-int estado = 0, columna = 0, ci = 0, error=0,x=0,i=0;
+int estado = 0, columna = 0, ci = 0, error=0,contador=0;
 Pila *pila = NULL;
 
-printf ("Porfis ingrese una expresion \n");
+printf ("Porfis ingrese una expresion :3 \n");
 scanf("%s",&expresion);
 
-while (expresion[x]!='\0')
-            x++;
+while (expresion[contador]!='\0')
+            contador++;
 
 pila=push (pila, '$');
 
-while (i<x) //recorremos la expresion
+for(int i=0; i<contador; i++) //recorremos la expresion
 {
     caracter = expresion[i];
     columna = aQueColumnaVoy(caracter);
@@ -190,9 +185,12 @@ while (i<x) //recorremos la expresion
         printf ("%c", caracter);
     }
     else if (error != 1){
-        printf ("%c  --> ERROR", caracter);
+        printf (" --> ERROR SINTACTICO :(");
         error = 1;
     }
-    i++;
+}
+if (error != 1){
+    printf (" NO HAY ERROR SINTACTICO :)");
 }
 }
+// ~(o_o~) ~(o_o)~ (~o_o)~  ~(o_o~) ~(o_o)~ (~o_o)~ 
