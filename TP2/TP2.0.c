@@ -2,38 +2,65 @@
 #include <stdlib.h>
 #include <string.h>
 
- struct tipoNodo {
+typedef struct nodo {
    char valor;
-   struct _nodo * siguiente;
-};
+   struct nodo * siguiente;
+} tipoNodo;
 
-typedef struct tipoNodo * pNodo;
-typedef struct tipoNodo * Pila;
+//INGRESO EL VALOR EN LA CIMA
+tipoNodo *push(tipoNodo *pila, char cima) {
+   tipoNodo *aux, *nuevo;
 
+   nuevo = (tipoNodo *)malloc(sizeof(tipoNodo));
+   nuevo->valor = cima;
 
-Pila push(Pila *pila, char v) {
-   pNodo nuevo;
-   nuevo = (pNodo)malloc(sizeof(Pila));
-   nuevo->valor = v;
+   nuevo->siguiente = NULL;
 
-   nuevo->siguiente = pila;
-  
-   pila = nuevo;
+   if (pila == NULL){
+       pila=nuevo;
+   }else{
+       aux=pila;
+       while(aux->siguiente != NULL)
+            aux = aux->siguiente;
+       aux->siguiente = nuevo;
+   }
    return pila;
 }
 
-char pop(Pila *pila) {
-   pNodo nodo;
-   char v;     
+tipoNodo *borrar (tipoNodo *pila) //BORRA EL ULTIMO VALOR DE LA PILA
+{
+    tipoNodo *nodo;
+    nodo=pila;
+    if (nodo->siguiente==NULL)
+    {
+        free(nodo);
+        pila=NULL;
+    }
+    else {
+        while (nodo->siguiente->siguiente!=NULL)
+        nodo = nodo->siguiente;
+        free(nodo->siguiente);
+        nodo->siguiente=NULL;
+    }
+    return pila;
+}
 
-   nodo = pila;
-   if(!nodo) return 0; 
+//DEVUELVO EL ULTIMO VALOR
+char pop(tipoNodo **pila) {
+   tipoNodo *nuevo;
+   char cima;     
+
+   nuevo = *pila;
+   if(!nuevo) return 0; 
    
-   pila = nodo->siguiente;
+   while(nuevo -> siguiente != NULL)
+        nuevo = nuevo -> siguiente;
 
-   v = nodo->valor;
+   cima = nuevo -> valor;
 
-   return v;
+   *pila = borrar (*pila);
+
+   return cima;
 }
 
 int aQueColumnaVoy (char cCaracter){
@@ -67,29 +94,40 @@ int aQueColumnaVoy (char cCaracter){
     return columna;
 }
 
-Pila pilasuper (char cCaracter, Pila *pila, char cimaPila){
+tipoNodo *pilasuper (char cCaracter, tipoNodo *pila, char *cimaPila){
+
+    char nuevaCimaPila;
 
     if (cCaracter == '0')
     {
-        push (pila, cimaPila);
+        nuevaCimaPila = pop (&pila);
+        pila = push (pila, nuevaCimaPila);
+        *cimaPila = nuevaCimaPila;
     }
     else if (cCaracter >= '1' &&  cCaracter <= '9')
     {
-        push (pila,cimaPila);
+        nuevaCimaPila = pop (&pila);
+        pila = push (pila, nuevaCimaPila);
+        *cimaPila = nuevaCimaPila;
     }
     else if (cCaracter == '+' || cCaracter == '-' || cCaracter == '*' || cCaracter == '/')
     {
-        push (pila,cimaPila);
+        nuevaCimaPila = pop (&pila);
+        pila = push (pila, nuevaCimaPila);
+        *cimaPila = nuevaCimaPila;
 
     }
     else if (cCaracter == '(')
     {
-        push (pila,cimaPila);
-        push (pila,cimaPila);
+        nuevaCimaPila = pop (&pila);
+        pila = push (pila, nuevaCimaPila);
+        pila = push(pila,'R');
+        *cimaPila = 'R';
     }
     else if (cCaracter == ')')
     {
-        push (pila,cimaPila);
+        nuevaCimaPila = pop (&pila);
+        *cimaPila = nuevaCimaPila;
     }
     else
     {
@@ -154,9 +192,9 @@ int TT [2][4][6];
         TT[1][3][5] =3;        // R, q3 , 5
 
 
-char expresion[3], caracter, cimaPila;
+char expresion[100], caracter, cimaPila;
 int estado = 0, columna = 0, ci = 0, error=0,contador=0;
-Pila *pila = NULL;
+tipoNodo *pila = NULL;
 
 printf ("Porfis ingrese una expresion :3 \n");
 scanf("%s",&expresion);
@@ -164,7 +202,7 @@ scanf("%s",&expresion);
 while (expresion[contador]!='\0')
             contador++;
 
-pila=push (pila, '$');
+pila=push (pila, '$'); //inicializamos
 
 for(int i=0; i<contador; i++) //recorremos la expresion
 {
@@ -173,24 +211,46 @@ for(int i=0; i<contador; i++) //recorremos la expresion
 
     if (estado != 3 && columna != 5 )  //osea, no hay error   :3
     {
-        cimaPila = pop (pila);               //(°_°) (°_°) (°_°)
+        pila=pilasuper (caracter, pila, &cimaPila);          //(°_°) (°_°) (°_°)
         if (cimaPila == 'R'){
             ci = 1;
         } else {
             ci = 0;
         }
-        pila=pilasuper (caracter, pila, cimaPila);
+    
         estado = TT[ci][estado][columna];
         printf ("%c", caracter);
     }
     else if (error != 1){
-        printf (" --> ERROR SINTACTICO :(");
+        printf (" --> ERROR SINTACTICO :( \n");
         error = 1;
     }
 }
+
+//para el ultimo caracter
 if (error != 1){
+    if (estado ==3 || columna == 5){
+        //error en el ultimo caracter
+        printf (" --> ERROR SINTACTICO :( \n");
+        error = 1;
+    } else if (columna == 2){
+        //verifico que no quede un operador solo
+        printf (" --> ERROR SINTACTICO :( \n");
+        error = 1;
+    }else{
+        //verifico que no quedo parentesis abierto
+        cimaPila = pop(&pila);
+        if(cimaPila == 'R'){
+            printf (" --> ERROR SINTACTICO :( \n");
+            error = 1;
+        }
+    }
+} else if (error != 1){
     printf (" NO HAY ERROR SINTACTICO :) \n");
 }
+
 printf("\nT ~(o_o~) \nE ~(o_o)~ \nR (~o_o)~ \nM ~(o_o)~ \nI ~(o_o~) \nN ~(o_o)~ \nA (~o_o)~ \nM ~(o_o)~ \nO ~(o_o~) \nS ~(o_o)~ \n");
+
+return 0;
 }
  
