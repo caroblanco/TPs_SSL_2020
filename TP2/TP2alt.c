@@ -109,17 +109,17 @@ int main(){
             if( estadoCimaTemporal.estado == 1 && Peek(pila) == '$' ||
                 estadoCimaTemporal.estado == 2 && Peek(pila) == '$' )
             {
-                fprintf(consola_salida,"es una expresion VALIDA\n");
+                fprintf(consola_salida,"es una expresion VALIDA :3\n");
             }
             else
             {
-                fprintf(consola_salida,"es una expresion INVALIDA\n");
+                fprintf(consola_salida,"es una expresion INVALIDA :(\n");
             }
             
         }
         else
         {
-            fprintf(consola_salida,"es una expresion INVALIDA\n");
+            fprintf(consola_salida,"es una expresion INVALIDA :(\n");
         }
         
     }
