@@ -9,7 +9,6 @@
     int sumaEnteros=0, linea = 0, valorD=0,valorO=0;
 %}
 
-
 TIPO_DE_DATO int | float | char | struct | double | long | unsigned | signed | short | void | enum | struct | typedef | union | const
 ESTRUCTURAS_DE_CONTROL switch | case | do | while | break | default | if | else | for | return | continue | goto
 OTROS volatile | goto | extstatic | auto | register 
@@ -48,7 +47,6 @@ CARACTER \'.\''
 {SALTO_DE_LINEA}            {linea ++;}
 {COMODIN}                   {printf("se encontro un caracter no identificado: %s, en la linea %d \n", yytext,linea);}
 {COMODINES}                 {printf("se encontro una cadena de caracteres no identificados: %s, en la linea %d \n", yytext,linea);}
-
 
 %%
 
@@ -125,6 +123,36 @@ int deHexaADecimal (char* hexa)
         i++;
     }
     return decimal;
+}
+
+int main ()
+{
+    char hexa[6]="xx123";
+    int decimal= 0;
+    int numero=0;
+    int caracter;
+    int largo = 5;
+    int i = 0,ii=0;
+    while (hexa[ii]!='\0')
+    {
+        ii++;
+    }
+    largo=ii-1;
+    while (i<=largo-2){
+        caracter = hexa[largo-i];
+        if (caracter >= 48 && caracter <= 57){      // o si quieren asi caracter>='0' && caracter<='9'
+            numero = caracter-48;
+            decimal =  decimal + ((numero)*(pow(16, i)));
+        }else{
+            if(caracter >= 92 && caracter <= 107)
+                decimal = decimal + ((caracter - 97 + 10) * pow(16,i));
+            else
+                decimal = decimal + ((caracter - 65 + 10)*(pow(16,i)));
+        }
+        i++;
+    }
+    printf ("%d",decimal);
+    return 0;
 }
 
 /* 
