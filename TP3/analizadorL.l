@@ -6,7 +6,23 @@
     #include <math.h>
     #include <string.h>
 
-    int sumaEnteros=0, linea = 0, valorD=0,valorO=0;
+    #define PALABRA_MAX 50
+    int sumaEnteros = 0, linea = 0, valorD = 0, valorO = 0, valorH = 0;
+    float valorR;
+
+    FILE* identificadores;
+    FILE* literalesCadena;
+    FILE* palabrasReservadas;
+    FILE* caracteres;
+    FILE* constantes;
+    FILE* operadores;
+    FILE* comentarios;
+
+    struct Constante
+    {
+        int valor;
+        char tipo[12];
+    };
 %}
 
 TIPO_DE_DATO int | float | char | struct | double | long | unsigned | signed | short | void | enum | struct | typedef | union | const
@@ -33,15 +49,60 @@ CARACTER \'.\''
 
 %%
 
-{CONSTANTE_ENTERA}          {valorD = atoi(yytext); sumaEnteros += valorD; printf("se encontro una constante decimal cuyo valor es : %d \n,valorD");} 
-{CONSTANTE_OCTAL}	        {valorO = atoi(yytext); printf("se encontro una constante octal: %s cuyo valor decimal es : %d \n",yytext,deOctalADecimal(valor));}
-{CONSTANTE_HEXADECIMAL}	    {printf("se encontro una variable hexadecimal: %s, cuya valor en decimal es: %d \n",yytext,deHexaADecimal(yytext));}
-{CONSTANTE_REAL}	        
-{CARACTER}	                
-{LITERAL_CADENA}            {printf ("se encontro el literal cadena: %s, de largo %d \n", yytext,yyleng);}
-{IDENTIFICADOR}
-{CARACTERES_PUNTUACION_OPERADORES}
-{PALABRAS_RESERVADAS}       {printf ("se encontro la palabra reservada: %s \n", yytext);}
+{CONSTANTE_ENTERA}          {
+                                valorD = obtenerNumero(yytext,10); 
+                                sumaEnteros += valorD; 
+                                agregarConstante(valorD,"decimal");
+                                printf("se encontro una constante decimal cuyo valor es : %d \n,valorD");
+                            } 
+{CONSTANTE_OCTAL}	        {
+                                valorO = obtenerNumero(yytext,8);
+                                agregarConstante(valorO,"octal");
+                                printf("se encontro una constante octal: %s cuyo valor decimal es : %d \n",yytext,valorO);
+                            }
+{CONSTANTE_HEXADECIMAL}	    {
+                                valorH = obtenerNumero(yytext,16);
+                                agregarConstante(valorH,"hexadecimal");
+                                printf("se encontro una variable hexadecimal: %s, cuya valor en decimal es: %d \n",yytext,valorH);
+                            }
+{CONSTANTE_REAL}	        {
+                                char*ignorar;
+                                float valorR = strtof(yytext,&ignorar);
+                                int entera = valorR;
+                                float decimales = valorR - entera;
+                                agregarConstante(valorR,"real");
+                                printf("se encontro una variable real: %s \n",yytext);
+                            }
+{CARACTER}	                {
+                                printf ("se encontro el caracter: %s \n", yytext);
+                                char caracter;
+                                strcpy(caracter,yytext);
+                                fwrite(&caracter , sizeof(caracter),1,caracteres);
+                            }
+{LITERAL_CADENA}            {
+                                printf ("se encontro el literal cadena: %s, de largo %d \n", yytext,yyleng);
+                                char literalCadena[PALABRA_MAX];
+                                strcpy(literalCadena,yytext);
+                                fwrite(&literalCadena, sizeof(literalCadena), 1, literalesCadena);
+                            }
+{IDENTIFICADOR}             {
+                                printf ("se encontro el identificar: %s \n", yytext);
+                                char identificador[PALABRA_MAX];
+                                strcpy(identificador,yytext);
+                                fwrite(&identificador,sizeof(identificador),1,identificadores);
+                            }
+{CARACTERES_PUNTUACION_OPERADORES} {
+                                printf ("se encontro el caracter de puntuacion: %s \n", yytext);
+                                char punt_oper[3];
+                                strcpy(punt_oper,yytext);
+                                fwrite(&punt_oper,sizeof(punt_oper),1,operadores);
+                            }
+{PALABRAS_RESERVADAS}       {
+                                printf ("se encontro la palabra reservada: %s \n", yytext);
+                                char palabrasReservada[PALABRA_MAX];
+                                strcpy(palabrasReservada,yytext);
+                                fwrite(&palabrasReservada,sizeof(palabrasReservada),1,palabrasReservadas);
+                            }
 {COMENTARIO_BLOQUE}         {printf("se encontro un comentario de multiples lineas: %s \n", yytext);}
 {COMENTARIO_LINEA}          {printf("se encontro un comentario de una linea: %s \n", yytext);}
 {SALTO_DE_LINEA}            {linea ++;}
@@ -49,113 +110,96 @@ CARACTER \'.\''
 {COMODINES}                 {printf("se encontro una cadena de caracteres no identificados: %s, en la linea %d \n", yytext,linea);}
 
 %%
+void agregarConstante(int numero, char tipo[12])
+{
+    Constante constante;
+    
+    constante->valor = numero;
+    strcopy(constante->tipo,tipo);
+    
+    fwrite(&constante, sizeof(constante), 1, constantes);
+} 
+
+
+int obtenerNumero(char* str, int base)
+{
+    char* ignorar;
+    
+    return strtol(str,&ignorar,base);
+}
 
 int main(){
     yyin = fopen("TextoEntrada.txt", "r");
     yyout = fopen("TextoSalida.txt", "w");
-
+    
+    identificadores = fopen("identificadores.txt","rw+");
+    literalesCadena = fopen("literalesCadena.txt","rw+");
+    palabrasReservadas = fopen("palabrasReservadas.txt","rw+");
+    constantes = fopen("constantes.txt","rw+");
+    caracteres = fopen("caracteres.txt","rw+");
+    operadores = fopen("operadores.txt","rw+");
+    comentarios = fopen("comentarios.txt","rw+");
+    
     yylex();
-
+    
+    fclose(identificadores);
+    fclose(literalesCadena));
+    fclose(palabrasReservadas);
+    fclose(constantes);
+    fclose(operadores);
+    fclose(comentarios);
+    
     printf ("la suma de los valores enteros es: %i \n", sumaEnteros);
 
     fclose(yyin);
     fclose(yyout);
 }
 
-int deOctalADecimal (int octal)
+/*
+ * C Program to Append the Content of File at the end of Another
+ */
+#include <stdio.h>
+#include <stdlib.h>
+ 
+main()
 {
-    int i =0,decimal=0;
-    while (octal != 0)
+    FILE *fsring1, *fsring2, *ftemp;
+    char ch, file1[20], file2[20], file3[20];
+ 
+    printf("Enter name of first file ");
+    gets(file1);
+    printf("Enter name of second file ");
+    gets(file2);
+    printf("Enter name to store merged file ");
+    gets(file3);
+    fsring1 = fopen(file1, "r");
+    fsring2 = fopen(file2, "r");
+    if (fsring1 == NULL || fsring2 == NULL)
     {
-    decimal += (octal % 10)* pow(8, i++);
-    octal = octal / 10;
+        perror("Error has occured");
+        printf("Press any key to exit...\n");
+        exit(EXIT_FAILURE);
     }
-    return decimal;
-}
-
-int deHexaADecimal (char* hexa)
-{
-    char caracter;
-    int largo = 0, i=0,decimal=0;
-   while (caracter != '\0')
+    ftemp = fopen(file3, "w");
+    if (ftemp == NULL)
     {
-        caracter = hexa[largo];
-        largo++; 
+        perror("Error has occures");
+        printf("Press any key to exit...\n");
+        exit(EXIT_FAILURE);
     }
-
-    while (i <= largo-2){
-        caracter = hexa[i+2];
-        if (caracter >= 48 && caracter <= 57){      // o si quieren asi caracter>='0' && caracter<='9' 
-            numero = atoi caracter;
-            decimal =  decimal +(numer)* pow(16, i++);
-        }else{
-            if(caracter >= 92 && caracter <= 107)
-                decimal = decimal + (caracter - 97 + 10)* pow(16,i++);
-            else
-                decimal = decimal + (caracter - 65 + 10)* pow(16,i++);           
-   
-        }
-        i++;
-    }
-    return decimal;
-}
-
-int deHexaADecimal (char* hexa)
-{
-    int largo = 0, i=0,decimal=0, numero=0,caracter;
-    while (caracter != '\0')
-    {
-        caracter = hexa[largo];
-        largo++; 
-    }
-
-    while (i<=largo-2){
-        caracter = hexa[largo-i];
-        if (caracter >= 48 && caracter <= 57){      // o si quieren asi caracter>='0' && caracter<='9'
-            numero = caracter-48;
-            decimal =  decimal + ((numero)*(pow(16, i)));
-        }else{
-            if(caracter >= 92 && caracter <= 107)
-                decimal = decimal + ((caracter - 97 + 10) * pow(16,i));
-            else
-                decimal = decimal + ((caracter - 65 + 10)*(pow(16,i)));
-        }
-        i++;
-    }
-    return decimal;
-}
-
-int main ()
-{
-    char hexa[6]="xx123";
-    int decimal= 0;
-    int numero=0;
-    int caracter;
-    int largo = 5;
-    int i = 0,ii=0;
-    while (hexa[ii]!='\0')
-    {
-        ii++;
-    }
-    largo=ii-1;
-    while (i<=largo-2){
-        caracter = hexa[largo-i];
-        if (caracter >= 48 && caracter <= 57){      // o si quieren asi caracter>='0' && caracter<='9'
-            numero = caracter-48;
-            decimal =  decimal + ((numero)*(pow(16, i)));
-        }else{
-            if(caracter >= 92 && caracter <= 107)
-                decimal = decimal + ((caracter - 97 + 10) * pow(16,i));
-            else
-                decimal = decimal + ((caracter - 65 + 10)*(pow(16,i)));
-        }
-        i++;
-    }
-    printf ("%d",decimal);
+    while ((ch = fgetc(fsring1)) != EOF)
+        fputc(ch, ftemp);
+    while ((ch = fgetc(fsring2) ) != EOF)
+        fputc(ch, ftemp);
+    printf("Two files merged  %s successfully.\n", file3);
+    fclose(fsring1);
+    fclose(fsring2);
+    fclose(ftemp);
     return 0;
 }
 
 /* 
+
 SANTI, TE REGALAMOS UN PERRITO <3
 ______________________$$$$$$$$
 _______________$$$$$$$________$$$$$$$$$
@@ -208,5 +252,12 @@ _____$$__$$__$$__$$_$______________________$$__________$$
 ______$$$$__$___$__$$______________________$$____________$
 _______$$___$___$__$________________________$$_$__$$__$$__$
 _________$$$$$$$$$$__________________________$$_$_$$$$$$$$
-*/
 
+
+░░░░░░░░░░░░░░░░░░░░░░░░░░
+░░░█▀▀▀░█▀▀█░█▀▀▀░▀░█░░░░░
+░░░█▀▀░░█▀▀█░▀▀▀█░█░█░░░░░
+░░░▀░░░░▀░░▀░▀▀▀▀░▀░▀▀▀░░░
+░░░░░░░░░░░░░░░░░░░░░░░░░░
+
+*/
