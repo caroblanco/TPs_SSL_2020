@@ -7,22 +7,45 @@
     #include <string.h>
 
     #define PALABRA_MAX 50
-    int sumaEnteros = 0, linea = 0, valorD = 0, valorO = 0, valorH = 0;
-    float valorR;
+    int sumaEnteros = 0, linea = 1, valorD = 0, valorO = 0, valorH = 0, largo;
 
-    FILE* identificadores;
-    FILE* literalesCadena;
-    FILE* palabrasReservadas;
-    FILE* caracteres;
-    FILE* constantes;
-    FILE* operadores;
-    FILE* comentarios;
-
-    struct Constante
+    typedef struct nodo
     {
-        int valor;
-        char tipo[12];
-    };
+        char* info;
+        int dato;
+        struct nodo* sig;
+    } Nodo;
+
+    
+typedef struct nodoReal
+    {
+        char* info;
+        int parteEntera;
+        float parteFraccionaria;
+        struct nodo* sig;
+    } NodoReal;
+
+typedef struct nodoString
+    {
+        char* info;
+        struct nodo* sig;
+    } NodoString;
+
+
+
+    Nodo* listaDeIdentificadores = NULL;
+    Nodo* listaDeLiterales = NULL;
+    NodoString* listaDePalabrasReservadas = NULL;
+    Nodo* listaDeOctales = NULL;
+    Nodo* listaDeHexadecimales = NULL;
+    Nodo* listaDeDecimales = NULL;
+    NodoReal* listaDeReales = NULL;
+    NodoString* listaDeCaracteres = NULL;
+    NodoString* listaDeOperYPunt = NULL;
+    NodoString* listaDeComentariosDeLinea = NULL;
+    NodoString* listaDeComentariosDeBloque = NULL;
+    Nodo* listaDeNoReconocidos = NULL;
+    
 %}
 
 TIPO_DE_DATO int | float | char | struct | double | long | unsigned | signed | short | void | enum | struct | typedef | union | const
@@ -31,14 +54,14 @@ OTROS volatile | goto | extstatic | auto | register
 
 CARACTERES_PUNTUACION_OPERADORES "[" | "]" | "(" | ")" | "{" | "}" | "," | ";" | ":" | "*" | "=" | "#" | "!" | "%" | "^" | "&" | "–" | "+" | "|" | "~" | "\" | "'" | "<" | ">" | "?" | "." | "/" | "==" | | "+=" | "-=" | "~" | "&&" | "!=" | "++" | "--"
  
-CONSTANTE_ENTERA [1-9][0-9]*
+CONSTANTE_DECIMAL [1-9][0-9]*
 CONSTANTE_OCTAL 0[0-7]*
 CONSTANTE_HEXADECIMAL 0[xX][0-9A-Fa-f]+
 CONSTANTE_REAL   [0-9]+ "." [0-9]+ //no estamos muy seguros
 CARACTER_LETRAS [a-zA-Z]
 
 COMENTARIO_LINEA "//" .*
-COMENTARIO_BLOQUE "/*"  (. | \n)*  "*/"
+COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 COMODIN .
 COMODINES .*
 SALTO_DE_LINEA \
@@ -49,215 +72,229 @@ CARACTER \'.\''
 
 %%
 
-{CONSTANTE_ENTERA}          {
-                                valorD = obtenerNumero(yytext,10); 
-                                sumaEnteros += valorD; 
-                                agregarConstante(valorD,"decimal");
-                                printf("se encontro una constante decimal cuyo valor es : %d \n,valorD");
+{CONSTANTE_DECIMAL}         {
+                                valorD = obtenerNumero(yytext,10);  
+                                insertarLista(yytext,listaDeDecimales);
                             } 
 {CONSTANTE_OCTAL}	        {
                                 valorO = obtenerNumero(yytext,8);
-                                agregarConstante(valorO,"octal");
-                                printf("se encontro una constante octal: %s cuyo valor decimal es : %d \n",yytext,valorO);
+                                insertarLista(yytext,valorO,listaDeOctales);
                             }
 {CONSTANTE_HEXADECIMAL}	    {
                                 valorH = obtenerNumero(yytext,16);
-                                agregarConstante(valorH,"hexadecimal");
-                                printf("se encontro una variable hexadecimal: %s, cuya valor en decimal es: %d \n",yytext,valorH);
+                                insertarLista(yytext,valorH,listaDeHexadecimales);
                             }
 {CONSTANTE_REAL}	        {
-                                char*ignorar;
-                                float valorR = strtof(yytext,&ignorar);
-                                int entera = valorR;
-                                float decimales = valorR - entera;
-                                agregarConstante(valorR,"real");
-                                printf("se encontro una variable real: %s \n",yytext);
+                                recReal(yytext);
                             }
 {CARACTER}	                {
-                                printf ("se encontro el caracter: %s \n", yytext);
-                                char caracter;
-                                strcpy(caracter,yytext);
-                                fwrite(&caracter , sizeof(caracter),1,caracteres);
+                                insertarLista(yytext,listaDeCaracteres);
                             }
 {LITERAL_CADENA}            {
-                                printf ("se encontro el literal cadena: %s, de largo %d \n", yytext,yyleng);
-                                char literalCadena[PALABRA_MAX];
-                                strcpy(literalCadena,yytext);
-                                fwrite(&literalCadena, sizeof(literalCadena), 1, literalesCadena);
+                                largo = strlen(yytext);
+                                insertarLista(yytext,largo,listaDeLiterales);
                             }
 {IDENTIFICADOR}             {
-                                printf ("se encontro el identificar: %s \n", yytext);
-                                char identificador[PALABRA_MAX];
-                                strcpy(identificador,yytext);
-                                fwrite(&identificador,sizeof(identificador),1,identificadores);
+                                insertarOrdenado(yytext,listaDeIdentificadores);
                             }
 {CARACTERES_PUNTUACION_OPERADORES} {
-                                printf ("se encontro el caracter de puntuacion: %s \n", yytext);
-                                char punt_oper[3];
-                                strcpy(punt_oper,yytext);
-                                fwrite(&punt_oper,sizeof(punt_oper),1,operadores);
-                            }
+                                    insertarLista(yytext,listaDeOperYPunt);
+                                   }
 {PALABRAS_RESERVADAS}       {
-                                printf ("se encontro la palabra reservada: %s \n", yytext);
-                                char palabrasReservada[PALABRA_MAX];
-                                strcpy(palabrasReservada,yytext);
-                                fwrite(&palabrasReservada,sizeof(palabrasReservada),1,palabrasReservadas);
+                                insertarLista(yytext,listaDePalabrasReservadas);
                             }
-{COMENTARIO_BLOQUE}         {printf("se encontro un comentario de multiples lineas: %s \n", yytext);}
-{COMENTARIO_LINEA}          {printf("se encontro un comentario de una linea: %s \n", yytext);}
+{COMENTARIO_BLOQUE}         {
+                                insertarLista(yytext,listaDeComentariosDeBloque);
+                            }
+{COMENTARIO_LINEA}          {
+                                insertarLista(yytext,listaDeComentariosDeLinea);
+                            }
 {SALTO_DE_LINEA}            {linea ++;}
-{COMODIN}                   {printf("se encontro un caracter no identificado: %s, en la linea %d \n", yytext,linea);}
-{COMODINES}                 {printf("se encontro una cadena de caracteres no identificados: %s, en la linea %d \n", yytext,linea);}
+{COMODIN}                   {
+                                insertarLista(yytext,linea,listaDeNoReconocidos);
+                            }
+{COMODINES}                 {
+                                insertarLista(yytext,linea,listaDeNoReconocidos);
+                            }
 
 %%
-void agregarConstante(int numero, char tipo[12])
-{
-    Constante constante;
-    
-    constante->valor = numero;
-    strcopy(constante->tipo,tipo);
-    
-    fwrite(&constante, sizeof(constante), 1, constantes);
-} 
-
 
 int obtenerNumero(char* str, int base)
 {
     char* ignorar;
-    
     return strtol(str,&ignorar,base);
 }
+
+Nodo *insertarLista(char *loQueQuieroGuardar,int numero, Nodo *Lista){
+    Nodo *nuevoNodo, *aux;
+    nuevoNodo = (Nodo*) malloc(sizeof(Nodo));
+    nuevoNodo->info = loQueQuieroGuardar;
+    nuevoNodo->dato = numero;
+    nuevoNodo->sig = NULL;
+    
+    if(Lista == NULL){
+         Lista = nuevoNodo;
+    }else{
+        aux = Lista;
+        while(aux->sig != NULL){
+            aux = aux->sig;
+        }
+        aux->sig = nuevoNodo;
+    }
+    return Lista;
+}
+
+Nodo *insertarOrdenado(char *loQueQuieroGuardar, Nodo *Lista){
+    Nodo *nuevoNodo, *aux1, *aux2;
+    nuevoNodo = (Nodo*) malloc(sizeof(Nodo));
+    nuevoNodo->dato = loQueQuieroGuardar;
+    nuevoNodo->info = 0;
+    nuevoNodo->sig = NULL;
+
+    if(Lista == NULL){
+         Lista = nuevoNodo;
+    }else{
+        aux1 = Lista;
+        while(strcmp(loQueQuieroGuardar, aux1->dato) > 0 && aux1 != NULL){
+            aux2 = aux1;
+            aux1 = aux1->sig;    
+        }
+
+        if(Lista==aux1){
+            Lista = nuevoNodo;
+        }else{
+            aux2->sig = nuevoNodo;
+            nuevoNodo->sig = aux1;
+        }
+    }
+}
+
+Nodo *insertarLista1String(char *loQueQuieroGuardar, Nodo *Lista){
+    Nodo *nuevoNodo, *aux;
+    nuevoNodo = (Nodo*) malloc(sizeof(Nodo));
+    nuevoNodo->info = loQueQuieroGuardar;
+    nuevoNodo->sig = NULL;
+    
+    if(Lista == NULL){
+         Lista = nuevoNodo;
+    }else{
+        aux = Lista;
+        while(aux->sig != NULL){
+            aux = aux->sig;
+        }
+        aux->sig = nuevoNodo;
+    }
+    return Lista;
+}
+
+void recReal(texto){
+    char*ignorar;
+    float valorR = strtof(texto,&ignorar);
+    int entera = valorR;
+    float decimales = valorR - entera;
+    NodoReal *nuevoNodoReal, *aux;
+    nuevoNodoReal = (NodoReal*) malloc(sizeof(NodoReal));
+    nuevoNodoReal->info = texto;
+    nuevoNodoReal->parteEntera = entero;
+    nuevoNodoReal->parteFraccionaria = fraccionaria;
+    nuevoNodoReal->sig = NULL;
+    
+    if(listaDeReales == NULL){
+         listaDeReales = nuevoNodoReal;
+    }else{
+        aux = listaDeReales;
+        while(aux->sig != NULL){
+            aux = aux->sig;
+        }
+        aux->sig = nuevoNodoReal;
+    }
+    return listaDeReales;
+};
+
 
 int main(){
     yyin = fopen("TextoEntrada.txt", "r");
     yyout = fopen("TextoSalida.txt", "w");
-    
-    identificadores = fopen("identificadores.txt","rw+");
-    literalesCadena = fopen("literalesCadena.txt","rw+");
-    palabrasReservadas = fopen("palabrasReservadas.txt","rw+");
-    constantes = fopen("constantes.txt","rw+");
-    caracteres = fopen("caracteres.txt","rw+");
-    operadores = fopen("operadores.txt","rw+");
-    comentarios = fopen("comentarios.txt","rw+");
-    
+
+    FILE* reporte = fopen("Reporte.txt", "w");
+
     yylex();
-    
-    fclose(identificadores);
-    fclose(literalesCadena));
-    fclose(palabrasReservadas);
-    fclose(constantes);
-    fclose(operadores);
-    fclose(comentarios);
-    
-    printf ("la suma de los valores enteros es: %i \n", sumaEnteros);
 
     fclose(yyin);
     fclose(yyout);
+    fclose(reporte);
 }
 
-/*
- * C Program to Append the Content of File at the end of Another
- */
-#include <stdio.h>
-#include <stdlib.h>
- 
-main()
-{
-    FILE *fsring1, *fsring2, *ftemp;
-    char ch, file1[20], file2[20], file3[20];
- 
-    printf("Enter name of first file ");
-    gets(file1);
-    printf("Enter name of second file ");
-    gets(file2);
-    printf("Enter name to store merged file ");
-    gets(file3);
-    fsring1 = fopen(file1, "r");
-    fsring2 = fopen(file2, "r");
-    if (fsring1 == NULL || fsring2 == NULL)
-    {
-        perror("Error has occured");
-        printf("Press any key to exit...\n");
-        exit(EXIT_FAILURE);
-    }
-    ftemp = fopen(file3, "w");
-    if (ftemp == NULL)
-    {
-        perror("Error has occures");
-        printf("Press any key to exit...\n");
-        exit(EXIT_FAILURE);
-    }
-    while ((ch = fgetc(fsring1)) != EOF)
-        fputc(ch, ftemp);
-    while ((ch = fgetc(fsring2) ) != EOF)
-        fputc(ch, ftemp);
-    printf("Two files merged  %s successfully.\n", file3);
-    fclose(fsring1);
-    fclose(fsring2);
-    fclose(ftemp);
-    return 0;
-}
-
-/* 
-
-SANTI, TE REGALAMOS UN PERRITO <3
-______________________$$$$$$$$
-_______________$$$$$$$________$$$$$$$$$
-_____________$$________________________$$$$
-____________$$_____________________________$$
-___________$__________________________________$$
-___________$$___________________________________$$
-__________$$__$$______________________$$__________$$
-________$$__$$___$$$$_________$$$$____$$__________$$$$
-______$$___$$__$$$$__$$_____$$$$__$$_$$_____________$$$
-______$$___$$____$$$$_________$$$$___$$_______________$$
-______$$___$$________________________$$_______________$$
-______$$____$$_______________________$$_____________$$
-________$$__$$____$$$$$$_____________$$___________$$$
-________$$__$$__$$______$$___________$$_________$$
-________$$__$$__$$______$$___________$$_______$$
-__________$$$$____$$$$$$_____________$$$$____$$$$
-__________$$$$_____________________$$__$$____$$$
-___________$$_$$$$$$$$$$$$_____$$$$______$$$$_$$
-_____________$$___$$______$$$$$_______________$$
-_____________$$_____$$$$$$$____________________$$
-_____________$$________________________________$$
-____________$$_________________________________$$
-____________$$_________________________________$$
-____________$$___________________________________$
-____________$$___________________________________$$
-__________$$_________________________$$___________$
-__________$$__________$$___________$$_____________$$
-________$$__$$________$$_________$$_______________$$
-______$$____$$__________$$_______$$_______________$$
-______$$____$$____________$$___$$_________________$$
-____$$______$$_____________$$_$$_______$$_________$$
-____$$______$$________$$____$$$________$$_________$$
-____$$______$$________$$____$$$_______$$__________$$
-____$$______$$________$$_______________$$__________$$
-____$$______$$________$$_______________$$____________$
-_$$$$_______$$________$$_______________$$____________$$
-$___$$______$$________$$$$___________$$$$____________$$
-$___$$______$$________$$__$$_______$$__$$____________$$
-_$$$$$______$$________$$____$$___$$_____$$___________$$
-____$$______$$________$$______$$_______$$___________$$
-____$$______$$________$$_____$$________$$___________$$
-__$$________$$________$$$$$$$$___$$$$$$__$$_________$$
-__$$________$$________$$______$$$______$$$$_________$$
-$$________$$__________$$_________$$$$$$__$$__________$
-$$______$$__________$$$$$$$$$$$$$$$______$$__________$
-$$_$$_$$$__________$$_____________$$$$$$$__$$_________$
-_$$$$$$$___________$$______________________$$________$$
-_____$$__$$__$$__$$_$______________________$$__________$$
-______$$$$__$___$__$$______________________$$____________$
-_______$$___$___$__$________________________$$_$__$$__$$__$
-_________$$$$$$$$$$__________________________$$_$_$$$$$$$$
 
 
-░░░░░░░░░░░░░░░░░░░░░░░░░░
-░░░█▀▀▀░█▀▀█░█▀▀▀░▀░█░░░░░
-░░░█▀▀░░█▀▀█░▀▀▀█░█░█░░░░░
-░░░▀░░░░▀░░▀░▀▀▀▀░▀░▀▀▀░░░
-░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-*/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.eze.
