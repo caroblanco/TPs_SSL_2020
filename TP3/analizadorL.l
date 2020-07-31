@@ -125,12 +125,17 @@ int obtenerNumero(char* str, int base)
     return strtol(str,&ignorar,base);
 }
 
-Nodo *insertarLista(char *loQueQuieroGuardar,int numero, Nodo *Lista){
-    Nodo *nuevoNodo, *aux;
-    nuevoNodo = (Nodo*) malloc(sizeof(Nodo));
-    nuevoNodo->info = loQueQuieroGuardar;
+Nodo* crearNodo(char* dato){
+    Nodo *nodo=(Nodo*) malloc(sizeof(Nodo));
+    nodo->info = dato;
+    nodo->sig = NULL;
+    return nodo;
+}
+
+
+void insertarLista(char *loQueQuieroGuardar,int numero, Nodo *Lista){
+    Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar), *aux;
     nuevoNodo->dato = numero;
-    nuevoNodo->sig = NULL;
     
     if(Lista == NULL){
          Lista = nuevoNodo;
@@ -144,7 +149,8 @@ Nodo *insertarLista(char *loQueQuieroGuardar,int numero, Nodo *Lista){
     return Lista;
 }
 
-Nodo *insertarOrdenado(char *loQueQuieroGuardar, Nodo *Lista){
+
+void insertarOrdenado(char *loQueQuieroGuardar, Nodo *Lista){
     Nodo *nuevoNodo, *aux1, *aux2;
     nuevoNodo = (Nodo*) malloc(sizeof(Nodo));
     nuevoNodo->dato = loQueQuieroGuardar;

@@ -1,0 +1,6 @@
+{
+    "prolog.executablePath": "C:\\Program Files\\swipl\\bin\\swipl.exe",
+    "extensions.ignoreRecommendations": true,
+    "files.autoSave": "off",
+    "debug.allowBreakpointsEverywhere": true
+}
