@@ -6,44 +6,27 @@
     #include <math.h>
     #include <string.h>
 
-    #define PALABRA_MAX 50
-    int sumaEnteros = 0, linea = 1, valorD = 0, valorO = 0, valorH = 0, largo;
+    int linea = 1;
 
     typedef struct nodo
     {
-        char* info;
-        int dato;
+        char* dato;
+        int linea;
         struct nodo* sig;
     } Nodo;
-
-    
-typedef struct nodoReal
-    {
-        char* info;
-        int parteEntera;
-        float parteFraccionaria;
-        struct nodo* sig;
-    } NodoReal;
-
-typedef struct nodoString
-    {
-        char* info;
-        struct nodo* sig;
-    } NodoString;
-
 
 
     Nodo* listaDeIdentificadores = NULL;
     Nodo* listaDeLiterales = NULL;
-    NodoString* listaDePalabrasReservadas = NULL;
+    Nodo* listaDePalabrasReservadas = NULL;
     Nodo* listaDeOctales = NULL;
     Nodo* listaDeHexadecimales = NULL;
     Nodo* listaDeDecimales = NULL;
-    NodoReal* listaDeReales = NULL;
-    NodoString* listaDeCaracteres = NULL;
-    NodoString* listaDeOperYPunt = NULL;
-    NodoString* listaDeComentariosDeLinea = NULL;
-    NodoString* listaDeComentariosDeBloque = NULL;
+    Nodo* listaDeReales = NULL;
+    Nodo* listaDeCaracteres = NULL;
+    Nodo* listaDeOperYPunt = NULL;
+    Nodo* listaDeComentariosDeLinea = NULL;
+    Nodo* listaDeComentariosDeBloque = NULL;
     Nodo* listaDeNoReconocidos = NULL;
     
 %}
@@ -59,11 +42,9 @@ CONSTANTE_OCTAL 0[0-7]*
 CONSTANTE_HEXADECIMAL 0[xX][0-9A-Fa-f]+
 CONSTANTE_REAL   [0-9]+ "." [0-9]+ //no estamos muy seguros
 CARACTER_LETRAS [a-zA-Z]
-
 COMENTARIO_LINEA "//" .*
 COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 COMODIN .
-COMODINES .*
 SALTO_DE_LINEA \
 IDENTIFICADOR ({CARACTER_LETRAS} |_)({CARACTER_LETRAS} | [0-9]| _)*
 PALABRAS_RESERVADAS {TIPO_DE_DATO} | {ESTRUCTURAS_DE_CONTROL} | {OTROS}
@@ -72,70 +53,59 @@ CARACTER \'.\''
 
 %%
 
-{CONSTANTE_DECIMAL}         {
-                                valorD = obtenerNumero(yytext,10);  
-                                insertarLista(yytext,listaDeDecimales);
+{CONSTANTE_DECIMAL}         { 
+                                insertarLista(yytext,linea,listaDeDecimales);
                             } 
 {CONSTANTE_OCTAL}	        {
-                                valorO = obtenerNumero(yytext,8);
-                                insertarLista(yytext,valorO,listaDeOctales);
+                                insertarLista(yytext,linea,listaDeOctales);
                             }
 {CONSTANTE_HEXADECIMAL}	    {
-                                valorH = obtenerNumero(yytext,16);
-                                insertarLista(yytext,valorH,listaDeHexadecimales);
+                                insertarLista(yytext,linea,listaDeHexadecimales);
                             }
 {CONSTANTE_REAL}	        {
-                                recReal(yytext);
+                                insertarLista(yytext,linea,listaDeReales);
                             }
 {CARACTER}	                {
-                                insertarLista(yytext,listaDeCaracteres);
+                                insertarLista(yytext,linea,listaDeCaracteres);
                             }
 {LITERAL_CADENA}            {
-                                largo = strlen(yytext);
-                                insertarLista(yytext,largo,listaDeLiterales);
+                                insertarLista(yytext,linea,listaDeLiterales);
                             }
 {IDENTIFICADOR}             {
-                                insertarOrdenado(yytext,listaDeIdentificadores);
+                                insertarOrdenado(yytext,linea,listaDeIdentificadores);
                             }
 {CARACTERES_PUNTUACION_OPERADORES} {
-                                    insertarLista(yytext,listaDeOperYPunt);
+                                    insertarLista(yytext,linea,listaDeOperYPunt);
                                    }
 {PALABRAS_RESERVADAS}       {
-                                insertarLista(yytext,listaDePalabrasReservadas);
+                                insertarLista(yytext,linea,listaDePalabrasReservadas);
                             }
 {COMENTARIO_BLOQUE}         {
-                                insertarLista(yytext,listaDeComentariosDeBloque);
+                                insertarLista(yytext,linea,listaDeComentariosDeBloque);
+                                linea+= cantidadSaltosDeLinea(yytext);
                             }
 {COMENTARIO_LINEA}          {
-                                insertarLista(yytext,listaDeComentariosDeLinea);
+                                insertarLista(yytext,linea,listaDeComentariosDeLinea);
                             }
 {SALTO_DE_LINEA}            {linea ++;}
+[" "|\t]*                   {;}
 {COMODIN}                   {
                                 insertarLista(yytext,linea,listaDeNoReconocidos);
                             }
-{COMODINES}                 {
-                                insertarLista(yytext,linea,listaDeNoReconocidos);
-                            }
+
 
 %%
 
-int obtenerNumero(char* str, int base)
-{
-    char* ignorar;
-    return strtol(str,&ignorar,base);
-}
-
 Nodo* crearNodo(char* dato){
     Nodo *nodo=(Nodo*) malloc(sizeof(Nodo));
-    nodo->info = dato;
+    nodo->dato = dato;
     nodo->sig = NULL;
     return nodo;
 }
 
-
-void insertarLista(char *loQueQuieroGuardar,int numero, Nodo *Lista){
+void insertarLista(char* loQueQuieroGuardar,int linea, Nodo *Lista){
     Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar), *aux;
-    nuevoNodo->dato = numero;
+    nuevoNodo->linea = linea;
     
     if(Lista == NULL){
          Lista = nuevoNodo;
@@ -149,13 +119,23 @@ void insertarLista(char *loQueQuieroGuardar,int numero, Nodo *Lista){
     return Lista;
 }
 
+int cantidadSaltosDeLinea(char* data)
+{
+    int linea= 0;
+    int i = 0;
+    while(data[i] != '\0')
+    {
+        if(data[i] == '\n')
+            linea++;
+        i++;
+    }
 
-void insertarOrdenado(char *loQueQuieroGuardar, Nodo *Lista){
-    Nodo *nuevoNodo, *aux1, *aux2;
-    nuevoNodo = (Nodo*) malloc(sizeof(Nodo));
-    nuevoNodo->dato = loQueQuieroGuardar;
-    nuevoNodo->info = 0;
-    nuevoNodo->sig = NULL;
+    return linea;
+}
+
+void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo *Lista){
+    Nodo *nuevoNodo=crearNodo(loQueQuieroGuardar), *aux1, *aux2;
+    nuevoNodo->linea = linea;
 
     if(Lista == NULL){
          Lista = nuevoNodo;
@@ -175,48 +155,114 @@ void insertarOrdenado(char *loQueQuieroGuardar, Nodo *Lista){
     }
 }
 
-Nodo *insertarLista1String(char *loQueQuieroGuardar, Nodo *Lista){
-    Nodo *nuevoNodo, *aux;
-    nuevoNodo = (Nodo*) malloc(sizeof(Nodo));
-    nuevoNodo->info = loQueQuieroGuardar;
-    nuevoNodo->sig = NULL;
-    
-    if(Lista == NULL){
-         Lista = nuevoNodo;
-    }else{
-        aux = Lista;
-        while(aux->sig != NULL){
-            aux = aux->sig;
+void copiarConRepeticiones(FILE * reporte, Nodo* lista){
+    Nodo *aux = lista;
+    char* nuevoDato;
+    int contador;
+
+    while(aux){
+        if(nuevoDato != aux->dato){
+            nuevoDato = aux->dato;
+            contador = contarRepeticiones(nuevoDato,lista);
+            fprintf(reporte, "%s: %d veces \n",nuevoDato,contador);
         }
-        aux->sig = nuevoNodo;
+        aux = aux->sig;
     }
-    return Lista;
 }
 
-void recReal(texto){
-    char*ignorar;
-    float valorR = strtof(texto,&ignorar);
-    int entera = valorR;
-    float decimales = valorR - entera;
-    NodoReal *nuevoNodoReal, *aux;
-    nuevoNodoReal = (NodoReal*) malloc(sizeof(NodoReal));
-    nuevoNodoReal->info = texto;
-    nuevoNodoReal->parteEntera = entero;
-    nuevoNodoReal->parteFraccionaria = fraccionaria;
-    nuevoNodoReal->sig = NULL;
+int contarRepeticiones(char* dato, Nodo* lista ){
+    Nodo* aux= lista;
+    int contador=0;
     
-    if(listaDeReales == NULL){
-         listaDeReales = nuevoNodoReal;
-    }else{
-        aux = listaDeReales;
-        while(aux->sig != NULL){
-            aux = aux->sig;
+    while(aux){
+        if(strcmp(dato,aux->dato)==0){
+            contador++;
         }
-        aux->sig = nuevoNodoReal;
+        aux=aux->sig;
     }
-    return listaDeReales;
-};
+    return contador;
+}
 
+void copiarConLength(FILE * reporte, Nodo* lista){
+    Nodo* aux=lista;
+    int length=0;
+    char* literalCadena;
+
+    while(aux){
+        literalCadena = aux->dato;
+        length = strlen(literalCadena);
+        fprintf(reporte,"%s, que tiene largo: %d \n",literalCadena,length);
+        aux=aux->sig;
+    }
+}
+
+void copiarLista(FILE* reporte, Nodo* lista){
+    Nodo* aux=lista;
+    
+    while(aux){
+        fprintf(reporte,"%s \n",aux->dato);
+        aux= aux->sig;
+    }   
+}
+
+void copiarNumeros(FILE* reporte, Nodo*lista, int base){
+    Nodo*aux = lista;
+    int numeroDecimal, numero;
+    char* ignorar;
+
+    while(aux){
+        numero = atoi(aux->dato);
+        numeroDecimal = strtol(numero,&ignorar,base);
+        fprintf(reporte,"%d -> %d \n",numero,numeroDecimal);
+        aux= aux->sig;
+    }
+}
+
+void sumatoria(FILE * reporte, Nodo* lista){
+    Nodo* aux=lista;
+    int sumatoria=0;
+
+    while(aux){
+        sumatoria += strtoll(aux->dato);
+        aux=aux->sig;
+    }
+    
+    fprintf(reporte,"La sumatoria es: %d \n",sumatoria);
+}
+
+void copiarCaracteres(FILE * reporte, Nodo* lista){
+    Nodo* aux=lista;
+    int num=1;
+
+    while(aux){
+        fprintf(reporte,"%d) %c \n",num,aux->dato);
+        num ++;
+        aux=aux->sig;
+    }
+}
+
+void copiarNoRec(FILE * reporte, Nodo* lista){
+    Nodo* aux= lista;
+    
+    while(aux){
+        fprintf(reporte,"%c -> linea %d", aux->dato,aux->linea);
+        aux = aux->sig;
+    }
+}
+
+void parteEnteraYmantisa(FILE * reporte, Nodo* lista){
+    Nodo* aux=lista;
+    float mantisa;
+    int parteEntera, numero;
+    
+    while(aux){
+        numero=fabs(aux->dato);
+        parteEntera=floor(numero);
+        mantisa= numero-parteEntera;
+        fprinf(reporte,"La parte entera es: %d, su mantisa es: %f", parteEntera,mantisa);
+        aux=aux->sig;
+    }
+}
 
 int main(){
     yyin = fopen("TextoEntrada.txt", "r");
@@ -224,49 +270,51 @@ int main(){
 
     FILE* reporte = fopen("Reporte.txt", "w");
 
+    fprintf(reporte,"-----------------REPORTE ANALIZADOR LEXICO--------------\n\n");
+    
+    fprintf(reporte,"Lista de identificadores: \n");
+    copiarConRepeticiones(reporte, listaDeIdentificadores);
+
+    fprintf(reporte,"Lista de literales cadena: \n");
+    copiarConLength(reporte,listaDeLiterales);
+
+    fprintf(reporte,"Lista de palabras reservadas: \n");
+    copiarLista(reporte,listaDePalabrasReservadas);
+
+    fprintf(reporte,"Lista de numeros octales: \n");
+    copiarNumeros(reporte,listaDeOctales,8);
+    
+    fprintf(reporte,"Lista de numeros hexadecimales: \n");
+    copiarNumeros(reporte,listaDeHexadecimales,16);
+
+    fprintf(reporte,"Lista de numeros decimales: \n");
+    copiarNumeros(reporte,listaDeDecimales,10);
+    sumatoria(reporte,listaDeDecimales);
+
+    fprintf(reporte,"Lista de constantes reales: \n"); 
+    parteEnteraYmantisa(reporte,listaDeReales);
+
+    fprintf(reporte,"Lista de constantes caracter: \n");
+    copiarCaracteres(reporte,listaDeCaracteres);
+
+    fprintf(reporte,"Lista de caracteres de puntuacion / operadores: \n");
+    copiarConRepeticiones(reporte,listaDeOperYPunt);
+
+    fprintf(reporte, "Lista de comentarios de una linea: \n");
+    copiarLista(reporte,listaDeComentariosDeLinea);
+
+    fprintf(reporte,"Lista de comentarios de bloque: \n");
+    copiarLista(reporte,listaDeComentariosDeBloque);
+
+    fprintf(reporte, "Lista de caracteres no reconocidos: \n"); 
+    copiarNoRec(reporte,listaDeNoReconocidos);
+
     yylex();
 
     fclose(yyin);
     fclose(yyout);
     fclose(reporte);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
