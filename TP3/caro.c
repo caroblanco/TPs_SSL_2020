@@ -82,11 +82,13 @@ CARACTER \'.\''
                             }
 {COMENTARIO_BLOQUE}         {
                                 insertarLista(yytext,linea,listaDeComentariosDeBloque);
+                                linea+= cantidadSaltosDeLinea(yytext);
                             }
 {COMENTARIO_LINEA}          {
                                 insertarLista(yytext,linea,listaDeComentariosDeLinea);
                             }
 {SALTO_DE_LINEA}            {linea ++;}
+[\t]                        {;}
 {COMODIN}                   {
                                 insertarLista(yytext,linea,listaDeNoReconocidos);
                             }
@@ -101,7 +103,7 @@ Nodo* crearNodo(char* dato){
     return nodo;
 }
 
-void insertarLista(char *loQueQuieroGuardar,int linea, Nodo *Lista){
+void insertarLista(char* loQueQuieroGuardar,int linea, Nodo *Lista){
     Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar), *aux;
     nuevoNodo->linea = linea;
     
@@ -117,6 +119,19 @@ void insertarLista(char *loQueQuieroGuardar,int linea, Nodo *Lista){
     return Lista;
 }
 
+int cantidadSaltosDeLinea(char* data)
+{
+    int linea= 0;
+    int i = 0;
+    while(data[i] != '\0')
+    {
+        if(data[i] == '\n')
+            linea++;
+        i++;
+    }
+
+    return linea;
+}
 
 void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo *Lista){
     Nodo *nuevoNodo=crearNodo(loQueQuieroGuardar), *aux1, *aux2;
@@ -235,6 +250,20 @@ void copiarNoRec(FILE * reporte, Nodo* lista){
     }
 }
 
+void parteEnteraYmantisa(FILE * reporte, Nodo* lista){
+    Nodo* aux=lista;
+    float mantisa;
+    int parteEntera, numero;
+    
+    while(aux){
+        numero=fabs(aux->dato);
+        parteEntera=floor(numero);
+        mantisa= numero-parteEntera;
+        fprinf(reporte,"La parte entera es: %d, su mantisa es: %f", parteEntera,mantisa);
+        aux=aux->sig;
+    }
+}
+
 int main(){
     yyin = fopen("TextoEntrada.txt", "r");
     yyout = fopen("TextoSalida.txt", "w");
@@ -262,7 +291,8 @@ int main(){
     copiarNumeros(reporte,listaDeDecimales,10);
     sumatoria(reporte,listaDeDecimales);
 
-    fprintf(reporte,"Lista de constantes reales: \n"); // FALTA HACER LO DE LA MANTISA Y PARTE ENTERA
+    fprintf(reporte,"Lista de constantes reales: \n"); 
+    parteEnteraYmantisa(reporte,listaDeReales);
 
     fprintf(reporte,"Lista de constantes caracter: \n");
     copiarCaracteres(reporte,listaDeCaracteres);
