@@ -255,7 +255,7 @@ void parteEnteraYmantisa(FILE * reporte, Nodo* lista){
     int parteEntera, numero;
     
     while(aux){
-        numero=atof(nodo->dato);
+        numero=atof(aux->dato);
         parteEntera=(int)numero;
         mantisa= numero-parteEntera;
         fprintf(reporte,"La parte entera es: %d, su mantisa es: %f", parteEntera,mantisa);
