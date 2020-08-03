@@ -104,12 +104,12 @@ Nodo* crearNodo(char* dato){
 
 void insertarLista(char* loQueQuieroGuardar,int linea, Nodo **Lista){
     Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar);
-    Nodo *aux1;
     nuevoNodo->linea = linea;
     
     if(*Lista == NULL){
          *Lista = nuevoNodo;
     }else{
+        Nodo *aux1;
         aux = *Lista;
         while(aux->sig != NULL){
             aux = aux->sig;
