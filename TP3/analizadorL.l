@@ -11,6 +11,9 @@
     
 %}
 
+TIPO_DE_DATO int|float|char|struct|double|long|unsigned|signed|short|void|enum|struct|typedef|union|const
+ESTRUCTURAS_DE_CONTROL switch|case|do|while|break|default|if|else|for|return|continue|goto
+OTROS volatile|extern|static|auto|register
 
 CARACTERES_PUNTUACION_OPERADORES "["|"]"|"("|")"|"{"|"}"|","|";"|":"|"*"|"="|"#"|"!"|"%"|"^"|"&"|"–"|"+"|"|"|"~"|"'"|"<"|">"|"?"|"."|"/"|"=="|"||"|"+="|"-="|"~"|"&&"|"!="|"++"|"--"
  
@@ -24,7 +27,7 @@ COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 COMODIN .
 SALTO_DE_LINEA \n
 IDENTIFICADOR ({CARACTER_LETRAS}|_)({CARACTER_LETRAS}|[0-9]|_)*
-PALABRAS_RESERVADAS int|float|char|struct|double|long|unsigned|signed|short|void|enum|struct|typedef|union|const
+PALABRAS_RESERVADAS {TIPO_DE_DATO}|{ESTRUCTURAS_DE_CONTROL}|{OTROS}
 LITERAL_CADENA \".+\"
 CARACTER \'.\'
 
@@ -78,6 +81,7 @@ int main(){
     yyout = fopen("TextoSalida.txt", "w");
 
     FILE* reporte = fopen("Reporte.txt", "w");
+    yylex();
 
     fprintf(reporte,"-----------------REPORTE ANALIZADOR LEXICO--------------\n\n");
     
@@ -118,9 +122,21 @@ int main(){
     fprintf(reporte, "Lista de caracteres no reconocidos: \n"); 
     copiarNoRec(reporte,listaDeNoReconocidos);
 
-    yylex();
-
     fclose(yyin);
     fclose(yyout);
     fclose(reporte);
+
+    free(listaDeCaracteres);
+    free(listaDeComentariosDeBloque);
+    free(listaDeComentariosDeLinea);
+    free(listaDeDecimales);
+    free(listaDeHexadecimales);
+    free(listaDeIdentificadores);
+    free(listaDeLiterales);
+    free(listaDeNoReconocidos);
+    free(listaDeOctales);
+    free(listaDeOperYPunt);
+    free(listaDePalabrasReservadas);
+    free(listaDeReales);
+    
 }
