@@ -208,7 +208,6 @@ void copiarLista(FILE* reporte, Nodo* lista){
 void copiarNumeros(FILE* reporte, Nodo*lista, int base){
     Nodo*aux = lista;
     int numeroDecimal, numero;
-    char* ignorar;
 
     while(aux){
         numero = atoi(aux->dato);
