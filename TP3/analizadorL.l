@@ -11,9 +11,6 @@
     
 %}
 
-TIPO_DE_DATO int|float|char|struct|double|long|unsigned|signed|short|void|enum|struct|typedef|union|const
-ESTRUCTURAS_DE_CONTROL switch|case|do|while|break|default|if|else|for|return|continue|goto
-OTROS volatile|extern|static|auto|register
 
 CARACTERES_PUNTUACION_OPERADORES "["|"]"|"("|")"|"{"|"}"|","|";"|":"|"*"|"="|"#"|"!"|"%"|"^"|"&"|"–"|"+"|"|"|"~"|"'"|"<"|">"|"?"|"."|"/"|"=="|"||"|"+="|"-="|"~"|"&&"|"!="|"++"|"--"
  
@@ -27,7 +24,7 @@ COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 COMODIN .
 SALTO_DE_LINEA \n
 IDENTIFICADOR ({CARACTER_LETRAS}|_)({CARACTER_LETRAS}|[0-9]|_)*
-PALABRAS_RESERVADAS {TIPO_DE_DATO}|{ESTRUCTURAS_DE_CONTROL}|{OTROS}
+PALABRAS_RESERVADAS int|float|char|struct|double|long|unsigned|signed|short|void|enum|struct|typedef|union|const
 LITERAL_CADENA \".+\"
 CARACTER \'.\'
 
