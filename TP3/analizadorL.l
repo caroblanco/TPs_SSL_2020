@@ -32,7 +32,7 @@
 
 TIPO_DE_DATO int|float|char|struct|double|long|unsigned|signed|short|void|enum|struct|typedef|union|const
 ESTRUCTURAS_DE_CONTROL switch|case|do|while|break|default|if|else|for|return|continue|goto
-OTROS volatile|goto|extstatic|auto|register
+OTROS volatile|goto|extern|static|auto|register
 
 CARACTERES_PUNTUACION_OPERADORES "["|"]"|"("|")"|"{"|"}"|","|";"|":"|"*"|"="|"#"|"!"|"%"|"^"|"&"|"–"|"+"|"|"|"~"|"'"|"<"|">"|"?"|"."|"/"|"=="|"||"|"+="|"-="|"~"|"&&"|"!="|"++"|"--"
  
@@ -155,6 +155,19 @@ void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo **Lista){
     }
 }
 
+int contarRepeticiones(char* dato, Nodo* lista ){
+    Nodo* aux= lista;
+    int contador=0;
+    
+    while(aux){
+        if(strcmp(dato,aux->dato)==0){
+            contador++;
+        }
+        aux=aux->sig;
+    }
+    return contador;
+}
+
 void copiarConRepeticiones(FILE * reporte, Nodo* lista){
     Nodo *aux = lista;
     char* nuevoDato;
@@ -168,19 +181,6 @@ void copiarConRepeticiones(FILE * reporte, Nodo* lista){
         }
         aux = aux->sig;
     }
-}
-
-int contarRepeticiones(char* dato, Nodo* lista ){
-    Nodo* aux= lista;
-    int contador=0;
-    
-    while(aux){
-        if(strcmp(dato,aux->dato)==0){
-            contador++;
-        }
-        aux=aux->sig;
-    }
-    return contador;
 }
 
 void copiarConLength(FILE * reporte, Nodo* lista){
