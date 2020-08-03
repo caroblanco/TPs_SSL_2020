@@ -46,8 +46,8 @@ COMENTARIO_LINEA "//".*
 COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 COMODIN .
 SALTO_DE_LINEA \n
-IDENTIFICADOR ({CARACTER_LETRAS} |_)({CARACTER_LETRAS} | [0-9]| _)*
-PALABRAS_RESERVADAS {TIPO_DE_DATO} | {ESTRUCTURAS_DE_CONTROL} | {OTROS}
+IDENTIFICADOR ({CARACTER_LETRAS}|_)({CARACTER_LETRAS}|[0-9]|_)*
+PALABRAS_RESERVADAS {TIPO_DE_DATO}|{ESTRUCTURAS_DE_CONTROL}|{OTROS}
 LITERAL_CADENA \".+\"
 CARACTER \'.\'
 
@@ -255,7 +255,7 @@ void parteEnteraYmantisa(FILE * reporte, Nodo* lista){
     int parteEntera, numero;
     
     while(aux){
-        numero=afot(nodo->dato);
+        numero=atof(nodo->dato);
         parteEntera=(int)numero;
         mantisa= numero-parteEntera;
         fprinf(reporte,"La parte entera es: %d, su mantisa es: %f", parteEntera,mantisa);
