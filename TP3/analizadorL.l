@@ -212,7 +212,7 @@ void copiarNumeros(FILE* reporte, Nodo*lista, int base){
     while(aux){
         numero = atoi(aux->dato);
         numeroDecimal = strtol(numero, NULL,base);
-        fprintf(reporte,"%d -> %d \n",numero,numeroDecimal);
+        fprintf(reporte,"%s -> %d \n",aux->dato,numeroDecimal);
         aux= aux->sig;
     }
 }
