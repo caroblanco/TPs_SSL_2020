@@ -11,10 +11,6 @@
     
 %}
 
-TIPO_DE_DATO int|float|char|struct|double|long|unsigned|signed|short|void|enum|struct|typedef|union|const
-ESTRUCTURAS_DE_CONTROL switch|case|do|while|break|default|if|else|for|return|continue|goto
-OTROS volatile|extern|static|auto|register
-
 CARACTERES_PUNTUACION_OPERADORES "["|"]"|"("|")"|"{"|"}"|","|";"|":"|"*"|"="|"#"|"!"|"%"|"^"|"&"|"–"|"+"|"|"|"~"|"'"|"<"|">"|"?"|"."|"/"|"=="|"||"|"+="|"-="|"~"|"&&"|"!="|"++"|"--"
  
 CONSTANTE_DECIMAL [1-9][0-9]*
@@ -27,7 +23,6 @@ COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 COMODIN .
 SALTO_DE_LINEA \n
 IDENTIFICADOR ({CARACTER_LETRAS}|_)({CARACTER_LETRAS}|[0-9]|_)*
-PALABRAS_RESERVADAS {TIPO_DE_DATO}|{ESTRUCTURAS_DE_CONTROL}|{OTROS}
 LITERAL_CADENA \".+\"
 CARACTER \'.\'
 
@@ -57,9 +52,6 @@ CARACTER \'.\'
 {CARACTERES_PUNTUACION_OPERADORES} {
                                     insertarLista(yytext,linea,&listaDeOperYPunt);
                                    }
-{PALABRAS_RESERVADAS}       {
-                                insertarLista(yytext,linea,&listaDePalabrasReservadas);
-                            }
 {COMENTARIO_BLOQUE}         {
                                 insertarLista(yytext,linea,&listaDeComentariosDeBloque);
                                 linea+= cantidadSaltosDeLinea(yytext);
@@ -90,9 +82,6 @@ int main(){
 
     fprintf(reporte,"Lista de literales cadena: \n");
     copiarConLength(reporte,listaDeLiterales);
-
-    fprintf(reporte,"Lista de palabras reservadas: \n");
-    copiarLista(reporte,listaDePalabrasReservadas);
 
     fprintf(reporte,"Lista de numeros octales: \n");
     copiarNumeros(reporte,listaDeOctales,8);
@@ -136,7 +125,6 @@ int main(){
     free(listaDeNoReconocidos);
     free(listaDeOctales);
     free(listaDeOperYPunt);
-    free(listaDePalabrasReservadas);
     free(listaDeReales);
     
 }
