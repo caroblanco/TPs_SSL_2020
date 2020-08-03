@@ -15,7 +15,6 @@
         struct nodo* sig;
     } Nodo;
 
-
     Nodo* listaDeIdentificadores = NULL;
     Nodo* listaDeLiterales = NULL;
     Nodo* listaDePalabrasReservadas = NULL;
@@ -104,7 +103,8 @@ Nodo* crearNodo(char* dato){
 }
 
 void insertarLista(char* loQueQuieroGuardar,int linea, Nodo *Lista){
-    Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar), *aux;
+    Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar);
+    Nodo *aux1;
     nuevoNodo->linea = linea;
     
     if(Lista == NULL){
@@ -116,7 +116,6 @@ void insertarLista(char* loQueQuieroGuardar,int linea, Nodo *Lista){
         }
         aux->sig = nuevoNodo;
     }
-    return Lista;
 }
 
 int cantidadSaltosDeLinea(char* data)
@@ -134,7 +133,9 @@ int cantidadSaltosDeLinea(char* data)
 }
 
 void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo *Lista){
-    Nodo *nuevoNodo=crearNodo(loQueQuieroGuardar), *aux1, *aux2;
+    Nodo *nuevoNodo=crearNodo(loQueQuieroGuardar);
+    Nodo *aux1;
+    Nodo *aux2;
     nuevoNodo->linea = linea;
 
     if(Lista == NULL){
@@ -145,7 +146,6 @@ void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo *Lista){
             aux2 = aux1;
             aux1 = aux1->sig;    
         }
-
         if(Lista==aux1){
             Lista = nuevoNodo;
         }else{
@@ -222,7 +222,7 @@ void sumatoria(FILE * reporte, Nodo* lista){
     int sumatoria=0;
 
     while(aux){
-        sumatoria += strtoll(aux->dato);
+        sumatoria += atoi(aux->dato);
         aux=aux->sig;
     }
     
@@ -258,7 +258,7 @@ void parteEnteraYmantisa(FILE * reporte, Nodo* lista){
         numero=atof(nodo->dato);
         parteEntera=(int)numero;
         mantisa= numero-parteEntera;
-        fprinf(reporte,"La parte entera es: %d, su mantisa es: %f", parteEntera,mantisa);
+        fprintf(reporte,"La parte entera es: %d, su mantisa es: %f", parteEntera,mantisa);
         aux=aux->sig;
     }
 }
