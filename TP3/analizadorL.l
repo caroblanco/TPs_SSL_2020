@@ -40,7 +40,7 @@ CARACTERES_PUNTUACION_OPERADORES"["|"]"|"("|")"|"{"|"}"|","|";"|":"|"*"|"="|"#"|
 CONSTANTE_DECIMAL [1-9][0-9]*
 CONSTANTE_OCTAL 0[0-7]*
 CONSTANTE_HEXADECIMAL 0[xX][0-9A-Fa-f]+
-CONSTANTE_REAL   [0-9]+"."[0-9]+ //no estamos muy seguros
+CONSTANTE_REAL   [0-9]+"."[0-9]*([eE](\+|\-)?[0-9]+)?
 CARACTER_LETRAS [a-zA-Z]
 COMENTARIO_LINEA "//".*
 COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
