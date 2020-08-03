@@ -53,43 +53,43 @@ CARACTER \'.\'
 %%
 
 {CONSTANTE_DECIMAL}         { 
-                                insertarLista(yytext,linea,listaDeDecimales);
+                                insertarLista(yytext,linea,&listaDeDecimales);
                             } 
 {CONSTANTE_OCTAL}	        {
-                                insertarLista(yytext,linea,listaDeOctales);
+                                insertarLista(yytext,linea,&listaDeOctales);
                             }
 {CONSTANTE_HEXADECIMAL}	    {
-                                insertarLista(yytext,linea,listaDeHexadecimales);
+                                insertarLista(yytext,linea,&listaDeHexadecimales);
                             }
 {CONSTANTE_REAL}	        {
-                                insertarLista(yytext,linea,listaDeReales);
+                                insertarLista(yytext,linea,&listaDeReales);
                             }
 {CARACTER}	                {
-                                insertarLista(yytext,linea,listaDeCaracteres);
+                                insertarLista(yytext,linea,&listaDeCaracteres);
                             }
 {LITERAL_CADENA}            {
-                                insertarLista(yytext,linea,listaDeLiterales);
+                                insertarLista(yytext,linea,&listaDeLiterales);
                             }
 {IDENTIFICADOR}             {
-                                insertarOrdenado(yytext,linea,listaDeIdentificadores);
+                                insertarOrdenado(yytext,linea,&listaDeIdentificadores);
                             }
 {CARACTERES_PUNTUACION_OPERADORES} {
-                                    insertarLista(yytext,linea,listaDeOperYPunt);
+                                    insertarLista(yytext,linea,&listaDeOperYPunt);
                                    }
 {PALABRAS_RESERVADAS}       {
-                                insertarLista(yytext,linea,listaDePalabrasReservadas);
+                                insertarLista(yytext,linea,&listaDePalabrasReservadas);
                             }
 {COMENTARIO_BLOQUE}         {
-                                insertarLista(yytext,linea,listaDeComentariosDeBloque);
+                                insertarLista(yytext,linea,&listaDeComentariosDeBloque);
                                 linea+= cantidadSaltosDeLinea(yytext);
                             }
 {COMENTARIO_LINEA}          {
-                                insertarLista(yytext,linea,listaDeComentariosDeLinea);
+                                insertarLista(yytext,linea,&listaDeComentariosDeLinea);
                             }
 {SALTO_DE_LINEA}            {linea ++;}
 [" "|\t]*                   {}
 {COMODIN}                   {
-                                insertarLista(yytext,linea,listaDeNoReconocidos);
+                                insertarLista(yytext,linea,&listaDeNoReconocidos);
                             }
 
 
@@ -102,7 +102,7 @@ Nodo* crearNodo(char* dato){
     return nodo;
 }
 
-void insertarLista(char* loQueQuieroGuardar,int linea, Nodo *Lista){
+void insertarLista(char* loQueQuieroGuardar,int linea, Nodo **Lista){
     Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar);
     Nodo *aux1;
     nuevoNodo->linea = linea;
@@ -132,7 +132,7 @@ int cantidadSaltosDeLinea(char* data)
     return linea;
 }
 
-void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo *Lista){
+void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo **Lista){
     Nodo *nuevoNodo=crearNodo(loQueQuieroGuardar);
     Nodo *aux1;
     Nodo *aux2;
