@@ -107,10 +107,10 @@ void insertarLista(char* loQueQuieroGuardar,int linea, Nodo **Lista){
     Nodo *aux1;
     nuevoNodo->linea = linea;
     
-    if(Lista == NULL){
-         Lista = nuevoNodo;
+    if(*Lista == NULL){
+         *Lista = nuevoNodo;
     }else{
-        aux = Lista;
+        aux = *Lista;
         while(aux->sig != NULL){
             aux = aux->sig;
         }
@@ -138,16 +138,16 @@ void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo **Lista){
     Nodo *aux2;
     nuevoNodo->linea = linea;
 
-    if(Lista == NULL){
-         Lista = nuevoNodo;
+    if(*Lista == NULL){
+         *Lista = nuevoNodo;
     }else{
-        aux1 = Lista;
+        aux1 = *Lista;
         while(strcmp(loQueQuieroGuardar, aux1->dato) > 0 && aux1 != NULL){
             aux2 = aux1;
             aux1 = aux1->sig;    
         }
-        if(Lista==aux1){
-            Lista = nuevoNodo;
+        if(*Lista==aux1){
+            *Lista = nuevoNodo;
         }else{
             aux2->sig = nuevoNodo;
             nuevoNodo->sig = aux1;
