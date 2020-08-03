@@ -136,11 +136,10 @@ void copiarLista(FILE* reporte, Nodo* lista){
 
 void copiarNumeros(FILE* reporte, Nodo*lista, int base){
     Nodo*aux = lista;
-    int numeroDecimal, numero;
+    int numeroDecimal;
 
     while(aux){
-        numero = atoi(aux->dato);
-        numeroDecimal = strtol(numero, NULL,base);
+        numeroDecimal = strtol(aux->dato, NULL,base);
         fprintf(reporte,"%s -> %d \n",aux->dato,numeroDecimal);
         aux= aux->sig;
     }
