@@ -31,25 +31,25 @@
     
 %}
 
-TIPO_DE_DATO int | float | char | struct | double | long | unsigned | signed | short | void | enum | struct | typedef | union | const
-ESTRUCTURAS_DE_CONTROL switch | case | do | while | break | default | if | else | for | return | continue | goto
-OTROS volatile | goto | extstatic | auto | register 
+TIPO_DE_DATO int|float|char|struct|double|long|unsigned|signed|short|void|enum|struct|typedef|union|const
+ESTRUCTURAS_DE_CONTROLswitch|case|do|while|break|default|if|else|for|return|continue|goto
+OTROSvolatile|goto|extstatic|auto|register
 
-CARACTERES_PUNTUACION_OPERADORES "[" | "]" | "(" | ")" | "{" | "}" | "," | ";" | ":" | "*" | "=" | "#" | "!" | "%" | "^" | "&" | "–" | "+" | "|" | "~" | "\" | "'" | "<" | ">" | "?" | "." | "/" | "==" | | "+=" | "-=" | "~" | "&&" | "!=" | "++" | "--"
+CARACTERES_PUNTUACION_OPERADORES"["|"]"|"("|")"|"{"|"}"|","|";"|":"|"*"|"="|"#"|"!"|"%"|"^"|"&"|"–"|"+"|"|"|"~"|"\"|"'"|"<"|">"|"?"|"."|"/"|"=="|"||"|"+="|"-="|"~"|"&&"|"!="|"++"|"--"
  
 CONSTANTE_DECIMAL [1-9][0-9]*
 CONSTANTE_OCTAL 0[0-7]*
 CONSTANTE_HEXADECIMAL 0[xX][0-9A-Fa-f]+
-CONSTANTE_REAL   [0-9]+ "." [0-9]+ //no estamos muy seguros
+CONSTANTE_REAL   [0-9]+"."[0-9]+ //no estamos muy seguros
 CARACTER_LETRAS [a-zA-Z]
-COMENTARIO_LINEA "//" .*
+COMENTARIO_LINEA "//".*
 COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 COMODIN .
-SALTO_DE_LINEA \
+SALTO_DE_LINEA \n
 IDENTIFICADOR ({CARACTER_LETRAS} |_)({CARACTER_LETRAS} | [0-9]| _)*
 PALABRAS_RESERVADAS {TIPO_DE_DATO} | {ESTRUCTURAS_DE_CONTROL} | {OTROS}
 LITERAL_CADENA \".+\"
-CARACTER \'.\''
+CARACTER \'.\'
 
 %%
 
@@ -88,7 +88,7 @@ CARACTER \'.\''
                                 insertarLista(yytext,linea,listaDeComentariosDeLinea);
                             }
 {SALTO_DE_LINEA}            {linea ++;}
-[" "|\t]*                   {;}
+[" "|\t]*                   {}
 {COMODIN}                   {
                                 insertarLista(yytext,linea,listaDeNoReconocidos);
                             }
@@ -98,7 +98,7 @@ CARACTER \'.\''
 
 Nodo* crearNodo(char* dato){
     Nodo *nodo=(Nodo*) malloc(sizeof(Nodo));
-    nodo->dato = dato;
+    nodo->dato = strdup(dato);
     nodo->sig = NULL;
     return nodo;
 }
@@ -212,7 +212,7 @@ void copiarNumeros(FILE* reporte, Nodo*lista, int base){
 
     while(aux){
         numero = atoi(aux->dato);
-        numeroDecimal = strtol(numero,&ignorar,base);
+        numeroDecimal = strtol(numero, NULL,base);
         fprintf(reporte,"%d -> %d \n",numero,numeroDecimal);
         aux= aux->sig;
     }
@@ -256,8 +256,8 @@ void parteEnteraYmantisa(FILE * reporte, Nodo* lista){
     int parteEntera, numero;
     
     while(aux){
-        numero=fabs(aux->dato);
-        parteEntera=floor(numero);
+        numero=afot(nodo->dato);
+        parteEntera=(int)numero;
         mantisa= numero-parteEntera;
         fprinf(reporte,"La parte entera es: %d, su mantisa es: %f", parteEntera,mantisa);
         aux=aux->sig;
@@ -315,40 +315,3 @@ int main(){
     fclose(yyout);
     fclose(reporte);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-.eze.

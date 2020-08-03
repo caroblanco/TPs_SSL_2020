@@ -88,7 +88,7 @@ CARACTER \'.\''
                                 insertarLista(yytext,linea,listaDeComentariosDeLinea);
                             }
 {SALTO_DE_LINEA}            {linea ++;}
-[\t]                        {;}
+[" "|\t]*                   {;}
 {COMODIN}                   {
                                 insertarLista(yytext,linea,listaDeNoReconocidos);
                             }
@@ -306,7 +306,7 @@ int main(){
     fprintf(reporte,"Lista de comentarios de bloque: \n");
     copiarLista(reporte,listaDeComentariosDeBloque);
 
-    fprintf(reporte, "Lista de caracteres no reconocidos: \n"); //FALTA ARREGLAR LO DE LA LINEA
+    fprintf(reporte, "Lista de caracteres no reconocidos: \n"); 
     copiarNoRec(reporte,listaDeNoReconocidos);
 
     yylex();
