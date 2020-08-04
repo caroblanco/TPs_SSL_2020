@@ -12,7 +12,6 @@
 
     Nodo* listaDeIdentificadores = NULL;
     Nodo* listaDeLiterales = NULL;
-    Nodo* listaDePalabrasReservadas = NULL;
     Nodo* listaDeOctales = NULL;
     Nodo* listaDeHexadecimales = NULL;
     Nodo* listaDeDecimales = NULL;
