@@ -81,9 +81,11 @@ int main(){
     yyout = fopen("TextoSalida.txt", "w");
 
     FILE* reporte = fopen("Reporte.txt", "w");
+    fprintf(reporte,"-----------------REPORTE ANALIZADOR LEXICO--------------\n\n");
+    
     yylex();
 
-    fprintf(reporte,"-----------------REPORTE ANALIZADOR LEXICO--------------\n\n");
+    
     
     fprintf(reporte,"Lista de identificadores: \n");
     copiarConRepeticiones(reporte, listaDeIdentificadores);
