@@ -24,22 +24,21 @@
     Nodo* listaDeNoReconocidos = NULL;
 
 
-Nodo* crearNodo(char* dato){
+Nodo* crearNodo(char* dato, int linea){
     Nodo *nodo=(Nodo*) malloc(sizeof(Nodo));
     nodo->dato = strdup(dato);
     nodo->sig = NULL;
+    nodo->linea = linea;
     return nodo;
 }
 
 void insertarLista(char* loQueQuieroGuardar,int linea, Nodo **Lista){
-    Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar);
-    nuevoNodo->linea = linea;
+    Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar,linea);
     
     if(*Lista == NULL){
          *Lista = nuevoNodo;
     }else{
-        Nodo *aux;
-        aux = *Lista;
+        Nodo *aux = *Lista;
         while(aux->sig != NULL){
             aux = aux->sig;
         }
@@ -61,11 +60,10 @@ int cantidadSaltosDeLinea(char* data)
     return linea;
 }
 
-void insertarOrdenado(char *loQueQuieroGuardar, int linea, Nodo **Lista){
-    Nodo *nuevoNodo=crearNodo(loQueQuieroGuardar);
+void insertarOrdenado(char* loQueQuieroGuardar, int linea, Nodo **Lista){
+    Nodo *nuevoNodo = crearNodo(loQueQuieroGuardar,linea);
     Nodo *aux1;
     Nodo *aux2;
-    nuevoNodo->linea = linea;
 
     if(*Lista == NULL){
          *Lista = nuevoNodo;

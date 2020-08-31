@@ -1731,7 +1731,7 @@ int main()
 
 
 int main(){
-    yyin = fopen("TextoEntrada.txt", "r");
+    yyin = fopen("codigo_a_analizar.C", "r");
     yyout = fopen("TextoSalida.txt", "w");
 
     FILE* reporte = fopen("Reporte.txt", "w");
@@ -1739,7 +1739,6 @@ int main(){
     
     yylex();
 
-    
     
     fprintf(reporte,"Lista de identificadores: \n");
     copiarConRepeticiones(reporte, listaDeIdentificadores);
