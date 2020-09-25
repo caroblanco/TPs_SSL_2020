@@ -27,6 +27,9 @@ void yyerror (char const *s) {
 %token <texto> LITERALCADENA
 %token <caracter> CARACTER
 
+// ACA ES LA ESPECIFICACION DE LA RECURSIVIDAD
+        //   #e s p e C I C I f a c i o n
+
 
 %union {
     int entero;
@@ -46,6 +49,7 @@ line:   '\n'
         | expresion '\n' {}
         | sentencia '\n' {}
         | funciones '\n' {}
+        | declaracion '\n' {}
 ;
 
 /*EXPRESIONES*/
@@ -111,7 +115,7 @@ expPrimaria:    IDENTIFICADOR
                 | '('expresion')'
 ;
 
-nombreTipo: char | int | double
+nombreTipo: CHAR | INT | DOUBLE
 ;
 
 expConst: expCondicional;
@@ -173,7 +177,7 @@ sentAsignacion: IDENTIFICADOR '=' expresion ';'
 
 /*DECLARACIONES*/
 
-declaracion:    espeDec listDec? ;
+declaracion:    espeDec listDec ;
 
 espeDec:        espeClasAlma espDec
                 |espeTipo espeDec 
@@ -206,8 +210,8 @@ espeTipo: VOID | CHAR | SHORT | INT | LONG | FLOAT | DOUBLE | SIGNED | UNSIGNED
 caliTipo: CONST | VOLATILE
 ;
 
-especificadorSU: SU identificador '{'listaDecS '}' |
-                | SU identificador
+especificadorSU: SU IDENTIFICADOR '{'listaDecS '}' |
+                | SU IDENTIFICADOR
 ;
 
 SU: STRUCT | UNION ;
@@ -264,11 +268,11 @@ decParam: espeDec decla
 ;
 
 listIden: identificador 
-        | listIden ',' identificador
+        | listIden ',' IDENTIFICADOR
 ;
 
-especificadorE: enum identificador '{' listEnum '} '
-        | enum identificador
+especificadorE: enum IDENTIFICADOR '{' listEnum '} '
+        | enum IDENTIFICADOR
 ;
 
 listEnum: enumerador
@@ -279,10 +283,10 @@ enumerador: constEnum
         | constEnum '=' expConst
 ;
 
-constEnum: identificador
+constEnum: IDENTIFICADOR
 ;
 
-nombreTypedef: identificador
+nombreTypedef: IDENTIFICADOR
 ;
 
 nombTipo: listCali decAbstract
@@ -300,6 +304,6 @@ decAbstDirec: '('decAbstract')'
 %%
 
 int main (){
-
+        
   yyparse ();
 }
