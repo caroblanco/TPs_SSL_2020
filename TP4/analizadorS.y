@@ -13,10 +13,12 @@ int yywrap(){
 	return(1);
 }
 
-void yyerror (char const *s) {
-   fprintf (stderr, "%s\n", s);
+void yyerror (char *cosa) {
+   fprintf ("encontre: %s\n", cosa);
 }
 
+FILE* yyin;
+FILE* yyout;
 
 %}
 
@@ -26,9 +28,26 @@ void yyerror (char const *s) {
 %token <texto> IDENTIFICADOR
 %token <texto> LITERALCADENA
 %token <caracter> CARACTER
+%token <texto> PALABRA_RESERVADA
 
+%token P_INC
+%token P_DEC 
+%token DISTINTO 
+%token IGUAL 
+%token AND 
+%token OR 
+%token DIV_IGUAL
+%token POR_IGUAL
+%token MENOS_IGUAL
+%token MAS_IGUAL 
+%token MENOR_IGUAL
+%token MAYOR_IGUAL
+%token MOD_IGUAL 
+%token BIT_SHIFT_L
+%token BIT_SHIFT_R
+%token FLECHITA
 // ACA ES LA ESPECIFICACION DE LA RECURSIVIDAD
-        //   #e s p e C I C I f a c i o n
+//   #e s p e C I C I f a c i o n
 
 
 %union {
@@ -53,69 +72,104 @@ line:   '\n'
 ;
 
 /*EXPRESIONES*/
+expresion: expresionAs  
+        |expresion ',' expresionAs
+;
 
-expresion:      expUnaria operadorAs expresion
+expresionAs:      expUnaria operadorAs expresionAs
                 | expCondicional
                 | error {printf("que haces cap@ declara bien\n");}
 ;
-operadorAs: '=' | '+''=' 
+operadorAs: '=' | DIV_IGUAL | POR_IGUAL | MENOS_IGUAL | MAS_IGUAL | MOD_IGUAL 
 ;
 
 expCondicional: expOr
-                | expOr expresion ':' expCondicional
+                | expOr '?' expresion ':' expCondicional
 ;
 
 expOr:  expAnd
-        | expOr '|''|' expAnd
+        | expOr OR expAnd
 ;
 
-expAnd: expIgualdad
-        | expAnd '&''&' expIgualdad
+expAnd: expOInclusivo
+        | expAnd AND expOInclusivo
+;
+
+expOInclusivo: expOExcluyente
+                |expOInclusivo '|' expOExcluyente
+;
+
+expOExcluyente: expY
+                |expOExcluyente '^' expY
+;
+
+expY: expIgualdad
+        |expY '&' expIgualdad
 ;
 
 expIgualdad:    expRelacional
-                | expIgualdad '=''=' expRelacional
-                | expIgualdad '!''=' expRelacional
+                | expIgualdad IGUAL expRelacional
+                | expIgualdad DISTINTO expRelacional
 ;            
 expRelacional:  expAditiva
-                | expRelacional '>''=' expAditiva 
+                | expRelacional MAYOR_IGUAL expAditiva 
                 | expRelacional '>' expAditiva
-                | expRelacional '<''=' expAditiva
+                | expRelacional MENOR_IGUAL expAditiva
                 | expRelacional '<' expAditiva
+;
+
+expCorrimiento: expAditiva
+                |expCorrimiento BIT_SHIFT_L expAditiva
+                |expAditiva BIT_SHIFT_R expCorrimiento
 ;
                 
 expAditiva:     expMultiplicativa
                 | expAditiva '+' expMultiplicativa
-                 | expaditiva '-' expMultiplicativa
+                | expaditiva '-' expMultiplicativa
 ;
+
+expMultiplicativa: expConversion
+                        |expMultiplicativa '/' expConversion //     algo / 0 x  ERROR
+                        |expMultiplicativa '*' expConversion
+                        |expMultiplicativa '%' expConversion
+;
+
+expConversion: expUnaria
+                |'(' nombreTipo ')' expConversion
+;
+
 expUnaria:      expPostfijo
                 | incremento expUnaria
-                | operUnario expUnaria
-                 | expUnaria incremento
+                | operUnario expConversion
+                | expUnaria incremento
 ;
 
-incremento: '+''+'|'-''-'
+incremento: P_INC | P_DEC
 ;
 
-oprUnario: '&' | '*' | '-' | '!'
+oprUnario: '&' | '*' | '-' | '!' | '+' | '~'
 ;
 
-expPostfijo: expPrimaria
-            | expPostfijo '['expresion']'
-            | expPostfijo '('listaArgumentos')'
+expSufijo: expPrimaria
+            | expSufijo '['expresion']'
+            | expSufijo '('listaArgumentos')'
+            | expSufijo '.' unID
+            | expSufijo FLECHITA unID
+            | expSufijo P_INC
+            | expSufijo P_DEC
 ;
 
 listaArgumentos: expAsignacion
-                | listaArgumentos expAsignacion
+                | listaArgumentos ',' expAsignacion
 ;
-expPrimaria:    IDENTIFICADOR
+expPrimaria:    unID
                 | NUMERO_ENTERO
                 | NUMERO_REAL
                 | LITERALCADENA 
-                | '('expresion')'
+                | '(' expresion ')'
 ;
 
-nombreTipo: CHAR | INT | DOUBLE
+nombreTipo: "char" | "const" | "float" | "int" | "long" | "signed" | "unsigned" | "short" | "void" | "struct" | "typedef" | "union" | "enum" 
 ;
 
 expConst: expCondicional;
@@ -132,10 +186,10 @@ sentencia:      sentExp
                 | error {printf("ERROR AL DECLARAR LA SENTENCIA");}
 ;
 
-sentExp: expresion
+sentExp: expresion '?'
 ;
 
-sentCompuesta:  '{' listaDeclaraciones listaSentencias '}'
+sentCompuesta:  '{' listaDeclaraciones '?' listaSentencias '?' '}'
                 | '{' listaDeclaraciones '}'
                 | '{' listaSentencias '}'
                 | '{''}'
@@ -156,7 +210,7 @@ sentSeleccion:  IF '(' expresion ')' sentencia
 
 sentIteracion:  WHILE '(' expresion ')' sentencia
                 | DO sentencia WHILE '(' exprecion ')'
-                | FOR '(' expresion ';' expresion ';' expresion ')' sentencia
+                | FOR '(' expresion '?' ';' expresion '?' ';' expresion '?' ')' sentencia
 ;
 
 sentEtiquetada: CASE expConstante ':' sentencia
@@ -164,8 +218,7 @@ sentEtiquetada: CASE expConstante ':' sentencia
                 | IDENTIFICADOR ':' sentencia
 ;
 
-sentSalto:      RETURN expresion ';'
-                | RETURN ';'
+sentSalto:      RETURN expresion '?' ';'
                 | CONTINUE ';'
                 | BREAK ';'
                 | GOTO IDENTIFICADOR ';'
@@ -177,18 +230,21 @@ sentAsignacion: IDENTIFICADOR '=' expresion ';'
 
 /*DECLARACIONES*/
 
-declaracion:    espeDec listDec ;
+declaracion:    espeDec listDec '?' 
+;
 
-espeDec:        espeClasAlma espDec
-                |espeTipo espeDec 
-                |caliTipo espeDec 
+espeDec:        espeClasAlma espDec '?'
+                |espeTipo espeDec '?'
+                |caliTipo espeDec '?'
 ;
 
 listDec:        declarador 
-                |listDec ',' declarador;
+                |listDec ',' declarador
+;
 
 declarador:     decla 
-                |decla '=' inicializador;
+                |decla '=' inicializador
+;
 
 inicializador:  expAsignación 
                 |'{'listInicial'}'  
@@ -196,7 +252,8 @@ inicializador:  expAsignación
 ;
 
 listInicial:    inicializador  
-                |listInicial ',' inicializador;
+                |listInicial ',' inicializador
+;
 
 espeClasAlma: TYPEDEF | STATIC | AUTO | REGISTER | EXTERN
 ;
@@ -210,20 +267,22 @@ espeTipo: VOID | CHAR | SHORT | INT | LONG | FLOAT | DOUBLE | SIGNED | UNSIGNED
 caliTipo: CONST | VOLATILE
 ;
 
-especificadorSU: SU IDENTIFICADOR '{'listaDecS '}' |
+especificadorSU: SU IDENTIFICADOR '?''{'listaDecS '}' |
                 | SU IDENTIFICADOR
 ;
 
-SU: STRUCT | UNION ;
+SU: STRUCT | UNION
+;
 
 listaDecS: declaracionS
             | listaDecS declaracionS
 ;
 
-declaracionS: listCali decS ;
+declaracionS: listCali decS
+;
 
-listCali:  espeTipo listCali 
-            |caliTipo listCali
+listCali:  espeTipo listCali '?'
+            |caliTipo listCali '?'
 ;
 
 declaracionS: decS 
@@ -231,15 +290,15 @@ declaracionS: decS
 ;
 
 decS: decS 
-    | decla ':' expConst
+    | decla '?' ':' expConst
 ;
 
-decla: puntero decDirec
+decla: puntero '?' decDirec
 ;
 
 puntero:
-        listCaliTipos 
-        |listCaliTipos puntero
+        listCaliTipos '?'
+        |listCaliTipos '?' puntero
 ;
 
 listCaliTipos: caliTipo 
@@ -248,14 +307,14 @@ listCaliTipos: caliTipo
 
 decDirec: identificador 
         | '('decla')' 
-        | decDirec '[' expConst? ']' 
+        | decDirec '[' expConst '?' ']' 
         | decDirec '(' listTipoPar ')' 
-        | decDirec '(' listIden ')' 
+        | decDirec '(' listIden '?' ')' 
 ;
 
 listTipoPar:
         listParam 
-       // | listParam ',' . . .  ????????
+       // | listParam ',' . . .  
 ;
 
 listParam:
@@ -271,7 +330,7 @@ listIden: identificador
         | listIden ',' IDENTIFICADOR
 ;
 
-especificadorE: enum IDENTIFICADOR '{' listEnum '} '
+especificadorE: enum IDENTIFICADOR '?' '{' listEnum '} '
         | enum IDENTIFICADOR
 ;
 
@@ -289,16 +348,16 @@ constEnum: IDENTIFICADOR
 nombreTypedef: IDENTIFICADOR
 ;
 
-nombTipo: listCali decAbstract
+nombTipo: listCali decAbstract '?'
 ;
 
 decAbstract:puntero 
-        | puntero decAbstDirec
+        | puntero '?' decAbstDirec
 ;
 
 decAbstDirec: '('decAbstract')' 
-        | decAbstDirec '['expConst']' 
-        | decAbstDirec '('listTipoPar')'
+        | decAbstDirec '?' '['expConst '?'']' 
+        | decAbstDirec '?' '('listTipoPar '?'')'
 ;
 
 %%
