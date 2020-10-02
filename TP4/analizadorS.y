@@ -5,12 +5,15 @@
 #include <ctype.h>
 #include <string.h>
 
+#define YYDEBUG 1
+
 int flag_error = 0; 
-// SE PONE EN BLANCO ESTO flag del culo
+
 int yylex();
 
-int yywrap(){
-	return(1);
+int yywrap()
+{
+    return(1);
 }
 
 void yyerror (char *cosa) {
@@ -46,9 +49,8 @@ FILE* yyout;
 %token BIT_SHIFT_L
 %token BIT_SHIFT_R
 %token FLECHITA
+%token SIZEOF
 // ACA ES LA ESPECIFICACION DE LA RECURSIVIDAD
-//   #e s p e C I C I f a c i o n
-
 
 %union {
     int entero;
@@ -57,6 +59,7 @@ FILE* yyout;
     float real;
 }
 
+// VER LINEAS: 72, que va entre llaves  -- 
  
 %% 
 
@@ -65,30 +68,35 @@ input:  /* vacio */
 ;
 
 line:   '\n'
-        | expresion '\n' {}
-        | sentencia '\n' {}
-        | funciones '\n' {}
+        | expresion '\n'   {}
+        | sentencia '\n'   {}
+        | funciones '\n'   {}
         | declaracion '\n' {}
 ;
 
 /*EXPRESIONES*/
 expresion: expresionAs  
-        |expresion ',' expresionAs
+        |expresion ';' expresionAs
 ;
 
 expresionAs:      expUnaria operadorAs expresionAs
                 | expCondicional
                 | error {printf("que haces cap@ declara bien\n");}
 ;
+
 operadorAs: '=' | DIV_IGUAL | POR_IGUAL | MENOS_IGUAL | MAS_IGUAL | MOD_IGUAL 
 ;
 
 expCondicional: expOr
-                | expOr '?' expresion ':' expCondicional
+                | expOrOP expresion ':' expCondicional
 ;
 
 expOr:  expAnd
         | expOr OR expAnd
+;
+
+expOrOP: /* na de na */
+         | expOr
 ;
 
 expAnd: expOInclusivo
@@ -129,7 +137,7 @@ expAditiva:     expMultiplicativa
 ;
 
 expMultiplicativa: expConversion
-                        |expMultiplicativa '/' expConversion //     algo / 0 x  ERROR
+                        |expMultiplicativa '/' expConversion  { if($<real>3 == 0){printf("ERROR AL DIVIDIR POR 0"); return 0;}else $<real>$ = $<real>1 / $<real>3;}
                         |expMultiplicativa '*' expConversion
                         |expMultiplicativa '%' expConversion
 ;
@@ -138,10 +146,11 @@ expConversion: expUnaria
                 |'(' nombreTipo ')' expConversion
 ;
 
-expUnaria:      expPostfijo
+expUnaria:      expSufijo
                 | incremento expUnaria
                 | operUnario expConversion
                 | expUnaria incremento
+                | SIZEOF expUnaria
 ;
 
 incremento: P_INC | P_DEC
@@ -169,10 +178,13 @@ expPrimaria:    unID
                 | '(' expresion ')'
 ;
 
-nombreTipo: "char" | "const" | "float" | "int" | "long" | "signed" | "unsigned" | "short" | "void" | "struct" | "typedef" | "union" | "enum" 
+nombreTipo: "char" | "const" | "float" | "int" | "long" | "signed" | "unsigned" | "short" | "void" | "struct" | "typedef" | "union" | ENUM
 ;
 
-expConst: expCondicional;
+unID: IDENTIFICADOR
+        |IDENTIFICADOR '=' expresion
+        |error  {printf("ERROR: falta ID \n");}
+;
 
 /*SENTENCIAS*/
 
@@ -183,23 +195,31 @@ sentencia:      sentExp
                 | sentIteracion
                 | sentEtiquetada
                 | sentSalto
-                | error {printf("ERROR AL DECLARAR LA SENTENCIA");}
+                | error {printf("ERROR AL DECLARAR LA SENTENCIA \n");}
 ;
 
-sentExp: expresion '?'
+sentExp: expresionOP
 ;
 
-sentCompuesta:  '{' listaDeclaraciones '?' listaSentencias '?' '}'
+sentCompuesta:  '{' listaDeclaracionesOP listaSentenciasOP '}'
                 | '{' listaDeclaraciones '}'
                 | '{' listaSentencias '}'
                 | '{''}'
+;
+
+listaSentenciasOP: /*na de na*/
+                        |listaSentencias
+;
+
+listaDeclaracionesOP: /*na de na*/
+                        |listaDeclaraciones
 ;
 
 listaDeclaraciones:     listaDeclaraciones declaracion 
                         | declaracion
 ;
 
-listaDeclaraciones:     sentencia   
+listaSentencias:     sentencia
                         | listaSentencias sentencia
 ;
 
@@ -209,8 +229,8 @@ sentSeleccion:  IF '(' expresion ')' sentencia
 ;
 
 sentIteracion:  WHILE '(' expresion ')' sentencia
-                | DO sentencia WHILE '(' exprecion ')'
-                | FOR '(' expresion '?' ';' expresion '?' ';' expresion '?' ')' sentencia
+                | DO sentencia WHILE '(' expresion ')'
+                | FOR '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia
 ;
 
 sentEtiquetada: CASE expConstante ':' sentencia
@@ -218,10 +238,14 @@ sentEtiquetada: CASE expConstante ':' sentencia
                 | IDENTIFICADOR ':' sentencia
 ;
 
-sentSalto:      RETURN expresion '?' ';'
+sentSalto:      RETURN expresionOP ';'
                 | CONTINUE ';'
                 | BREAK ';'
                 | GOTO IDENTIFICADOR ';'
+;
+
+expresionOP: /* na de na */
+             | expresion
 ;
 
 sentAsignacion: IDENTIFICADOR '=' expresion ';'
@@ -230,115 +254,148 @@ sentAsignacion: IDENTIFICADOR '=' expresion ';'
 
 /*DECLARACIONES*/
 
-declaracion:    espeDec listDec '?' 
+declaracion:    espeDec listDecOP  
 ;
 
-espeDec:        espeClasAlma espDec '?'
-                |espeTipo espeDec '?'
-                |caliTipo espeDec '?'
+listaDecOP:     /* na de na */
+                |listDec
+;
+
+espeDec:        espeClasAlma espDecOP 
+                |espeTipo espeDecOP
+                |caliTipo espeDecOP
+;
+
+espeDecOP:      /* na de na */      
+                |espeDec
 ;
 
 listDec:        declarador 
                 |listDec ',' declarador
 ;
 
-declarador:     decla 
+declarador:     decla
                 |decla '=' inicializador
 ;
 
-inicializador:  expAsignación 
-                |'{'listInicial'}'  
-                |'{' listInicial ',' '}'
+inicializador:  expAsignación
+                |'{'listInicial'}'
+                |'{' listInicial comaOP '}'
 ;
 
-listInicial:    inicializador  
+comaOP: /* na de na */
+        | ','
+;
+
+listInicial:    inicializador
                 |listInicial ',' inicializador
 ;
 
-espeClasAlma: TYPEDEF | STATIC | AUTO | REGISTER | EXTERN
+espeClasAlma: "typedef" | "static" | "auto" | "register" | "extern"
 ;
 
-espeTipo: VOID | CHAR | SHORT | INT | LONG | FLOAT | DOUBLE | SIGNED | UNSIGNED
+espeTipo: nombreTipo
         | especificadorSU
         | especificadorE
         | nombreTypedef
 ;
 
-caliTipo: CONST | VOLATILE
+caliTipo: "const" | "volatile"
 ;
 
-especificadorSU: SU IDENTIFICADOR '?''{'listaDecS '}' |
+especificadorSU: SU IDENTIFICADOROP '{'listaDecS '}'
                 | SU IDENTIFICADOR
 ;
 
-SU: STRUCT | UNION
+IDENTIFICADOROP: /*na de na*/
+                |IDENTIFICADOR
+;
+
+SU: "struct" | "union"
 ;
 
 listaDecS: declaracionS
             | listaDecS declaracionS
 ;
 
-declaracionS: listCali decS
+declaracionS: listCali decS ';'
 ;
 
-listCali:  espeTipo listCali '?'
-            |caliTipo listCali '?'
+listCali: espeTipo listCaliOP
+            |caliTipo listCaliOP
 ;
 
-declaracionS: decS 
-            |declaracionS ',' decS
+listCaliOP: /* na de na */
+            |listCali
 ;
 
-decS: decS 
-    | decla '?' ':' expConst
+declaracionStruct: declaS
+            |declaracionStruct ',' declaS
 ;
 
-decla: puntero '?' decDirec
+declaS: declaS
+    | declaOP ':' expConst
 ;
 
-puntero:
-        listCaliTipos '?'
-        |listCaliTipos '?' puntero
+declaOP: /* na de na */
+          |decla
 ;
 
-listCaliTipos: caliTipo 
+decla: punteroOP decDirec
+;
+
+punteroOP: /* na de na */
+            | puntero
+;
+
+puntero: '*' listCaliTiposOP 
+        |'*' listCaliTiposOP puntero
+;
+
+listCaliTiposOP: /*na de na*/
+                |listaCaliTipos
+;
+
+listCaliTipos: caliTipo
                 |listCaliTipos caliTipo
 ;
 
-decDirec: identificador 
-        | '('decla')' 
-        | decDirec '[' expConst '?' ']' 
-        | decDirec '(' listTipoPar ')' 
-        | decDirec '(' listIden '?' ')' 
+decDirec: IDENTIFICADOR
+        | '('decla')'
+        | decDirec '[' expConstOP ']'
+        | decDirec '(' listTipoPar ')'
+        | decDirec '(' listIdenOP ')'
 ;
 
-listTipoPar:
-        listParam 
-       // | listParam ',' . . .  
+listIdenOP: /*na de na*/
+        | listaIden
 ;
 
-listParam:
-        decParam
-        | listParam ',' decParam
+listTipoPar:     listParam
+                | listParam ',' '.' '.' '.'
 ;
 
-decParam: espeDec decla 
-        | espeDec decAbstract
+listParam: decParam
+          | listParam ',' decParam
 ;
 
-listIden: identificador 
+decParam: espeDec decla
+        | espeDec decAbstractOP
+;
+
+listIden: IDENTIFICADOR
         | listIden ',' IDENTIFICADOR
 ;
 
-especificadorE: enum IDENTIFICADOR '?' '{' listEnum '} '
-        | enum IDENTIFICADOR
+especificadorE: ENUM IDENTIFICADOROP '{' listEnum '} '
+                | ENUM IDENTIFICADOR
 ;
 
 listEnum: enumerador
         | listEnum ',' enumerador
 ;
 
-enumerador: constEnum 
+enumerador: constEnum
         | constEnum '=' expConst
 ;
 
@@ -348,21 +405,50 @@ constEnum: IDENTIFICADOR
 nombreTypedef: IDENTIFICADOR
 ;
 
-nombTipo: listCali decAbstract '?'
+nombTipo: listCali decAbstractOP 
 ;
 
-decAbstract:puntero 
-        | puntero '?' decAbstDirec
+decAbstractOP: /*na de na*/
+                |decAbstract
+;
+decAbstract:puntero
+         | punteroOP decAbstDirec
 ;
 
-decAbstDirec: '('decAbstract')' 
-        | decAbstDirec '?' '['expConst '?'']' 
-        | decAbstDirec '?' '('listTipoPar '?'')'
+expConst: expCondicional
 ;
+
+expConstOP: /*na de na*/
+                |expConst
+;
+
+decAbstDirec: '('decAbstract')'
+                | decAbstDirecOP  '['expConstOP ']'
+                | decAbstDirecOP '('listTipoParOP ')'
+;
+
+listTipoParOP: /*na de na*/
+                |listTipoPar
+;
+
+decAbstDirecOP: /*na de na*/
+                | decAbstDirec 
+;
+
+
 
 %%
 
 int main (){
-        
+
+  yyin = fopen("entrada.c", "r");
+  yyout = fopen("salida.txt", "w");
+
+  #ifdef BISON_DEBUG
+       yydebug = 1;
+    #endif
+
   yyparse ();
+  fclose(yyin);
+  fclose(yyout);
 }

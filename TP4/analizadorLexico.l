@@ -28,6 +28,8 @@ CARACTER \'.\'
 ESPACIOS [" "|\t]*
 COMENTARIO_LINEA "//".*
 COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/  
+SIZEOF "sizeof"    
+ENUM "enum"
 
 P_INC "++"
 P_DEC "--"
@@ -76,6 +78,8 @@ FLECHITA "->"
 {BIT_SHIFT_R}                       { return BIT_SHIFT_R;                                               }
 {BIT_SHIFT_L}                       { return BIT_SHIFT_L;                                               }
 {FLECHITA}                          { return FLECHITA;                                                  } 
+{SIZEOF}                            { return SIZEOF;}
+{ENUM}                              { return ENUM;}
 .                                   {                                                                   }
 
 %%
