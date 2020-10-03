@@ -20,8 +20,8 @@ int yywrap()
     return(1);
 }
 
-void yyerror (char *cosa) {
-   fprintf ("encontre: %s\n", cosa);
+void yyerror (char *smth) {
+   fprintf ("encontre: %s\n", smth);
 }
 
 FILE* yyin;
@@ -36,6 +36,8 @@ FILE* yyout;
 %token <texto> LITERALCADENA
 %token <caracter> CARACTER
 %token <texto> PALABRA_RESERVADA
+
+%type <texto> ID
 
 %token P_INC
 %token P_DEC 
@@ -54,6 +56,9 @@ FILE* yyout;
 %token BIT_SHIFT_R
 %token FLECHITA
 %token SIZEOF
+%token ENUM
+
+
 // ACA ES LA ESPECIFICACION DE LA RECURSIVIDAD
 
 %union {
@@ -74,7 +79,6 @@ input:  /* vacio */
 line:   '\n'
         | expresion '\n'   {}
         | sentencia '\n'   {}
-        | funciones '\n'   {}
         | declaracion '\n' {}
 ;
 
@@ -138,7 +142,7 @@ expCorrimiento: expAditiva
                 
 expAditiva:     expMultiplicativa
                 | expAditiva '+' expMultiplicativa
-                | expaditiva '-' expMultiplicativa
+                | expAditiva '-' expMultiplicativa
 ;
 
 expMultiplicativa: expConversion
@@ -161,22 +165,22 @@ expUnaria:      expSufijo
 incremento: P_INC | P_DEC
 ;
 
-oprUnario: '&' | '*' | '-' | '!' | '+' | '~'
+operUnario: '&' | '*' | '-' | '!' | '+' | '~'
 ;
 
 expSufijo: expPrimaria
             | expSufijo '['expresion']'
             | expSufijo '('listaArgumentos')'
-            | expSufijo '.' unID
-            | expSufijo FLECHITA unID
+            | expSufijo '.' ID
+            | expSufijo FLECHITA ID
             | expSufijo P_INC
             | expSufijo P_DEC
 ;
 
-listaArgumentos: expAsignacion
-                | listaArgumentos ',' expAsignacion
+listaArgumentos: expresionAs
+                | listaArgumentos ',' expresionAs
 ;
-expPrimaria:    unID
+expPrimaria:    ID
                 | NUMERO_ENTERO
                 | NUMERO_REAL
                 | LITERALCADENA 
@@ -186,7 +190,7 @@ expPrimaria:    unID
 nombreTipo: "char" | "const" | "float" | "int" | "long" | "signed" | "unsigned" | "short" | "void" | "struct" | "typedef" | "union" | ENUM
 ;
 
-unID: IDENTIFICADOR
+ID: IDENTIFICADOR
         |IDENTIFICADOR '=' expresion
         |error  {printf("ERROR: falta ID \n");}
 ;
@@ -228,25 +232,25 @@ listaSentencias:     sentencia
                         | listaSentencias sentencia
 ;
 
-sentSeleccion:  IF '(' expresion ')' sentencia
-                | IF '(' expresion ')' sentencia ELSE
-                | SWITCH '(' expresion ')' sentencia
+sentSeleccion:  "if" '(' expresion ')' sentencia
+                | "if" '(' expresion ')' sentencia "else"
+                | "switch" '(' expresion ')' sentencia
 ;
 
-sentIteracion:  WHILE '(' expresion ')' sentencia
-                | DO sentencia WHILE '(' expresion ')'
-                | FOR '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia
+sentIteracion:  "while" '(' expresion ')' sentencia
+                | "do" sentencia "while" '(' expresion ')'
+                | "for" '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia
 ;
 
-sentEtiquetada: CASE expConstante ':' sentencia
-                | DEFAULT ':' sentencia
+sentEtiquetada: "case" expConst ':' sentencia
+                | "default" ':' sentencia
                 | IDENTIFICADOR ':' sentencia
 ;
 
-sentSalto:      RETURN expresionOP ';'
-                | CONTINUE ';'
-                | BREAK ';'
-                | GOTO IDENTIFICADOR ';'
+sentSalto:      "return" expresionOP ';'
+                | "continue" ';'
+                | "break" ';'
+                | "goto" IDENTIFICADOR ';'
 ;
 
 expresionOP: /* na de na */
@@ -259,14 +263,14 @@ sentAsignacion: IDENTIFICADOR '=' expresion ';'
 
 /*DECLARACIONES*/
 
-declaracion:    espeDec listDecOP  
+declaracion:    espeDec listaDecOP  
 ;
 
 listaDecOP:     /* na de na */
-                |listDec
+                |listaDecS
 ;
 
-espeDec:        espeClasAlma espDecOP 
+espeDec:        espeClasAlma espeDecOP 
                 |espeTipo espeDecOP
                 |caliTipo espeDecOP
 ;
@@ -283,7 +287,7 @@ declarador:     decla
                 |decla '=' inicializador
 ;
 
-inicializador:  expAsignación
+inicializador:  expresionAs
                 |'{'listInicial'}'
                 |'{' listInicial comaOP '}'
 ;
@@ -323,7 +327,7 @@ listaDecS: declaracionS
             | listaDecS declaracionS
 ;
 
-declaracionS: listCali decS ';'
+declaracionS: listCali declaS ';'
 ;
 
 listCali: espeTipo listCaliOP
@@ -358,7 +362,7 @@ puntero: '*' listCaliTiposOP
 ;
 
 listCaliTiposOP: /*na de na*/
-                |listaCaliTipos
+                |listCaliTipos
 ;
 
 listCaliTipos: caliTipo
@@ -373,7 +377,7 @@ decDirec: IDENTIFICADOR
 ;
 
 listIdenOP: /*na de na*/
-        | listaIden
+        | listIden
 ;
 
 listTipoPar:     listParam
