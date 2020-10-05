@@ -207,7 +207,7 @@ sentencia:      sentExp
                 | error {printf("ERROR AL DECLARAR LA SENTENCIA \n");}
 ;
 
-sentExp: expresionOP
+sentExp: expresionOP ';'
 ;
 
 sentCompuesta:  '{' listaDeclaracionesOP listaSentenciasOP '}'
@@ -233,7 +233,7 @@ listaSentencias:     sentencia
 ;
 
 sentSeleccion:  "if" '(' expresion ')' sentencia
-                | "if" '(' expresion ')' sentencia "else"
+                | "if" '(' expresion ')' "else" sentencia 
                 | "switch" '(' expresion ')' sentencia
 ;
 
@@ -288,7 +288,7 @@ declarador:     decla
 ;
 
 inicializador:  expresionAs
-                |'{'listInicial'}'
+                |'{' listInicial'}'
                 |'{' listInicial comaOP '}'
 ;
 
@@ -444,6 +444,17 @@ decAbstDirecOP: /*na de na*/
                 | decAbstDirec 
 ;
 
+/*FUNCIONES*/
+unidadDeTraduccion: decExterna
+                        |unidadDeTraduccion decExterna
+;
+
+decExterna: defFuncion {}
+                |declaracion
+;
+
+defFuncion: espeDecOP decla listaDeclaracionesOP sentCompuesta
+;
 
 %%
 
