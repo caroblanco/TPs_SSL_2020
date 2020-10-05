@@ -1,4 +1,3 @@
-
 /*reconocer expresiones, declaraciones de variables, declaraciones de funciones, sentencias de distintos tipos y definiciones de funciones.
 El mismo deberá tomar un archivo de texto como entrada (archivo fuente) y dar como salida en pantalla un reporte de variables declaradas 
 indicando tipo de dato correspondiente, funciones declaradas, tipos sentencias encontradas a medida que realiza la lectura del archivo fuente. 
