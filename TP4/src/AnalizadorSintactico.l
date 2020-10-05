@@ -18,7 +18,7 @@ CONSTANTE_REAL   [0-9]+"."[0-9]*([eE](\+|\-)?[0-9]+)?
 CARACTER_LETRAS [a-zA-Z]
 
 TIPO_DATO "void"|"char"|"short"|"int"|"long"|"float"|"double"|"signed"|"unsigned"
-ESTRUCTURAS "switch"|"case"|"break"|"default"|"continue"|"do"|"while"|"if"|"else"|"for"|"return"|"goto"
+
 IDENTIFICADOR ({CARACTER_LETRAS}|_)({CARACTER_LETRAS}|[0-9]|_)*
 LITERAL_CADENA \".+\"
 CARACTER \'.\'
@@ -54,13 +54,12 @@ SALTO_DE_LINEA \n
 {CONSTANTE_OCTAL}	                { yyval.entero = strtol(yytext, NULL, 8); return NUMERO_ENTERO;     }
 {CONSTANTE_HEXADECIMAL}	            { yyval.entero = strtol(yytext, NULL, 16); return NUMERO_ENTERO;    }
 {CONSTANTE_REAL}	                { yyval.real = strtof(yytext, NULL); return NUMERO_REAL;            }
+{SIZEOF}                            { return SIZEOF;                                                    }
+{ENUM}                              { return ENUM;                                                      }
 {CARACTER}	                        { return yytext[0];                                                 }
-{IDENTIFICADOR}                     { strcpy(yylval.texto, yytext); return IDENTIFICADOR;               }
 {TIPO_DATO}                         { yylval.texto = strdup(yytext); return TIPO_DATO;                  }
-{ESTRUCTURAS}                       { strcpy(yylval.texto, yytext); return ESTRUCTURAS;                 }
+{IDENTIFICADOR}                     { strcpy(yylval.texto, yytext); return IDENTIFICADOR;               }
 {CARACTERES_PUNTUACION_OPERADORES}  { return yytext[0];                                                 }
-{ESPACIOS}+                         {                                                                   }
-{COMENTARIO_LINEA}                  {                                                                   }
 {P_INC}                             { return P_INC;                                                     }
 {P_DEC}                             { return p_DEC;                                                     }
 {DISTINTO}                          { return DISTINTO;                                                  }
@@ -77,8 +76,8 @@ SALTO_DE_LINEA \n
 {BIT_SHIFT_R}                       { return BIT_SHIFT_R;                                               }
 {BIT_SHIFT_L}                       { return BIT_SHIFT_L;                                               }
 {FLECHITA}                          { return FLECHITA;                                                  } 
-{SIZEOF}                            { return SIZEOF;}
-{ENUM}                              { return ENUM;}
+{ESPACIOS}+                         {                                                                   }
+{COMENTARIO_LINEA}                  {                                                                   }
 {COMODIN}                           {                                                                   }
 
 %%

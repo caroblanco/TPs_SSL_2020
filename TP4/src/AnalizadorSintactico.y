@@ -57,7 +57,6 @@ FILE* yyout;
 %token SIZEOF
 %token ENUM
 
-
 // ACA ES LA ESPECIFICACION DE LA RECURSIVIDAD
 
 %union {
@@ -75,32 +74,33 @@ input:  /* vacio */
         | input line
 ;
 
-line:   '\n'
-        | expresion '\n'   {}
-        | sentencia '\n'   {}
-        | declaracion '\n' {}
+line:   '\n'                                    {fprintf(yyout,"\n");}
+        | expresion '\n'                        {fprintf(yyout,"--------EXPRESION--------")}
+        | sentencia '\n'                        {fprintf(yyout,"--------SENTENCIA--------")}
+        | declaracion '\n'                      {fprintf(yyout,"--------DECLARACION--------")}
+        | unidadDeTraduccion '\n'               {fprintf(yyout,"--------FUNCION--------")}
 ;
 
 /*EXPRESIONES*/
 
 expresion: expresionAs  
-        |expresion ';' expresionAs
+        |expresion ';' expresionAs              {fprintf(yyout, "Se encontro un ; \n");}
 ;
 
 expresionAs:      expUnaria operadorAs expresionAs
                 | expCondicional
-                | error {printf("que haces cap@ declara bien\n");}
+                | error                         {printf("ERROR al declarar la expresion asignacion \n");}
 ;
 
 operadorAs: '=' | DIV_IGUAL | POR_IGUAL | MENOS_IGUAL | MAS_IGUAL | MOD_IGUAL 
 ;
 
 expCondicional: expOr
-                | expOrOP expresion ':' expCondicional
+                | expOrOP expresion ':' expCondicional          {fprintf(yyout, "Se encontro un : \n");}
 ;
 
 expOr:  expAnd
-        | expOr OR expAnd
+        | expOr OR expAnd                       {fprintf(yyout, "Se encontro un || \n");}
 ;
 
 expOrOP: /* na de na */
@@ -108,46 +108,46 @@ expOrOP: /* na de na */
 ;
 
 expAnd: expOInclusivo
-        | expAnd AND expOInclusivo
+        | expAnd AND expOInclusivo              {fprintf(yyout, "Se encontro un && \n");}
 ;
 
 expOInclusivo: expOExcluyente
-                |expOInclusivo '|' expOExcluyente
+                |expOInclusivo '|' expOExcluyente       {fprintf(yyout, "Se encontro un | \n");}
 ;
 
 expOExcluyente: expY
-                |expOExcluyente '^' expY
+                |expOExcluyente '^' expY        {fprintf(yyout, "Se encontro un ^ \n");}
 ;
 
 expY: expIgualdad
-        |expY '&' expIgualdad
+        |expY '&' expIgualdad                   {fprintf(yyout, "Se encontro un & \n");}
 ;
 
 expIgualdad:    expRelacional
-                | expIgualdad IGUAL expRelacional
-                | expIgualdad DISTINTO expRelacional
+                | expIgualdad IGUAL expRelacional       {fprintf(yyout, "Se encontro un == \n");}
+                | expIgualdad DISTINTO expRelacional    {fprintf(yyout, "Se encontro un != \n");}
 ;            
 expRelacional:  expAditiva
-                | expRelacional MAYOR_IGUAL expAditiva 
-                | expRelacional '>' expAditiva
-                | expRelacional MENOR_IGUAL expAditiva
-                | expRelacional '<' expAditiva
+                | expRelacional MAYOR_IGUAL expAditiva  {fprintf(yyout, "Se encontro un >= \n");}
+                | expRelacional '>' expAditiva          {fprintf(yyout, "Se encontro un > \n");}
+                | expRelacional MENOR_IGUAL expAditiva  {fprintf(yyout, "Se encontro un <= \n");}
+                | expRelacional '<' expAditiva          {fprintf(yyout, "Se encontro un >= \n");}
 ;
 
 expCorrimiento: expAditiva
-                |expCorrimiento BIT_SHIFT_L expAditiva
-                |expAditiva BIT_SHIFT_R expCorrimiento
+                |expCorrimiento BIT_SHIFT_L expAditiva          {fprintf(yyout, "Se encontro un << \n");}
+                |expAditiva BIT_SHIFT_R expCorrimiento          {fprintf(yyout, "Se encontro un >> \n");}
 ;
                 
 expAditiva:     expMultiplicativa
-                | expAditiva '+' expMultiplicativa
-                | expAditiva '-' expMultiplicativa
+                | expAditiva '+' expMultiplicativa      {fprintf(yyout, "Se encontro un + \n");}
+                | expAditiva '-' expMultiplicativa      {fprintf(yyout, "Se encontro un - \n");}
 ;
 
 expMultiplicativa: expConversion
-                        |expMultiplicativa '/' expConversion  { if($<real>3 == 0){printf("ERROR AL DIVIDIR POR 0"); return 0;}else $<real>$ = $<real>1 / $<real>3;}
-                        |expMultiplicativa '*' expConversion
-                        |expMultiplicativa '%' expConversion
+                        |expMultiplicativa '/' expConversion    { if($<real>3 == 0){printf("ERROR AL DIVIDIR POR 0"); return 0;}else $<real>$ = $<real>1 / $<real>3; fprintf(yyout,"se encontro un / \n");}
+                        |expMultiplicativa '*' expConversion    {fprintf(yyout, "Se encontro un * \n");}
+                        |expMultiplicativa '%' expConversion    {fprintf(yyout, "Se encontro un % \n");}
 ;
 
 expConversion: expUnaria
@@ -155,38 +155,40 @@ expConversion: expUnaria
 ;
 
 expUnaria:      expSufijo
-                | incremento expUnaria
-                | operUnario expConversion
-                | expUnaria incremento
+                | incremento expUnaria 
+                | operUnario expConversion 
+                | expUnaria incremento 
                 | SIZEOF expUnaria
 ;
 
-incremento: P_INC | P_DEC
+incremento: P_INC               {fprintf(yyout, "Se encontro un ++ \n");} 
+                | P_DEC         {fprintf(yyout, "Se encontro un -- \n");}
 ;
 
 operUnario: '&' | '*' | '-' | '!' | '+' | '~'
 ;
 
 expSufijo: expPrimaria
-            | expSufijo '['expresion']'
-            | expSufijo '('listaArgumentos')'
-            | expSufijo '.' ID
-            | expSufijo FLECHITA ID
-            | expSufijo P_INC
-            | expSufijo P_DEC
+            | expSufijo '['expresion']'         {fprintf(yyout, "Se encontro [ y ] \n");}
+            | expSufijo '('listaArgumentos')'   {fprintf(yyout, "Se encontro un ( y un )\n");}
+            | expSufijo '.' ID                  {fprintf(yyout, "Se encontro un . \n"); fprintf(yyout, "Identificador = %s \n", $<texto>3);}
+            | expSufijo FLECHITA ID             {fprintf(yyout, "Se encontro un -> \n"); fprintf(yyout, "Identificador = %s /n", $<texto>3);}
+            | expSufijo P_INC                   {fprintf(yyout, "Se encontro un ++ \n");}
+            | expSufijo P_DEC                   {fprintf(yyout, "Se encontro un -- \n");}
 ;
 
 listaArgumentos: expresionAs
                 | listaArgumentos ',' expresionAs
 ;
-expPrimaria:    ID
-                | NUMERO_ENTERO
-                | NUMERO_REAL
-                | LITERALCADENA 
-                | '(' expresion ')'
+
+expPrimaria:    ID                      {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
+                | NUMERO_ENTERO         {fprintf(yyout, "Num entero = %d \n",$<entero>1);}
+                | NUMERO_REAL           {fprintf(yyout, "Num real = %f \n",$<real>1);}
+                | LITERALCADENA         {fprintf(yyout, "String = %s \n",$<texto>1);}
+                | '(' expresion ')'     {fprintf(yyout, "Se encontro un ( y un ) \n");}
 ;
 
-nombreTipo: "char" | "const" | "float" | "int" | "long" | "signed" | "unsigned" | "short" | "void" | "struct" | "typedef" | "union" | ENUM
+nombreTipo: TIPO_DATO | "struct" | "typedef" | "union" | ENUM
 ;
 
 ID: IDENTIFICADOR
@@ -197,13 +199,13 @@ ID: IDENTIFICADOR
 /*SENTENCIAS*/
 
 sentencia:      sentExp
-                | sentCompuesta
-                | sentAsignacion
-                | sentSeleccion
-                | sentIteracion
-                | sentEtiquetada
-                | sentSalto
-                | error {printf("ERROR AL DECLARAR LA SENTENCIA \n");}
+                | sentCompuesta         {printf("Se declaro una sentencia compuesta");}
+                | sentAsignacion        {printf("Se declaro una sentencia de asignacion");}
+                | sentSeleccion         {printf("Se declaro una sentencia de seleccion");}
+                | sentIteracion         {printf("Se declaro una sentencia de iteracion");}
+                | sentEtiquetada        {printf("Se declaro una sentencia etiquetada");}
+                | sentSalto             {printf("Se declaro una sentencia de salto");}
+                | error                 {printf("ERROR AL DECLARAR LA SENTENCIA \n");}
 ;
 
 sentExp: expresionOP ';'
@@ -231,32 +233,32 @@ listaSentencias:     sentencia
                         | listaSentencias sentencia
 ;
 
-sentSeleccion:  "if" '(' expresion ')' sentencia
-                | "if" '(' expresion ')' "else" sentencia 
-                | "switch" '(' expresion ')' sentencia
+sentSeleccion:  "if" '(' expresion ')' sentencia                {fprintf(yyout, "Se utiliza el If \n");}
+                | "if" '(' expresion ')' "else" sentencia       {fprintf(yyout,"Se utiliza el If Else \n");}
+                | "switch" '(' expresion ')' sentencia          {fprintf(yyout,"Se utiliza el Switch \n")}
 ;
 
-sentIteracion:  "while" '(' expresion ')' sentencia
-                | "do" sentencia "while" '(' expresion ')'
-                | "for" '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia
+sentIteracion:  "while" '(' expresion ')' sentencia                                     {fprintf(yyout, "Se utiliza el While \n");}
+                | "do" sentencia "while" '(' expresion ')'                              {fprintf(yyout, "Se utiliza el Do While \n");}
+                | "for" '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia   {fprintf(yyout,"Se utiliza el for \n");}
 ;
 
-sentEtiquetada: "case" expConst ':' sentencia
-                | "default" ':' sentencia
-                | IDENTIFICADOR ':' sentencia
+sentEtiquetada: "case" expConst ':' sentencia                   {fprintf(yyout, "Se utiliza un Case \n");}
+                | "default" ':' sentencia                       {fprintf(yyout,"Se utiliza el Default \n");}
+                | IDENTIFICADOR ':' sentencia                   {fprintf(yyout, "Identificador = %s \n",$<texto>1); fprintf(yyout, "se utiliza el : \n");}
 ;
 
-sentSalto:      "return" expresionOP ';'
-                | "continue" ';'
-                | "break" ';'
-                | "goto" IDENTIFICADOR ';'
+sentSalto:      "return" expresionOP ';'                        {fprintf(yyout,"Se utiliza el return \n");}
+                | "continue" ';'                                {fprintf(yyout, "Se utiliza el Continue \n");}
+                | "break" ';'                                   {fprintf(yyout,"Se utiliza el Break \n");}
+                | "goto" IDENTIFICADOR ';'                      {fprintf(yyout,"Se utiliza el Goto\n");}
 ;
 
 expresionOP: /* na de na */
-             | expresion
+             | expresion 
 ;
 
-sentAsignacion: IDENTIFICADOR '=' expresion ';'
+sentAsignacion: IDENTIFICADOR '=' expresion ';'                 {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
 ;
 
 
@@ -311,22 +313,23 @@ espeTipo: nombreTipo
 caliTipo: "const" | "volatile"
 ;
 
-especificadorSU: SU IDENTIFICADOROP '{'listaDecS '}'
-                | SU IDENTIFICADOR
+especificadorSU: SU IDENTIFICADOROP '{'listaDecS '}'    
+                | SU IDENTIFICADOR                      {fprintf(yyout, "Identificador = %s \n",$<texto>2);}
 ;
 
 IDENTIFICADOROP: /*na de na*/
-                |IDENTIFICADOR
+                |IDENTIFICADOR                          {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
 ;
 
-SU: "struct" | "union"
+SU: "struct"                                            {fprintf(yyout, "se utiliza un struct \n");}
+        | "union"                                       {fprintf(yyout, "se utiliza un union \n");}
 ;
 
 listaDecS: declaracionS
             | listaDecS declaracionS
 ;
 
-declaracionS: listCali declaS ';'
+declaracionS: listCali declaS ';'                       
 ;
 
 listCali: espeTipo listCaliOP
@@ -353,10 +356,10 @@ decla: punteroOP decDirec
 ;
 
 punteroOP: /* na de na */
-            | puntero
+            | puntero                           {fprinf(yyout, "Se declaro un Puntero \n");}
 ;
 
-puntero: '*' listCaliTiposOP 
+puntero: '*' listCaliTiposOP            
         |'*' listCaliTiposOP puntero
 ;
 
@@ -368,7 +371,7 @@ listCaliTipos: caliTipo
                 |listCaliTipos caliTipo
 ;
 
-decDirec: IDENTIFICADOR
+decDirec: IDENTIFICADOR {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
         | '('decla')'
         | decDirec '[' expConstOP ']'
         | decDirec '(' listTipoPar ')'
@@ -391,7 +394,7 @@ decParam: espeDec decla
         | espeDec decAbstractOP
 ;
 
-listIden: IDENTIFICADOR
+listIden: IDENTIFICADOR         {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
         | listIden ',' IDENTIFICADOR
 ;
 
@@ -407,10 +410,10 @@ enumerador: constEnum
         | constEnum '=' expConst
 ;
 
-constEnum: IDENTIFICADOR
+constEnum: IDENTIFICADOR        {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
 ;
 
-nombreTypedef: IDENTIFICADOR
+nombreTypedef: IDENTIFICADOR    {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
 ;
 
 nombTipo: listCali decAbstractOP 
@@ -448,7 +451,7 @@ unidadDeTraduccion: decExterna
                         |unidadDeTraduccion decExterna
 ;
 
-decExterna: defFuncion {}
+decExterna: defFuncion          {fprintf(yyout, "se declaro a la funcion %s \n",$<texto>1);}
                 |declaracion
 ;
 
