@@ -264,7 +264,7 @@ sentAsignacion: IDENTIFICADOR '=' expresion ';'                 {fprintf(yyout, 
 
 /*DECLARACIONES*/
 
-declaracion:    espeDec listaDecOP  
+declaracion:    espeDec listaDecOP ';'
 ;
 
 listaDecOP:     /* na de na */
