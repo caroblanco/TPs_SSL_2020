@@ -206,7 +206,19 @@ expPrimaria:    ID                      {fprintf(yyout, "Identificador = %s \n",
                 | '(' expresion ')'     {fprintf(yyout, "Se encontro un ( y un ) \n");}
 ;
 
-nombreTipo: TIPO_DATO | STRUCT | TYPEDEF | UNION | ENUM
+nombreTipo: tipoDato | STRUCT | TYPEDEF | UNION | ENUM
+;
+
+tipoDato: CHAR
+        |INT
+        |FLOAT
+        |LONG
+        |SHORT
+        |SIGNED
+        |UNSIGNED
+        |VOID
+        |ENUM
+        |DOUBLE
 ;
 
 ID: IDENTIFICADOR
