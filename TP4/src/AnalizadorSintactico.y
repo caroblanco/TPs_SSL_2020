@@ -11,6 +11,12 @@ Deberá indicarse aquellas secuencias que no pertenezcan a ninguna categoría l�
 #define YYDEBUG 1
 
 int flag_error = 0; 
+int linea=1;
+
+extern FILE* yyin;
+FILE* yyout;
+
+extern int line;
 
 int yylex();
 
@@ -20,21 +26,17 @@ int yywrap()
 }
 
 void yyerror (char *smth) {
-   fprintf ("encontre: %s\n", smth);
+   fprintf (yyout,"error sintactico en la linea: %d = %s\n",line, smth);
 }
-
-FILE* yyin;
-FILE* yyout;
 
 %}
 
 %token <entero> NUMERO_ENTERO
 %token <real> NUMERO_REAL
-%token <texto> TIPO_DATO
 %token <texto> IDENTIFICADOR
-%token <texto> LITERALCADENA
+%token <texto> STRING
 %token <caracter> CARACTER
-%token <texto> PALABRA_RESERVADA
+%token <entero> error
 
 %type <texto> ID
 
@@ -54,10 +56,38 @@ FILE* yyout;
 %token BIT_SHIFT_L
 %token BIT_SHIFT_R
 %token FLECHITA
-%token SIZEOF
+%token DO
+%token WHILE
+%token IF
+%token ELSE
+%token FOR
+%token RETURN
+%token GOTO
+%token STATIC
+%token EXTERN
+%token CONST
+%token VOLATILE
+%token STRUCT
+%token UNION
+%token TYPEDEF
+%token AUTO
+%token REGISTER
+%token CHAR
+%token INT
+%token FLOAT
+%token LONG
+%token SHORT
+%token SIGNED
+%token UNSIGNED
+%token VOID
 %token ENUM
-
-// ACA ES LA ESPECIFICACION DE LA RECURSIVIDAD
+%token DOUBLE
+%token SIZEOF
+%token SWITCH
+%token CASE
+%token BREAK
+%token DEFAULT
+%token CONTINUE
 
 %union {
     int entero;
@@ -65,8 +95,7 @@ FILE* yyout;
     char caracter;
     float real;
 }
-
-// VER LINEAS: 72, que va entre llaves  -- 
+ 
  
 %% 
 
@@ -74,11 +103,12 @@ input:  /* vacio */
         | input line
 ;
 
-line:   '\n'                                    {fprintf(yyout,"\n");}
-        | expresion '\n'                        {fprintf(yyout,"--------EXPRESION--------")}
-        | sentencia '\n'                        {fprintf(yyout,"--------SENTENCIA--------")}
-        | declaracion '\n'                      {fprintf(yyout,"--------DECLARACION--------")}
-        | unidadDeTraduccion '\n'               {fprintf(yyout,"--------FUNCION--------")}
+line:   '\n'                                    {fprintf(yyout,"\n"); linea++;}
+        | expresion '\n'                        {fprintf(yyout,"--------EXPRESION--------");linea++;}
+        | sentencia '\n'                        {fprintf(yyout,"--------SENTENCIA--------");}
+        | declaracion '\n'                      {fprintf(yyout,"--------DECLARACION--------");linea++;}
+        | unidadDeTraduccion '\n'               {fprintf(yyout,"--------FUNCION--------");linea++;}
+        | error '\n'                            {fprintf(yyout, "\nse detecto un error sintactico en la linea %i", linea); linea++;}
 ;
 
 /*EXPRESIONES*/
@@ -108,19 +138,7 @@ expOrOP: /* na de na */
 ;
 
 expAnd: expOInclusivo
-        | expAnd AND expOInclusivo              {fprintf(yyout, "Se encontro un && \n");}
-;
-
-expOInclusivo: expOExcluyente
-                |expOInclusivo '|' expOExcluyente       {fprintf(yyout, "Se encontro un | \n");}
-;
-
-expOExcluyente: expY
-                |expOExcluyente '^' expY        {fprintf(yyout, "Se encontro un ^ \n");}
-;
-
-expY: expIgualdad
-        |expY '&' expIgualdad                   {fprintf(yyout, "Se encontro un & \n");}
+        | expAnd AND expIgualdad             {fprintf(yyout, "Se encontro un && \n");}
 ;
 
 expIgualdad:    expRelacional
@@ -188,7 +206,7 @@ expPrimaria:    ID                      {fprintf(yyout, "Identificador = %s \n",
                 | '(' expresion ')'     {fprintf(yyout, "Se encontro un ( y un ) \n");}
 ;
 
-nombreTipo: TIPO_DATO | "struct" | "typedef" | "union" | ENUM
+nombreTipo: TIPO_DATO | STRUCT | TYPEDEF | UNION | ENUM
 ;
 
 ID: IDENTIFICADOR
@@ -198,19 +216,22 @@ ID: IDENTIFICADOR
 
 /*SENTENCIAS*/
 
-sentencia:      sentExp
+sentencia:      sentExp                 {printf("Se declaro una sentencia expresion");}
                 | sentCompuesta         {printf("Se declaro una sentencia compuesta");}
                 | sentAsignacion        {printf("Se declaro una sentencia de asignacion");}
                 | sentSeleccion         {printf("Se declaro una sentencia de seleccion");}
                 | sentIteracion         {printf("Se declaro una sentencia de iteracion");}
                 | sentEtiquetada        {printf("Se declaro una sentencia etiquetada");}
                 | sentSalto             {printf("Se declaro una sentencia de salto");}
-                | error                 {printf("ERROR AL DECLARAR LA SENTENCIA \n");}
+                | error                 {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
 ;
 
+//EXPRESION
 sentExp: expresionOP ';'
+        | error                         {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
 ;
 
+//COMPUESTA
 sentCompuesta:  '{' listaDeclaracionesOP listaSentenciasOP '}'
                 | '{' listaDeclaraciones '}'
                 | '{' listaSentencias '}'
@@ -231,33 +252,40 @@ listaDeclaraciones:     listaDeclaraciones declaracion
 
 listaSentencias:     sentencia
                         | listaSentencias sentencia
+                                | error                         {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
 ;
 
-sentSeleccion:  "if" '(' expresion ')' sentencia                {fprintf(yyout, "Se utiliza el If \n");}
-                | "if" '(' expresion ')' "else" sentencia       {fprintf(yyout,"Se utiliza el If Else \n");}
-                | "switch" '(' expresion ')' sentencia          {fprintf(yyout,"Se utiliza el Switch \n")}
+//SELECCION
+sentSeleccion:  IF '(' expresion ')' sentencia                {fprintf(yyout, "Se utiliza el If \n");}
+                | IF '(' expresion ')' ELSE sentencia       {fprintf(yyout,"Se utiliza el If Else \n");}
+                | SWITCH '(' expresion ')' sentencia          {fprintf(yyout,"Se utiliza el Switch \n")}
+                | error                                        {printf("ERROR AL DEFINIR LA EXPRESION \n");}
 ;
 
-sentIteracion:  "while" '(' expresion ')' sentencia                                     {fprintf(yyout, "Se utiliza el While \n");}
-                | "do" sentencia "while" '(' expresion ')'                              {fprintf(yyout, "Se utiliza el Do While \n");}
-                | "for" '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia   {fprintf(yyout,"Se utiliza el for \n");}
+//ITERACION
+sentIteracion:  WHILE '(' expresion ')' sentencia                                     {fprintf(yyout, "Se utiliza el While \n");}
+                | DO sentencia WHILE '(' expresion ')'                              {fprintf(yyout, "Se utiliza el Do While \n");}
+                | FOR '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia   {fprintf(yyout,"Se utiliza el for \n");}
 ;
 
-sentEtiquetada: "case" expConst ':' sentencia                   {fprintf(yyout, "Se utiliza un Case \n");}
-                | "default" ':' sentencia                       {fprintf(yyout,"Se utiliza el Default \n");}
+//ETIQUETADA
+sentEtiquetada: CASE expConst ':' sentencia                   {fprintf(yyout, "Se utiliza un Case \n");}
+                | DEFAULT ':' sentencia                       {fprintf(yyout,"Se utiliza el Default \n");}
                 | IDENTIFICADOR ':' sentencia                   {fprintf(yyout, "Identificador = %s \n",$<texto>1); fprintf(yyout, "se utiliza el : \n");}
 ;
 
-sentSalto:      "return" expresionOP ';'                        {fprintf(yyout,"Se utiliza el return \n");}
-                | "continue" ';'                                {fprintf(yyout, "Se utiliza el Continue \n");}
-                | "break" ';'                                   {fprintf(yyout,"Se utiliza el Break \n");}
-                | "goto" IDENTIFICADOR ';'                      {fprintf(yyout,"Se utiliza el Goto\n");}
+//SALTO
+sentSalto:      RETURN expresionOP ';'                        {fprintf(yyout,"Se utiliza el return \n");}
+                | CONTINUE ';'                                {fprintf(yyout, "Se utiliza el Continue \n");}
+                | BREAK ';'                                   {fprintf(yyout,"Se utiliza el Break \n");}
+                | GOTO IDENTIFICADOR ';'                      {fprintf(yyout,"Se utiliza el Goto\n");}
 ;
 
 expresionOP: /* na de na */
              | expresion 
 ;
 
+//ASIGNACION
 sentAsignacion: IDENTIFICADOR '=' expresion ';'                 {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
 ;
 
@@ -301,7 +329,7 @@ listInicial:    inicializador
                 |listInicial ',' inicializador
 ;
 
-espeClasAlma: "typedef" | "static" | "auto" | "register" | "extern"
+espeClasAlma: TYPEDEF | STATIC | AUTO | REGISTER | EXTERN
 ;
 
 espeTipo: nombreTipo
@@ -310,7 +338,7 @@ espeTipo: nombreTipo
         | nombreTypedef
 ;
 
-caliTipo: "const" | "volatile"
+caliTipo: CONST | VOLATILE
 ;
 
 especificadorSU: SU IDENTIFICADOROP '{'listaDecS '}'    
@@ -321,8 +349,8 @@ IDENTIFICADOROP: /*na de na*/
                 |IDENTIFICADOR                          {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
 ;
 
-SU: "struct"                                            {fprintf(yyout, "se utiliza un struct \n");}
-        | "union"                                       {fprintf(yyout, "se utiliza un union \n");}
+SU: STRUCT                                           {fprintf(yyout, "se utiliza un struct \n");}
+        | UNION                                       {fprintf(yyout, "se utiliza un union \n");}
 ;
 
 listaDecS: declaracionS
@@ -462,6 +490,8 @@ defFuncion: espeDecOP decla listaDeclaracionesOP sentCompuesta
 
 int main (){
 
+  int flag;
+
   yyin = fopen("entrada.c", "r");
   yyout = fopen("salida.txt", "w");
 
@@ -469,7 +499,8 @@ int main (){
        yydebug = 1;
     #endif
 
-  yyparse ();
+  flag = yyparse ();
   fclose(yyin);
   fclose(yyout);
+  return flag;
 }
