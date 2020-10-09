@@ -98,22 +98,22 @@ input:  /* vacio */
 ;
 
 line:   '\n'                                    {fprintf(yyout,"\n"); linea++;}
-        | sentencia '\n'                        {fprintf(yyout,"--------SENTENCIA--------");}
-        | expresion '\n'                        {fprintf(yyout,"--------EXPRESION--------");linea++;}
-        | declaracion '\n'                      {fprintf(yyout,"--------DECLARACION--------");linea++;}
-        | unidadDeTraduccion '\n'               {fprintf(yyout,"--------FUNCION--------");linea++;}
-        | error '\n'                            {fprintf(yyout, "\nse detecto un error sintactico en la linea %i", linea); linea++;}
+        | sentencia                             {fprintf(yyout,"--------SENTENCIA--------\n");}
+        | expresion                             {fprintf(yyout,"--------EXPRESION--------\n");linea++;}
+        | declaracion                           {fprintf(yyout,"--------DECLARACION--------\n");linea++;}
+        | definicionFunciones                   {fprintf(yyout,"-------FUNCION--------\n");linea ++;}
+        | error                                 {fprintf(yyout, "\nse detecto un error sintactico en la linea %i \n", linea); linea++;}
 ;
 
 /*EXPRESIONES*/
 
-expresion: expresionAs  
+expresion: expresionAs 
         |expresion ';' expresionAs              {fprintf(yyout, "Se encontro un ; \n");}
 ;
 
-expresionAs:      expUnaria operadorAs expresionAs
-                | expCondicional
-                | error                         {printf("ERROR al declarar la expresion asignacion \n");}
+expresionAs:      expUnaria operadorAs expresionAs      {fprintf(yyout, "EXPRESION AS \n");}
+                | expCondicional                        {fprintf(yyout, "EXPRESION COND \n");}
+                | error                                 {fprintf(yyout,"ERROR al declarar la expresion asignacion \n");}
 ;
 
 operadorAs: '=' | DIV_IGUAL | POR_IGUAL | MENOS_IGUAL | MAS_IGUAL | MOD_IGUAL 
@@ -128,7 +128,7 @@ expOr:  expAnd
 ;
 
 expOrOP: /* na de na */
-         | expOr
+|         | expOr
 ;
 
 expAnd: expIgualdad
@@ -146,10 +146,10 @@ expRelacional:  expAditiva
                 | expRelacional '<' expAditiva          {fprintf(yyout, "Se encontro un >= \n");}
 ;
 
-expCorrimiento: expAditiva
+/*expCorrimiento: expAditiva
                 |expCorrimiento BIT_SHIFT_L expAditiva          {fprintf(yyout, "Se encontro un << \n");}
                 |expAditiva BIT_SHIFT_R expCorrimiento          {fprintf(yyout, "Se encontro un >> \n");}
-;
+;*/
                 
 expAditiva:     expMultiplicativa
                 | expAditiva '+' expMultiplicativa      {fprintf(yyout, "Se encontro un + \n");}
@@ -180,7 +180,7 @@ incremento: P_INC               {fprintf(yyout, "Se encontro un ++ \n");}
 operUnario: '&' | '*' | '-' | '!' | '+' | '~'
 ;
 
-expSufijo: expPrimaria
+expSufijo: expPrimaria                          
             | expSufijo '['expresion']'         {fprintf(yyout, "Se encontro [ y ] \n");}
             | expSufijo '('listaArgumentos')'   {fprintf(yyout, "Se encontro un ( y un )\n");}
             | expSufijo '.' ID                  {fprintf(yyout, "Se encontro un . \n"); /*fprintf(yyout, "Identificador = %s \n", $<texto>3);*/}
@@ -217,7 +217,7 @@ tipoDato: CHAR
 
 ID: IDENTIFICADOR
         |IDENTIFICADOR '=' expresion
-        |error  {printf("ERROR: falta ID \n");}
+        |error  {fprintf(yyout,"ERROR: falta ID \n");}
 ;
 
 /*SENTENCIAS*/
@@ -267,7 +267,7 @@ listaSentencias:     sentencia
 
 //SELECCION
 sentSeleccion:  IF '(' expresion ')' sentencia                {fprintf(yyout, "Se utiliza el If \n");}
-                | IF '(' expresion ')' ELSE sentencia       {fprintf(yyout,"Se utiliza el If Else \n");}
+                | IF '(' expresion ')' sentencia ELSE sentencia       {fprintf(yyout,"Se utiliza el If Else \n");}
                 | SWITCH '(' expresion ')' sentencia          {fprintf(yyout,"Se utiliza el Switch \n")}
                 | error                                        {printf("ERROR AL DEFINIR LA EXPRESION \n");}
 ;
@@ -283,7 +283,8 @@ sentEtiquetada: CASE expConst ':' sentencia                   {fprintf(yyout, "S
                 | DEFAULT ':' sentencia                       {fprintf(yyout,"Se utiliza el Default \n");}
                 | IDENTIFICADOR ':' sentencia                   {fprintf(yyout, "Identificador = %s \n",$<texto>1); fprintf(yyout, "se utiliza el : \n");}
 ;
-
+expConst: expCondicional
+;
 //SALTO
 sentSalto:      RETURN expresionOP ';'                        {fprintf(yyout,"Se utiliza el return \n");}
                 | CONTINUE ';'                                {fprintf(yyout, "Se utiliza el Continue \n");}
@@ -299,202 +300,52 @@ expresionOP: /* na de na */
 sentAsignacion: IDENTIFICADOR '=' expresion ';'                 {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
 ;
 
-
 /*DECLARACIONES*/
-
-declaracion:    espeDec listaDecOP ';'
+declaracion: declaracionVariablesSimples  {fprintf(yyout,"termine de leer\n");}
+            | declaracionFunciones
 ;
 
-listaDecOP:     /* na de na */
-                |listaDecS
+declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {fprintf(yyout,"empieza la declaracion de variable simple\n");}
 ;
 
-espeDec:        espeClasAlma espeDecOP 
-                |espeTipo espeDecOP
-                |caliTipo espeDecOP
+listaVariablesSimples: variableSimple       {fprintf(yyout,"declaro una\n");}
+                     | listaVariablesSimples ',' variableSimple
 ;
 
-espeDecOP:      /* na de na */      
-                |espeDec
+variableSimple: expSufijo opcionInicializacion {fprintf(yyout,"identificador = %s\n",$<texto>1);}
 ;
 
-listDec:        declarador 
-                |listDec ',' declarador
+opcionInicializacion:   /* vacio */
+                     | operadorAs constante {fprintf(yyout,"quiero inicializar\n");}
 ;
 
-declarador:     decla
-                |decla '=' inicializador
+constante: NUMERO_ENTERO        {fprintf(yyout,"num = %d\n",$<entero>1);}
+        | NUMERO_REAL           {fprintf(yyout,"float = %f\n",$<real>1);}
+        | CARACTER              {fprintf(yyout,"caracter = %c \n", $<caracter>1);}
+        | LITERALCADENA         {fprintf(yyout,"literal = %s \n", $<texto>1);}
+        | expresionAs
 ;
 
-inicializador:  expresionAs
-                |'{' listInicial'}'
-                |'{' listInicial comaOP '}'
+//FUNCIONES
+declaracionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')'  {fprintf(yyout,"se declara una funcion de tipo %s llamada %s\n",$<texto>1, $<texto>2);}
 ;
 
-comaOP: /* na de na */
-        | ','
+opcionArgumentosConTipo:        /* vacio */ 
+                                | tipoDato opcionReferencia IDENTIFICADOR
+                                | tipoDato opcionReferencia IDENTIFICADOR ',' argumentosConTipo 
 ;
 
-listInicial:    inicializador
-                |listInicial ',' inicializador
+argumentosConTipo: tipoDato opcionReferencia IDENTIFICADOR
+                 | tipoDato opcionReferencia IDENTIFICADOR ',' argumentosConTipo
 ;
 
-espeClasAlma: TYPEDEF | STATIC | AUTO | REGISTER | EXTERN
+opcionReferencia: /* vacio */
+                  | '&'
 ;
 
-espeTipo: nombreTipo
-        | especificadorSU
-        | especificadorE
-        | nombreTypedef
+definicionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')' sentencia {fprintf(yyout,"se define una funcion de tipo %s llamada %s\n",$<texto>1, $<texto>2);}
 ;
 
-caliTipo: CONST | VOLATILE
-;
-
-especificadorSU: SU IDENTIFICADOROP '{'listaDecS '}'    
-                | SU IDENTIFICADOR                      {fprintf(yyout, "Identificador = %s \n",$<texto>2);}
-;
-
-IDENTIFICADOROP: /*na de na*/
-                |IDENTIFICADOR                          {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
-;
-
-SU: STRUCT                                           {fprintf(yyout, "se utiliza un struct \n");}
-        | UNION                                       {fprintf(yyout, "se utiliza un union \n");}
-;
-
-listaDecS: declaracionS
-            | listaDecS declaracionS
-;
-
-declaracionS: listCali declaS ';'                       
-;
-
-listCali: espeTipo listCaliOP
-            |caliTipo listCaliOP
-;
-
-listCaliOP: /* na de na */
-            |listCali
-;
-
-declaracionStruct: declaS
-            |declaracionStruct ',' declaS
-;
-
-declaS: declaS
-    | declaOP ':' expConst
-;
-
-declaOP: /* na de na */
-          |decla
-;
-
-decla: punteroOP decDirec
-;
-
-punteroOP: /* na de na */
-            | puntero                           {fprintf(yyout, "Se declaro un Puntero \n");}
-;
-
-puntero: '*' listCaliTiposOP            
-        |'*' listCaliTiposOP puntero
-;
-
-listCaliTiposOP: /*na de na*/
-                |listCaliTipos
-;
-
-listCaliTipos: caliTipo
-                |listCaliTipos caliTipo
-;
-
-decDirec: IDENTIFICADOR {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
-        | '('decla')'
-        | decDirec '[' expConstOP ']'
-        | decDirec '(' listTipoPar ')'
-        | decDirec '(' listIdenOP ')'
-;
-
-listIdenOP: /*na de na*/
-        | listIden
-;
-
-listTipoPar:     listParam
-                | listParam ',' '.' '.' '.'
-;
-
-listParam: decParam
-          | listParam ',' decParam
-;
-
-decParam: espeDec decla
-        | espeDec decAbstractOP
-;
-
-listIden: IDENTIFICADOR         {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
-        | listIden ',' IDENTIFICADOR
-;
-
-especificadorE: ENUM IDENTIFICADOROP '{' listEnum '} '
-                | ENUM IDENTIFICADOR
-;
-
-listEnum: enumerador
-        | listEnum ',' enumerador
-;
-
-enumerador: constEnum
-        | constEnum '=' expConst
-;
-
-constEnum: IDENTIFICADOR        {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
-;
-
-nombreTypedef: IDENTIFICADOR    {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
-;
-
-nombTipo: listCali decAbstractOP 
-;
-
-decAbstractOP: /*na de na*/
-                |decAbstract
-;
-decAbstract:puntero
-         | punteroOP decAbstDirec
-;
-
-expConst: expCondicional
-;
-
-expConstOP: /*na de na*/
-                |expConst
-;
-
-decAbstDirec: '('decAbstract')'
-                | decAbstDirecOP  '['expConstOP ']'
-                | decAbstDirecOP '('listTipoParOP ')'
-;
-
-listTipoParOP: /*na de na*/
-                |listTipoPar
-;
-
-decAbstDirecOP: /*na de na*/
-                | decAbstDirec 
-;
-
-/*FUNCIONES*/
-unidadDeTraduccion: decExterna
-                        |unidadDeTraduccion decExterna
-;
-
-decExterna: defFuncion          {fprintf(yyout, "se declaro a la funcion %s \n",$<texto>1);}
-                |declaracion
-;
-
-defFuncion: espeDecOP decla listaDeclaracionesOP sentCompuesta
-;
 
 %%
 

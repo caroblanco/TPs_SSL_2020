@@ -1,4 +1,10 @@
 se encontro tipo de dato int 
-Identificador = caro 
-error sintactico en la linea: 1 = syntax error
-Identificador = caro 
+Identificador = c 
+Num entero = 3 
+EXPRESION COND 
+Se encontro [ y ] 
+identificador = c
+declaro una
+empieza la declaracion de variable simple
+termine de leer
+--------DECLARACION--------

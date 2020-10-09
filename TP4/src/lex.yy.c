@@ -667,7 +667,7 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
 
-#line 49 "AnalizadorSintactico.l"
+#line 50 "AnalizadorSintactico.l"
 
 
 #line 674 "lex.yy.c"
@@ -755,302 +755,302 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 51 "AnalizadorSintactico.l"
+#line 52 "AnalizadorSintactico.l"
 { yylval.entero = strtol(yytext, NULL, 10); return NUMERO_ENTERO;    } 
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 52 "AnalizadorSintactico.l"
+#line 53 "AnalizadorSintactico.l"
 { yylval.entero = strtol(yytext, NULL, 8); return NUMERO_ENTERO;     }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 53 "AnalizadorSintactico.l"
+#line 54 "AnalizadorSintactico.l"
 { yylval.entero = strtol(yytext, NULL, 16); return NUMERO_ENTERO;    }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 54 "AnalizadorSintactico.l"
+#line 55 "AnalizadorSintactico.l"
 { yylval.real = strtof(yytext, NULL); return NUMERO_REAL;            }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 55 "AnalizadorSintactico.l"
+#line 56 "AnalizadorSintactico.l"
 { return yytext[0];                                                 }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 56 "AnalizadorSintactico.l"
+#line 57 "AnalizadorSintactico.l"
 { yylval.texto = strdup(yytext); return LITERALCADENA;                    }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 57 "AnalizadorSintactico.l"
+#line 58 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return SWITCH ;}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 58 "AnalizadorSintactico.l"
+#line 59 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return CASE ;}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 59 "AnalizadorSintactico.l"
+#line 60 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return BREAK ;}
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 60 "AnalizadorSintactico.l"
+#line 61 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return DEFAULT ;}
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 61 "AnalizadorSintactico.l"
+#line 62 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return CONTINUE ;}
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 62 "AnalizadorSintactico.l"
+#line 63 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return DO ;}
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 63 "AnalizadorSintactico.l"
+#line 64 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return WHILE ;}
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 64 "AnalizadorSintactico.l"
+#line 65 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return IF ;}
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 65 "AnalizadorSintactico.l"
+#line 66 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return ELSE ;}
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 66 "AnalizadorSintactico.l"
+#line 67 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return FOR ;}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 67 "AnalizadorSintactico.l"
+#line 68 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return RETURN ;}
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 68 "AnalizadorSintactico.l"
+#line 69 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return GOTO ;}
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 69 "AnalizadorSintactico.l"
+#line 70 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return SIZEOF ;}
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 70 "AnalizadorSintactico.l"
+#line 71 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return STATIC ;}
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 71 "AnalizadorSintactico.l"
+#line 72 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return EXTERN ;}
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 72 "AnalizadorSintactico.l"
+#line 73 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return CONST ;}
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 73 "AnalizadorSintactico.l"
+#line 74 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return VOLATILE ;}
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 74 "AnalizadorSintactico.l"
+#line 75 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return STRUCT ;}
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 75 "AnalizadorSintactico.l"
+#line 76 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return UNION ;}
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 76 "AnalizadorSintactico.l"
+#line 77 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return TYPEDEF ;}
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 77 "AnalizadorSintactico.l"
+#line 78 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return AUTO ;}
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 78 "AnalizadorSintactico.l"
+#line 79 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return REGISTER ;}
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 79 "AnalizadorSintactico.l"
+#line 80 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return CHAR ;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 80 "AnalizadorSintactico.l"
+#line 81 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return INT ;}
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 81 "AnalizadorSintactico.l"
+#line 82 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return FLOAT ;}
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 82 "AnalizadorSintactico.l"
+#line 83 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return LONG ;}
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 83 "AnalizadorSintactico.l"
+#line 84 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return SHORT ;}
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 84 "AnalizadorSintactico.l"
+#line 85 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return SIGNED ;}
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 85 "AnalizadorSintactico.l"
+#line 86 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return UNSIGNED ;}
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 86 "AnalizadorSintactico.l"
+#line 87 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return VOID ;}
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 87 "AnalizadorSintactico.l"
+#line 88 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return ENUM ;}
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 88 "AnalizadorSintactico.l"
+#line 89 "AnalizadorSintactico.l"
 {yylval.texto = strdup(yytext); return DOUBLE ;}
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 89 "AnalizadorSintactico.l"
+#line 90 "AnalizadorSintactico.l"
 { return P_INC;                                                     }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 90 "AnalizadorSintactico.l"
+#line 91 "AnalizadorSintactico.l"
 { return P_DEC;                                                     }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 91 "AnalizadorSintactico.l"
+#line 92 "AnalizadorSintactico.l"
 { return DISTINTO;                                                  }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 92 "AnalizadorSintactico.l"
+#line 93 "AnalizadorSintactico.l"
 { return IGUAL;                                                     }
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 93 "AnalizadorSintactico.l"
+#line 94 "AnalizadorSintactico.l"
 { return AND;                                                       }
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 94 "AnalizadorSintactico.l"
+#line 95 "AnalizadorSintactico.l"
 { return OR;                                                        }
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 95 "AnalizadorSintactico.l"
+#line 96 "AnalizadorSintactico.l"
 { return DIV_IGUAL;                                                  }
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 96 "AnalizadorSintactico.l"
+#line 97 "AnalizadorSintactico.l"
 { return POR_IGUAL;                                                 } 
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 97 "AnalizadorSintactico.l"
+#line 98 "AnalizadorSintactico.l"
 { return MENOS_IGUAL;                                               }
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 98 "AnalizadorSintactico.l"
+#line 99 "AnalizadorSintactico.l"
 { return MAS_IGUAL;                                                 }
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 99 "AnalizadorSintactico.l"
+#line 100 "AnalizadorSintactico.l"
 { return MENOR_IGUAL;                                               }
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 100 "AnalizadorSintactico.l"
+#line 101 "AnalizadorSintactico.l"
 { return MAYOR_IGUAL;                                               }
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 101 "AnalizadorSintactico.l"
+#line 102 "AnalizadorSintactico.l"
 { return MOD_IGUAL;                                                 }
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 102 "AnalizadorSintactico.l"
+#line 103 "AnalizadorSintactico.l"
 { return BIT_SHIFT_R;                                               }
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 103 "AnalizadorSintactico.l"
+#line 104 "AnalizadorSintactico.l"
 { return BIT_SHIFT_L;                                               }
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 104 "AnalizadorSintactico.l"
+#line 105 "AnalizadorSintactico.l"
 { return FLECHITA;                                                  } 
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 105 "AnalizadorSintactico.l"
+#line 106 "AnalizadorSintactico.l"
 { strcpy(yylval.texto, yytext); return IDENTIFICADOR;               }
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 106 "AnalizadorSintactico.l"
+#line 107 "AnalizadorSintactico.l"
 { return yytext[0];                                                 }
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 107 "AnalizadorSintactico.l"
+#line 108 "AnalizadorSintactico.l"
 {                                                                   }
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 108 "AnalizadorSintactico.l"
+#line 109 "AnalizadorSintactico.l"
 {                                                                   }
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 109 "AnalizadorSintactico.l"
+#line 110 "AnalizadorSintactico.l"
 {                                                                   }
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 111 "AnalizadorSintactico.l"
+#line 112 "AnalizadorSintactico.l"
 ECHO;
 	YY_BREAK
 #line 1057 "lex.yy.c"
@@ -1939,5 +1939,5 @@ int main()
 	return 0;
 	}
 #endif
-#line 111 "AnalizadorSintactico.l"
+#line 112 "AnalizadorSintactico.l"
 
