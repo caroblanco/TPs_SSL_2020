@@ -41,29 +41,57 @@
    enum yytokentype {
      NUMERO_ENTERO = 258,
      NUMERO_REAL = 259,
-     TIPO_DATO = 260,
-     IDENTIFICADOR = 261,
-     LITERALCADENA = 262,
-     CARACTER = 263,
-     PALABRA_RESERVADA = 264,
-     P_INC = 265,
-     P_DEC = 266,
-     DISTINTO = 267,
-     IGUAL = 268,
-     AND = 269,
-     OR = 270,
-     DIV_IGUAL = 271,
-     POR_IGUAL = 272,
-     MENOS_IGUAL = 273,
-     MAS_IGUAL = 274,
-     MENOR_IGUAL = 275,
-     MAYOR_IGUAL = 276,
-     MOD_IGUAL = 277,
-     BIT_SHIFT_L = 278,
-     BIT_SHIFT_R = 279,
-     FLECHITA = 280,
-     SIZEOF = 281,
-     ENUM = 282
+     IDENTIFICADOR = 260,
+     LITERALCADENA = 261,
+     CARACTER = 262,
+     P_INC = 263,
+     P_DEC = 264,
+     DISTINTO = 265,
+     IGUAL = 266,
+     AND = 267,
+     OR = 268,
+     DIV_IGUAL = 269,
+     POR_IGUAL = 270,
+     MENOS_IGUAL = 271,
+     MAS_IGUAL = 272,
+     MENOR_IGUAL = 273,
+     MAYOR_IGUAL = 274,
+     MOD_IGUAL = 275,
+     BIT_SHIFT_L = 276,
+     BIT_SHIFT_R = 277,
+     FLECHITA = 278,
+     DO = 279,
+     WHILE = 280,
+     IF = 281,
+     ELSE = 282,
+     FOR = 283,
+     RETURN = 284,
+     GOTO = 285,
+     STATIC = 286,
+     EXTERN = 287,
+     CONST = 288,
+     VOLATILE = 289,
+     STRUCT = 290,
+     UNION = 291,
+     TYPEDEF = 292,
+     AUTO = 293,
+     REGISTER = 294,
+     CHAR = 295,
+     INT = 296,
+     FLOAT = 297,
+     LONG = 298,
+     SHORT = 299,
+     SIGNED = 300,
+     UNSIGNED = 301,
+     VOID = 302,
+     ENUM = 303,
+     DOUBLE = 304,
+     SIZEOF = 305,
+     SWITCH = 306,
+     CASE = 307,
+     BREAK = 308,
+     DEFAULT = 309,
+     CONTINUE = 310
    };
 #endif
 
@@ -74,7 +102,7 @@ typedef union YYSTYPE
 {
 
 /* Line 1676 of yacc.c  */
-#line 62 "AnalizadorSintactico.y"
+#line 86 "AnalizadorSintactico.y"
 
     int entero;
     char* texto;
@@ -84,7 +112,7 @@ typedef union YYSTYPE
 
 
 /* Line 1676 of yacc.c  */
-#line 88 "AnalizadorSintactico.tab.h"
+#line 116 "AnalizadorSintactico.tab.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

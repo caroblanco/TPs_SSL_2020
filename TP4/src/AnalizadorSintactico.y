@@ -1,8 +1,3 @@
-/*reconocer expresiones, declaraciones de variables, declaraciones de funciones, sentencias de distintos tipos y definiciones de funciones.
-El mismo deberá tomar un archivo de texto como entrada (archivo fuente) y dar como salida en pantalla un reporte de variables declaradas 
-indicando tipo de dato correspondiente, funciones declaradas, tipos sentencias encontradas a medida que realiza la lectura del archivo fuente. 
-Deberá indicarse aquellas secuencias que no pertenezcan a ninguna categoría léxica o estructuras que no sean válidas sintácticamente.*/
-
 %{
 #include <stdio.h>
 #include <ctype.h>
@@ -16,7 +11,6 @@ int linea=1;
 extern FILE* yyin;
 FILE* yyout;
 
-extern int line;
 
 int yylex();
 
@@ -26,7 +20,7 @@ int yywrap()
 }
 
 void yyerror (char *smth) {
-   fprintf (yyout,"error sintactico en la linea: %d = %s\n",line, smth);
+   fprintf (yyout,"error sintactico en la linea: %d = %s\n",linea, smth);
 }
 
 %}
@@ -34,7 +28,7 @@ void yyerror (char *smth) {
 %token <entero> NUMERO_ENTERO
 %token <real> NUMERO_REAL
 %token <texto> IDENTIFICADOR
-%token <texto> STRING
+%token <texto> LITERALCADENA
 %token <caracter> CARACTER
 %token <entero> error
 
@@ -104,8 +98,8 @@ input:  /* vacio */
 ;
 
 line:   '\n'                                    {fprintf(yyout,"\n"); linea++;}
-        | expresion '\n'                        {fprintf(yyout,"--------EXPRESION--------");linea++;}
         | sentencia '\n'                        {fprintf(yyout,"--------SENTENCIA--------");}
+        | expresion '\n'                        {fprintf(yyout,"--------EXPRESION--------");linea++;}
         | declaracion '\n'                      {fprintf(yyout,"--------DECLARACION--------");linea++;}
         | unidadDeTraduccion '\n'               {fprintf(yyout,"--------FUNCION--------");linea++;}
         | error '\n'                            {fprintf(yyout, "\nse detecto un error sintactico en la linea %i", linea); linea++;}
@@ -137,7 +131,7 @@ expOrOP: /* na de na */
          | expOr
 ;
 
-expAnd: expOInclusivo
+expAnd: expIgualdad
         | expAnd AND expIgualdad             {fprintf(yyout, "Se encontro un && \n");}
 ;
 
@@ -189,8 +183,8 @@ operUnario: '&' | '*' | '-' | '!' | '+' | '~'
 expSufijo: expPrimaria
             | expSufijo '['expresion']'         {fprintf(yyout, "Se encontro [ y ] \n");}
             | expSufijo '('listaArgumentos')'   {fprintf(yyout, "Se encontro un ( y un )\n");}
-            | expSufijo '.' ID                  {fprintf(yyout, "Se encontro un . \n"); fprintf(yyout, "Identificador = %s \n", $<texto>3);}
-            | expSufijo FLECHITA ID             {fprintf(yyout, "Se encontro un -> \n"); fprintf(yyout, "Identificador = %s /n", $<texto>3);}
+            | expSufijo '.' ID                  {fprintf(yyout, "Se encontro un . \n"); /*fprintf(yyout, "Identificador = %s \n", $<texto>3);*/}
+            | expSufijo FLECHITA ID             {fprintf(yyout, "Se encontro un -> \n"); /*fprintf(yyout, "Identificador = %s /n", $<texto>3);*/}
             | expSufijo P_INC                   {fprintf(yyout, "Se encontro un ++ \n");}
             | expSufijo P_DEC                   {fprintf(yyout, "Se encontro un -- \n");}
 ;
@@ -210,7 +204,7 @@ nombreTipo: tipoDato | STRUCT | TYPEDEF | UNION | ENUM
 ;
 
 tipoDato: CHAR
-        |INT
+        |INT            {fprintf(yyout, "se encontro tipo de dato int \n");}
         |FLOAT
         |LONG
         |SHORT
@@ -244,10 +238,14 @@ sentExp: expresionOP ';'
 ;
 
 //COMPUESTA
-sentCompuesta:  '{' listaDeclaracionesOP listaSentenciasOP '}'
-                | '{' listaDeclaraciones '}'
-                | '{' listaSentencias '}'
-                | '{''}'
+sentCompuesta:  '{' listaDeclaracionesOP listaSentenciasOP '}' PCOp
+                | '{' listaDeclaraciones '}' PCOp
+                | '{' listaSentencias '}' PCOp
+                | '{''}' PCOp
+;
+
+PCOp: /*na de na*/
+        |';'
 ;
 
 listaSentenciasOP: /*na de na*/
@@ -396,7 +394,7 @@ decla: punteroOP decDirec
 ;
 
 punteroOP: /* na de na */
-            | puntero                           {fprinf(yyout, "Se declaro un Puntero \n");}
+            | puntero                           {fprintf(yyout, "Se declaro un Puntero \n");}
 ;
 
 puntero: '*' listCaliTiposOP            

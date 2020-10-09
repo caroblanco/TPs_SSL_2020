@@ -1,0 +1,4 @@
+se encontro tipo de dato int 
+Identificador = caro 
+error sintactico en la linea: 1 = syntax error
+Identificador = caro 
