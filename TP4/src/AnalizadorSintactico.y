@@ -225,7 +225,7 @@ ID: IDENTIFICADOR
 /*SENTENCIAS*/
 
 sentencia:      sentExp                 {fprintf(yyout,"Se declaro una sentencia expresion \n");}
-                | sentCompuesta         {fprintf(yyout,"Se declaro una sentencia compuesta\n");}
+                | sentCompuesta         
                 | sentAsignacion        {fprintf(yyout,"Se declaro una sentencia de asignacion\n");}
                 | sentSeleccion         {fprintf(yyout,"Se declaro una sentencia de seleccion\n");}
                 | sentIteracion         {fprintf(yyout,"Se declaro una sentencia de iteracion\n");}
@@ -240,10 +240,11 @@ sentExp: expresionOP ';'
 ;
 
 //COMPUESTA
-sentCompuesta:  '{' listaDeclaracionesOP listaSentenciasOP '}' PCOp
-                | '{' listaDeclaraciones '}' PCOp
-                | '{' listaSentencias '}' PCOp
-                | '{''}' PCOp
+sentCompuesta:  '{' listaDeclaracionesOP listaSentenciasOP '}' PCOp     {fprintf(yyout,"Se declaro una sentencia compuesta\n");}
+                | '{' listaDeclaraciones '}' PCOp                       {fprintf(yyout,"Se declaro una sentencia compuesta\n");}
+                | '{' listaSentencias '}' PCOp                          {fprintf(yyout,"Se declaro una sentencia compuesta\n");}
+                | '{''}' PCOp                                           {fprintf(yyout,"Se declaro una sentencia compuesta\n");}
+                | error                                                 {fprintf(yyout, "error al declarar la sentencia compuesta\n");}
 ;
 
 PCOp: /*na de na*/
@@ -259,7 +260,7 @@ listaDeclaracionesOP: /*na de na*/
 ;
 
 listaDeclaraciones:     listaDeclaraciones declaracion 
-                        | declaracion
+                        | declaracion                   
 ;
 
 listaSentencias:     sentencia
@@ -308,7 +309,7 @@ declaracion: declaracionVariablesSimples
 ;
 
 declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {fprintf(yyout,"se declaro una variable de tipo %s llamada %s\n", $<texto>1,nombre);}
-                                | error {fprintf(yyout,"Falta el ; en la declaracion \n"); } 
+                                | error                         {fprintf(yyout,"Falta el ; en la declaracion \n"); } 
 ;
 
 listaVariablesSimples: variableSimple       
