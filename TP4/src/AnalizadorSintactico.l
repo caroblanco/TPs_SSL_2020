@@ -8,7 +8,7 @@
     #include "AnalizadorSintactico.tab.h"
 
     extern FILE* yyin;
-    //mingw32-make
+
 %}
 
 CARACTERES_PUNTUACION_OPERADORES "."|"+"|"-"|"!"|"*"|"/"|"%"|"["|"]"|"<"|">"|"^"|"?"|"="|","|":"|"{"|"}"|"("|")"|";"|"|"|"^"|"&"

@@ -7,9 +7,11 @@
 
 int flag_error = 0; 
 int linea=1;
+char* nombre;
 
 extern FILE* yyin;
 FILE* yyout;
+
 
 
 int yylex();
@@ -102,7 +104,7 @@ line:   '\n'                                    {fprintf(yyout,"\n"); linea++;}
         | expresion                             {fprintf(yyout,"--------EXPRESION--------\n");linea++;}
         | declaracion                           {fprintf(yyout,"--------DECLARACION--------\n");linea++;}
         | definicionFunciones                   {fprintf(yyout,"-------FUNCION--------\n");linea ++;}
-        | error                                 {fprintf(yyout, "\nse detecto un error sintactico en la linea %i \n", linea); linea++;}
+        | error                                 {fprintf(yyout, "\nse detecto un error sintactico \n"); linea++;}
 ;
 
 /*EXPRESIONES*/
@@ -204,7 +206,7 @@ nombreTipo: tipoDato | STRUCT | TYPEDEF | UNION | ENUM
 ;
 
 tipoDato: CHAR
-        |INT            {fprintf(yyout, "se encontro tipo de dato int \n");}
+        |INT            
         |FLOAT
         |LONG
         |SHORT
@@ -222,19 +224,19 @@ ID: IDENTIFICADOR
 
 /*SENTENCIAS*/
 
-sentencia:      sentExp                 {printf("Se declaro una sentencia expresion");}
-                | sentCompuesta         {printf("Se declaro una sentencia compuesta");}
-                | sentAsignacion        {printf("Se declaro una sentencia de asignacion");}
-                | sentSeleccion         {printf("Se declaro una sentencia de seleccion");}
-                | sentIteracion         {printf("Se declaro una sentencia de iteracion");}
-                | sentEtiquetada        {printf("Se declaro una sentencia etiquetada");}
-                | sentSalto             {printf("Se declaro una sentencia de salto");}
-                | error                 {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
+sentencia:      sentExp                 {fprintf(yyout,"Se declaro una sentencia expresion \n");}
+                | sentCompuesta         {fprintf(yyout,"Se declaro una sentencia compuesta\n");}
+                | sentAsignacion        {fprintf(yyout,"Se declaro una sentencia de asignacion\n");}
+                | sentSeleccion         {fprintf(yyout,"Se declaro una sentencia de seleccion\n");}
+                | sentIteracion         {fprintf(yyout,"Se declaro una sentencia de iteracion\n");}
+                | sentEtiquetada        {fprintf(yyout,"Se declaro una sentencia etiquetada\n");}
+                | sentSalto             {fprintf(yyout,"Se declaro una sentencia de salto\n");}
+                | error                 {fprintf(yyout,"ERROR AL DEFINIR LA SENTENCIA \n");}
 ;
 
 //EXPRESION
 sentExp: expresionOP ';'
-        | error                         {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
+        | error                         {fprintf(yyout,"falta ; en la definicion de la sentencia de expresion \n");}
 ;
 
 //COMPUESTA
@@ -262,20 +264,20 @@ listaDeclaraciones:     listaDeclaraciones declaracion
 
 listaSentencias:     sentencia
                         | listaSentencias sentencia
-                                | error                         {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
+                        | error                         {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
 ;
 
 //SELECCION
-sentSeleccion:  IF '(' expresion ')' sentencia                {fprintf(yyout, "Se utiliza el If \n");}
-                | IF '(' expresion ')' sentencia ELSE sentencia       {fprintf(yyout,"Se utiliza el If Else \n");}
-                | SWITCH '(' expresion ')' sentencia          {fprintf(yyout,"Se utiliza el Switch \n")}
-                | error                                        {printf("ERROR AL DEFINIR LA EXPRESION \n");}
+sentSeleccion:  IF '(' expresion ')' sentencia                          {fprintf(yyout, "Se utiliza el If \n");}
+                | IF '(' expresion ')' sentencia ELSE sentencia         {fprintf(yyout,"Se utiliza el If Else \n");}
+                | SWITCH '(' expresion ')' sentencia                    {fprintf(yyout,"Se utiliza el Switch \n")}
+                | error                                                 {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
 ;
 
 //ITERACION
-sentIteracion:  WHILE '(' expresion ')' sentencia                                     {fprintf(yyout, "Se utiliza el While \n");}
-                | DO sentencia WHILE '(' expresion ')'                              {fprintf(yyout, "Se utiliza el Do While \n");}
-                | FOR '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia   {fprintf(yyout,"Se utiliza el for \n");}
+sentIteracion:  WHILE '(' expresion ')' sentencia                                       {fprintf(yyout, "Se utiliza el While \n");}
+                | DO sentencia WHILE '(' expresion ')'                                  {fprintf(yyout, "Se utiliza el Do While \n");}
+                | FOR '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia     {fprintf(yyout,"Se utiliza el For \n");}
 ;
 
 //ETIQUETADA
@@ -301,22 +303,23 @@ sentAsignacion: IDENTIFICADOR '=' expresion ';'                 {fprintf(yyout, 
 ;
 
 /*DECLARACIONES*/
-declaracion: declaracionVariablesSimples  {fprintf(yyout,"termine de leer\n");}
+declaracion: declaracionVariablesSimples  
             | declaracionFunciones
 ;
 
-declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {fprintf(yyout,"empieza la declaracion de variable simple\n");}
+declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {fprintf(yyout,"se declaro una variable de tipo %s llamada %s\n", $<texto>1,nombre);}
+                                | error {fprintf(yyout,"Falta el ; en la declaracion \n"); } 
 ;
 
-listaVariablesSimples: variableSimple       {fprintf(yyout,"declaro una\n");}
+listaVariablesSimples: variableSimple       
                      | listaVariablesSimples ',' variableSimple
 ;
 
-variableSimple: expSufijo opcionInicializacion {fprintf(yyout,"identificador = %s\n",$<texto>1);}
+variableSimple: expSufijo opcionInicializacion { nombre = strdup($<texto>1); }
 ;
 
 opcionInicializacion:   /* vacio */
-                     | operadorAs constante {fprintf(yyout,"quiero inicializar\n");}
+                     | operadorAs constante 
 ;
 
 constante: NUMERO_ENTERO        {fprintf(yyout,"num = %d\n",$<entero>1);}
@@ -327,7 +330,7 @@ constante: NUMERO_ENTERO        {fprintf(yyout,"num = %d\n",$<entero>1);}
 ;
 
 //FUNCIONES
-declaracionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')'  {fprintf(yyout,"se declara una funcion de tipo %s llamada %s\n",$<texto>1, $<texto>2);}
+declaracionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')'  //{fprintf(yyout,"se declara una funcion de tipo %s llamada %s\n",$<texto>1, $<texto>2);}
 ;
 
 opcionArgumentosConTipo:        /* vacio */ 
@@ -356,6 +359,7 @@ int main (){
   yyin = fopen("entrada.c", "r");
   yyout = fopen("salida.txt", "w");
 
+  fprintf(yyout,"-------------------REPORTE-------------------");
   #ifdef BISON_DEBUG
        yydebug = 1;
     #endif
