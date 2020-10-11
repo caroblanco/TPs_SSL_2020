@@ -1,0 +1,30 @@
+-------------------REPORTE-------------------
+
+Num entero = 23 
+se declaro una variable de tipo int llamada a
+--------DECLARACION--------
+
+Num entero = 0 
+se declaro una variable de tipo int llamada i
+--------DECLARACION--------
+
+
+Identificador = a 
+Num entero = 3 
+Se utiliza un > 
+-------EXPRESION--------
+
+Num real = 5.400000 
+se declaro una variable de tipo float llamada z
+
+Se declaro una sentencia compuesta
+
+
+Se declaro una sentencia compuesta
+Se utiliza el If Else 
+Se declaro una sentencia de seleccion
+--------SENTENCIA--------
+
+
+-------------finalizo el analisis----------
+:)

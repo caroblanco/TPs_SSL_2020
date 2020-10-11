@@ -18,6 +18,7 @@ CONSTANTE_OCTAL 0[0-7]*
 CONSTANTE_HEXADECIMAL 0[xX][0-9A-Fa-f]+
 CONSTANTE_REAL   [0-9]+"."[0-9]*([eE](\+|\-)?[0-9]+)?
 CARACTER_LETRAS [a-zA-Z]
+CONSTANTES {CONSTANTE_DECIMAL}|{CONSTANTE_OCTAL}|{CONSTANTE_HEXADECIMAL}|{CONSTANTE_REAL}|{CARACTER_LETRAS}
 
 IDENTIFICADOR ({CARACTER_LETRAS}|_)({CARACTER_LETRAS}|[0-9]|_)*
 LITERALCADENA \".+\"
@@ -25,6 +26,13 @@ CARACTER \'.\'
 ESPACIOS [" "|\t]*
 COMENTARIO_LINEA "//".*
 COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/  
+KEYWORDS {TIPODATO}|{ESTRUCTURA}|{OTROS}
+TIPODATO char|const|int|float|double|long|short|signed|unsigned|void|enum|struct|typedef|union
+ESTRUCTURA switch|case|break|default|continue|do|while|if|else|for|return|goto
+OTROS volatile|extern|static|auto|register|sizeof
+INCLUDE #include(" ")*((<.+>)|(\".+\"))
+DEFINE #define(" ")*{IDENTIFICADOR}({TOKEN}+)?
+TOKEN {KEYWORDS}|{IDENTIFICADOR}|{CONSTANTES}|{LITERALCADENA}|{CARACTERES_PUNTUACION_OPERADORES}|{ESPACIOS}
 
 P_INC "++"
 P_DEC "--"
@@ -105,8 +113,11 @@ SALTO_DE_LINEA \n
 {FLECHITA}                          { return FLECHITA;                                                  } 
 {IDENTIFICADOR}                     { strcpy(yylval.texto, yytext); return IDENTIFICADOR;               }
 {CARACTERES_PUNTUACION_OPERADORES}  { return yytext[0];                                                 }
+{INCLUDE}                           {}
+{DEFINE}                            {}
 {ESPACIOS}+                         {                                                                   }
 {COMENTARIO_LINEA}                  {                                                                   }
-{COMODIN}                           {                                                                   }
+{COMENTARIO_BLOQUE}                 {}
+{COMODIN}                           { return ERRORLEXICO;                                                       }
 
 %%

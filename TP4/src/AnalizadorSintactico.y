@@ -6,8 +6,9 @@
 #define YYDEBUG 1
 
 int flag_error = 0; 
-int linea=1;
+
 char* nombre;
+char* tipodato;
 
 extern FILE* yyin;
 FILE* yyout;
@@ -22,7 +23,7 @@ int yywrap()
 }
 
 void yyerror (char *smth) {
-   fprintf (yyout,"error sintactico en la linea: %d = %s\n",linea, smth);
+   fprintf (yyout,"error sintactico = %s\n", smth);
 }
 
 %}
@@ -36,6 +37,7 @@ void yyerror (char *smth) {
 
 %type <texto> ID
 
+%token ERRORLEXICO
 %token P_INC
 %token P_DEC 
 %token DISTINTO 
@@ -95,38 +97,37 @@ void yyerror (char *smth) {
  
 %% 
 
-input:  /* vacio */
+input:  /* na de na */
         | input line
 ;
 
-line:   '\n'                                    {fprintf(yyout,"\n"); linea++;}
-        | sentencia                             {fprintf(yyout,"--------SENTENCIA--------\n");}
-        | expresion                             {fprintf(yyout,"--------EXPRESION--------\n");linea++;}
-        | declaracion                           {fprintf(yyout,"--------DECLARACION--------\n");linea++;}
-        | definicionFunciones                   {fprintf(yyout,"-------FUNCION--------\n");linea ++;}
-        | error                                 {fprintf(yyout, "\nse detecto un error sintactico \n"); linea++;}
+line:   '\n'                                    {fprintf(yyout,"\n");}
+        | sentencia                             {fprintf(yyout,"--------SENTENCIA--------\n");}         
+        | declaracion                           {fprintf(yyout,"--------DECLARACION--------\n");}
+        | definicionFunciones                   {fprintf(yyout,"-------FUNCION--------\n");}
+        | ERRORLEXICO                           {fprintf(yyout, "\nSE DETECTO UN ERROR LEXICO: %s \n", $<texto>1);}
 ;
 
 /*EXPRESIONES*/
 
-expresion: expresionAs 
-        |expresion ';' expresionAs              {fprintf(yyout, "Se encontro un ; \n");}
+expresion: expresionAs                                         {fprintf(yyout,"-------EXPRESION--------\n");}
+        |expresion ';' expresionAs                              {fprintf(yyout,"-------EXPRESION--------\n");}
 ;
 
-expresionAs:      expUnaria operadorAs expresionAs      {fprintf(yyout, "EXPRESION AS \n");}
-                | expCondicional                        {fprintf(yyout, "EXPRESION COND \n");}
-                | error                                 {fprintf(yyout,"ERROR al declarar la expresion asignacion \n");}
+expresionAs:      expUnaria operadorAs expresionAs      
+                | expCondicional                        
+                | error                                 
 ;
 
 operadorAs: '=' | DIV_IGUAL | POR_IGUAL | MENOS_IGUAL | MAS_IGUAL | MOD_IGUAL 
 ;
 
 expCondicional: expOr
-                | expOrOP expresion ':' expCondicional          {fprintf(yyout, "Se encontro un : \n");}
+                | expOrOP expresion ':' expCondicional          {fprintf(yyout, "Se utiliza un : \n");}
 ;
 
 expOr:  expAnd
-        | expOr OR expAnd                       {fprintf(yyout, "Se encontro un || \n");}
+        | expOr OR expAnd                       {fprintf(yyout, "Se utiliza un || \n");}
 ;
 
 expOrOP: /* na de na */
@@ -134,34 +135,34 @@ expOrOP: /* na de na */
 ;
 
 expAnd: expIgualdad
-        | expAnd AND expIgualdad             {fprintf(yyout, "Se encontro un && \n");}
+        | expAnd AND expIgualdad             {fprintf(yyout, "Se utiliza un && \n");}
 ;
 
 expIgualdad:    expRelacional
-                | expIgualdad IGUAL expRelacional       {fprintf(yyout, "Se encontro un == \n");}
-                | expIgualdad DISTINTO expRelacional    {fprintf(yyout, "Se encontro un != \n");}
+                | expIgualdad IGUAL expRelacional       {fprintf(yyout, "Se utiliza un == \n");}
+                | expIgualdad DISTINTO expRelacional    {fprintf(yyout, "Se utiliza un != \n");}
 ;            
 expRelacional:  expAditiva
-                | expRelacional MAYOR_IGUAL expAditiva  {fprintf(yyout, "Se encontro un >= \n");}
-                | expRelacional '>' expAditiva          {fprintf(yyout, "Se encontro un > \n");}
-                | expRelacional MENOR_IGUAL expAditiva  {fprintf(yyout, "Se encontro un <= \n");}
-                | expRelacional '<' expAditiva          {fprintf(yyout, "Se encontro un >= \n");}
+                | expRelacional MAYOR_IGUAL expAditiva  {fprintf(yyout, "Se utiliza un >= \n");}
+                | expRelacional '>' expAditiva          {fprintf(yyout, "Se utiliza un > \n");}
+                | expRelacional MENOR_IGUAL expAditiva  {fprintf(yyout, "Se utiliza un <= \n");}
+                | expRelacional '<' expAditiva          {fprintf(yyout, "Se utiliza un >= \n");}
 ;
 
 /*expCorrimiento: expAditiva
-                |expCorrimiento BIT_SHIFT_L expAditiva          {fprintf(yyout, "Se encontro un << \n");}
-                |expAditiva BIT_SHIFT_R expCorrimiento          {fprintf(yyout, "Se encontro un >> \n");}
+                |expCorrimiento BIT_SHIFT_L expAditiva          {fprintf(yyout, "Se utiliza un << \n");}
+                |expAditiva BIT_SHIFT_R expCorrimiento          {fprintf(yyout, "Se utiliza un >> \n");}
 ;*/
                 
 expAditiva:     expMultiplicativa
-                | expAditiva '+' expMultiplicativa      {fprintf(yyout, "Se encontro un + \n");}
-                | expAditiva '-' expMultiplicativa      {fprintf(yyout, "Se encontro un - \n");}
+                | expAditiva '+' expMultiplicativa      {fprintf(yyout, "Se utiliza un + \n");}
+                | expAditiva '-' expMultiplicativa      {fprintf(yyout, "Se utiliza un - \n");}
 ;
 
 expMultiplicativa: expConversion
-                        |expMultiplicativa '/' expConversion    { if($<real>3 == 0){printf("ERROR AL DIVIDIR POR 0"); return 0;}else $<real>$ = $<real>1 / $<real>3; fprintf(yyout,"se encontro un / \n");}
-                        |expMultiplicativa '*' expConversion    {fprintf(yyout, "Se encontro un * \n");}
-                        |expMultiplicativa '%' expConversion    {fprintf(yyout, "Se encontro un % \n");}
+                        |expMultiplicativa '/' expConversion    { if($<real>3 == 0){printf("ERROR AL DIVIDIR POR 0"); return 0;}else $<real>$ = $<real>1 / $<real>3; fprintf(yyout,"se utiliza un / \n");}
+                        |expMultiplicativa '*' expConversion    {fprintf(yyout, "Se utiliza un * \n");}
+                        |expMultiplicativa '%' expConversion    {fprintf(yyout, "Se utiliza un % \n");}  
 ;
 
 expConversion: expUnaria
@@ -175,20 +176,20 @@ expUnaria:      expSufijo
                 | SIZEOF expUnaria
 ;
 
-incremento: P_INC               {fprintf(yyout, "Se encontro un ++ \n");} 
-                | P_DEC         {fprintf(yyout, "Se encontro un -- \n");}
+incremento: P_INC               {fprintf(yyout, "Se utiliza un ++ \n");} 
+                | P_DEC         {fprintf(yyout, "Se utiliza un -- \n");}        
 ;
 
 operUnario: '&' | '*' | '-' | '!' | '+' | '~'
 ;
 
 expSufijo: expPrimaria                          
-            | expSufijo '['expresion']'         {fprintf(yyout, "Se encontro [ y ] \n");}
-            | expSufijo '('listaArgumentos')'   {fprintf(yyout, "Se encontro un ( y un )\n");}
-            | expSufijo '.' ID                  {fprintf(yyout, "Se encontro un . \n"); /*fprintf(yyout, "Identificador = %s \n", $<texto>3);*/}
-            | expSufijo FLECHITA ID             {fprintf(yyout, "Se encontro un -> \n"); /*fprintf(yyout, "Identificador = %s /n", $<texto>3);*/}
-            | expSufijo P_INC                   {fprintf(yyout, "Se encontro un ++ \n");}
-            | expSufijo P_DEC                   {fprintf(yyout, "Se encontro un -- \n");}
+            | expSufijo '['expresion']'         {fprintf(yyout, "Se utiliza [ y ] \n");}
+            | expSufijo '('listaArgumentos')'   {fprintf(yyout, "Se utiliza un ( y un )\n");}
+            | expSufijo '.' ID                  {fprintf(yyout, "Se utiliza un . \n");}
+            | expSufijo FLECHITA ID             {fprintf(yyout, "Se utiliza un -> \n");}
+            | expSufijo P_INC                   {fprintf(yyout, "Se utiliza un ++ \n");}
+            | expSufijo P_DEC                   {fprintf(yyout, "Se utiliza un -- \n");}               
 ;
 
 listaArgumentos: expresionAs
@@ -199,27 +200,26 @@ expPrimaria:    ID                      {fprintf(yyout, "Identificador = %s \n",
                 | NUMERO_ENTERO         {fprintf(yyout, "Num entero = %d \n",$<entero>1);}
                 | NUMERO_REAL           {fprintf(yyout, "Num real = %f \n",$<real>1);}
                 | LITERALCADENA         {fprintf(yyout, "String = %s \n",$<texto>1);}
-                | '(' expresion ')'     {fprintf(yyout, "Se encontro un ( y un ) \n");}
+                | '(' expresion ')'     
 ;
 
 nombreTipo: tipoDato | STRUCT | TYPEDEF | UNION | ENUM
 ;
 
-tipoDato: CHAR
-        |INT            
-        |FLOAT
-        |LONG
-        |SHORT
-        |SIGNED
-        |UNSIGNED
-        |VOID
-        |ENUM
-        |DOUBLE
+tipoDato: CHAR           {tipodato = strdup($<texto>1);}
+        |INT            {tipodato = strdup($<texto>1);}
+        |FLOAT          {tipodato = strdup($<texto>1);}
+        |LONG           {tipodato = strdup($<texto>1);}
+        |SHORT          {tipodato = strdup($<texto>1);}
+        |SIGNED         {tipodato = strdup($<texto>1);}
+        |UNSIGNED        {tipodato = strdup($<texto>1);}
+        |VOID           {tipodato = strdup($<texto>1);}
+        |ENUM           {tipodato = strdup($<texto>1);}
+        |DOUBLE         {tipodato = strdup($<texto>1);}
 ;
 
 ID: IDENTIFICADOR
         |IDENTIFICADOR '=' expresion
-        |error  {fprintf(yyout,"ERROR: falta ID \n");}
 ;
 
 /*SENTENCIAS*/
@@ -235,7 +235,7 @@ sentencia:      sentExp                 {fprintf(yyout,"Se declaro una sentencia
 ;
 
 //EXPRESION
-sentExp: expresionOP ';'
+sentExp: expresionOP ';'                
         | error                         {fprintf(yyout,"falta ; en la definicion de la sentencia de expresion \n");}
 ;
 
@@ -272,19 +272,25 @@ listaSentencias:     sentencia
 sentSeleccion:  IF '(' expresion ')' sentencia                          {fprintf(yyout, "Se utiliza el If \n");}
                 | IF '(' expresion ')' sentencia ELSE sentencia         {fprintf(yyout,"Se utiliza el If Else \n");}
                 | SWITCH '(' expresion ')' sentencia                    {fprintf(yyout,"Se utiliza el Switch \n")}
-                | error                                                 {printf("ERROR AL DEFINIR LA SENTENCIA \n");}
+                |IF error                                               {fprintf(yyout,"ERROR SINTACTICO EN EL IF\n");}
+                |SWITCH error                                           {fprintf(yyout, "ERROR SINTACTICO EN EL SWITCH\n");}
 ;
 
 //ITERACION
 sentIteracion:  WHILE '(' expresion ')' sentencia                                       {fprintf(yyout, "Se utiliza el While \n");}
                 | DO sentencia WHILE '(' expresion ')'                                  {fprintf(yyout, "Se utiliza el Do While \n");}
                 | FOR '(' expresionOP ';' expresionOP ';' expresionOP ')' sentencia     {fprintf(yyout,"Se utiliza el For \n");}
+                | WHILE error                                                           {fprintf(yyout, "ERROR SINTACTICO EN EL WHILE\n");}
+                | DO error                                                              {fprintf(yyout, "ERROR SINTACTICO EN EL DO\n");}
+                |FOR error                                                              {fprintf(yyout, "ERROR SINTACTICO EN EL FOR\n");}
 ;
 
 //ETIQUETADA
 sentEtiquetada: CASE expConst ':' sentencia                   {fprintf(yyout, "Se utiliza un Case \n");}
                 | DEFAULT ':' sentencia                       {fprintf(yyout,"Se utiliza el Default \n");}
-                | IDENTIFICADOR ':' sentencia                   {fprintf(yyout, "Identificador = %s \n",$<texto>1); fprintf(yyout, "se utiliza el : \n");}
+                | IDENTIFICADOR ':' sentencia                 
+                |CASE error                                     {fprintf(yyout, "ERROR SINTACTICO EN EL CASE\n");}
+                | DEFAULT error                                 {fprintf(yyout, "ERROR SINTACTICO EN EL DEFAULT\n");}
 ;
 expConst: expCondicional
 ;
@@ -293,6 +299,10 @@ sentSalto:      RETURN expresionOP ';'                        {fprintf(yyout,"Se
                 | CONTINUE ';'                                {fprintf(yyout, "Se utiliza el Continue \n");}
                 | BREAK ';'                                   {fprintf(yyout,"Se utiliza el Break \n");}
                 | GOTO IDENTIFICADOR ';'                      {fprintf(yyout,"Se utiliza el Goto\n");}
+                |GOTO error                                     {fprintf(yyout, "ERROR SINTACTICO EN EL GOTO, mal identificador\n");}
+                |BREAK error                                    {fprintf(yyout, "ERROR SINTACTICO EN EL BREAK, falta ;\n");}
+                | CONTINUE error                                {fprintf(yyout, "ERROR SINTACTICO EN EL CONTINUE, falta ;\n");}
+                |RETURN error                                   {fprintf(yyout, "ERROR SINTACTICO EN EL RETURN, falta ;\n");}
 ;
 
 expresionOP: /* na de na */
@@ -300,7 +310,7 @@ expresionOP: /* na de na */
 ;
 
 //ASIGNACION
-sentAsignacion: IDENTIFICADOR '=' expresion ';'                 {fprintf(yyout, "Identificador = %s \n",$<texto>1);}
+sentAsignacion: IDENTIFICADOR '=' expresion ';' 
 ;
 
 /*DECLARACIONES*/
@@ -308,7 +318,7 @@ declaracion: declaracionVariablesSimples
             | declaracionFunciones
 ;
 
-declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {fprintf(yyout,"se declaro una variable de tipo %s llamada %s\n", $<texto>1,nombre);}
+declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {fprintf(yyout,"se declaro una variable de tipo %s llamada %s\n", tipodato,nombre);}
                                 | error                         {fprintf(yyout,"Falta el ; en la declaracion \n"); } 
 ;
 
@@ -316,7 +326,7 @@ listaVariablesSimples: variableSimple
                      | listaVariablesSimples ',' variableSimple
 ;
 
-variableSimple: expSufijo opcionInicializacion { nombre = strdup($<texto>1); }
+variableSimple: IDENTIFICADOR opcionInicializacion { nombre = strdup($<texto>1); }
 ;
 
 opcionInicializacion:   /* vacio */
@@ -331,7 +341,7 @@ constante: NUMERO_ENTERO        {fprintf(yyout,"num = %d\n",$<entero>1);}
 ;
 
 //FUNCIONES
-declaracionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')'  //{fprintf(yyout,"se declara una funcion de tipo %s llamada %s\n",$<texto>1, $<texto>2);}
+declaracionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')'  {fprintf(yyout,"se declara una funcion de tipo %s llamada %s\n",tipodato, $<texto>2);}
 ;
 
 opcionArgumentosConTipo:        /* vacio */ 
@@ -347,7 +357,8 @@ opcionReferencia: /* vacio */
                   | '&'
 ;
 
-definicionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')' sentencia {fprintf(yyout,"se define una funcion de tipo %s llamada %s\n",$<texto>1, $<texto>2);}
+definicionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')' sentencia   {fprintf(yyout,"se define una funcion de tipo %s llamada %s\n",tipodato, $<texto>2);}
+                        |error {fprintf(yyout,"ERROR AL DEFINIR LA FUNCION\n");}
 ;
 
 
@@ -360,12 +371,13 @@ int main (){
   yyin = fopen("entrada.c", "r");
   yyout = fopen("salida.txt", "w");
 
-  fprintf(yyout,"-------------------REPORTE-------------------");
+  fprintf(yyout,"-------------------REPORTE-------------------\n\n");
   #ifdef BISON_DEBUG
        yydebug = 1;
     #endif
 
   flag = yyparse ();
+  fprintf(yyout,"\n\n-------------finalizo el analisis----------\n:)");
   fclose(yyin);
   fclose(yyout);
   return flag;
