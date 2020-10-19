@@ -1,1 +1,20 @@
-hola
+lista_id
+    nombre_id  
+    tipo_id
+    ambito
+    sgte_id
+
+lista_funciones
+    nombre_funcion
+    lista_param_entrada    --> OTRA LISTA DENTRO DE UNA LISTA
+        tipo
+        nombre
+        por referencia / por valor
+        sgte_parametro
+    param_salida
+        tipo
+        nombre
+    sgte_funcion
+
+lista_literales cadena
+    

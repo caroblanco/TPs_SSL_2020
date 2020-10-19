@@ -1,28 +1,21 @@
 -------------------REPORTE-------------------
 
-Num entero = 23 
-se declaro una variable de tipo int llamada a
+Num entero = 23 en la linea 1
+se declaro una variable de tipo int llamada a en la linea 1
 --------DECLARACION--------
-
-Num entero = 0 
-se declaro una variable de tipo int llamada i
+Num entero = 0 en la linea 2
+se declaro una variable de tipo int llamada i en la linea 2
 --------DECLARACION--------
-
-
-Identificador = a 
-Num entero = 3 
-Se utiliza un > 
+Identificador = a  en la linea 4
+Num entero = 3 en la linea 4
+Se utiliza un > en la linea 4
 -------EXPRESION--------
-
-Num real = 5.400000 
-se declaro una variable de tipo float llamada z
-
-Se declaro una sentencia compuesta
-
-
-Se declaro una sentencia compuesta
-Se utiliza el If Else 
-Se declaro una sentencia de seleccion
+Num real = 5.400000 en la  linea 5
+se declaro una variable de tipo float llamada z en la linea 5
+Se declaro una sentencia compuesta en la linea 6
+Se declaro una sentencia compuesta en la linea 8
+Se utiliza el If Else en la linea 8
+Se declaro una sentencia de seleccion en la linea 8
 --------SENTENCIA--------
 
 

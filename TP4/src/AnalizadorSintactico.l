@@ -10,6 +10,7 @@
     extern FILE* yyin;
 
 %}
+%option yylineno
 
 CARACTERES_PUNTUACION_OPERADORES "."|"+"|"-"|"!"|"*"|"/"|"%"|"["|"]"|"<"|">"|"^"|"?"|"="|","|":"|"{"|"}"|"("|")"|";"|"|"|"^"|"&"
  
@@ -118,6 +119,7 @@ SALTO_DE_LINEA \n
 {ESPACIOS}+                         {                                                                   }
 {COMENTARIO_LINEA}                  {                                                                   }
 {COMENTARIO_BLOQUE}                 {}
+{SALTO_DE_LINEA}                    { }
 {COMODIN}                           { return ERRORLEXICO;                                                       }
 
 %%
