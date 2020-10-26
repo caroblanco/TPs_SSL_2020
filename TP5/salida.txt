@@ -1,19 +1,12 @@
 -------------------REPORTE-------------------
 
-Num entero = 23 en la linea 1
---------DECLARACION--------
-Num entero = 0 en la linea 2
---------DECLARACION--------
-Identificador = a  en la linea 4
-Num entero = 3 en la linea 4
-Se utiliza un > en la linea 4
--------EXPRESION--------
-Num real = 5.400000 en la  linea 5
-Se declaro una sentencia compuesta en la linea 6
-Se declaro una sentencia compuesta en la linea 8
-Se utiliza el If Else en la linea 8
-Se declaro una sentencia de seleccion en la linea 8
---------SENTENCIA--------
+error sintactico = syntax error
+ERROR AL DEFINIR LA SENTENCIA EN LA LINEA 1
+ERROR AL DEFINIR LA SENTENCIA EN LA LINEA 1
+ERROR AL DEFINIR LA SENTENCIA EN LA LINEA 1
+Se declaro una sentencia compuesta en la linea 1
+se define una funcion de tipo int llamada elpepe
+-------FUNCION--------
 
 
 -------------finalizo el analisis----------

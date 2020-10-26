@@ -86,6 +86,7 @@ void yyerror (char *smth) {
 %token DEFAULT
 %token CONTINUE
 
+
 %union {
     int entero;
     char* texto;
@@ -368,8 +369,6 @@ opcionReferencia: /* vacio */
 ;
 
 definicionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')' sentencia   {
-        //nombreDeLaFuncion = "IDENTIFICADOR";
-        //agregarFuncionNuevo(tipoDato, IDENTIFICADOR);
         fprintf(yyout,"se define una funcion de tipo %s llamada %s\n",tipodato, $<texto>2);
         }
                      |error {fprintf(yyout,"ERROR AL DEFINIR LA FUNCION\n");}
