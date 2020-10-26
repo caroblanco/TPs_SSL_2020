@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "funciones.c"
 
 #define YYDEBUG 1
 
@@ -103,7 +104,7 @@ line:   '\n'                                    {fprintf(yyout,"\n");}
         | sentencia                             {fprintf(yyout,"--------SENTENCIA--------\n");}         
         | declaracion                           {fprintf(yyout,"--------DECLARACION--------\n");}
         | definicionFunciones                   {fprintf(yyout,"-------FUNCION--------\n");}
-        | ERRORLEXICO                           {fprintf(yyout, "\nSE DETECTO UN ERROR LEXICO: %s \n", $<texto>1);}
+        | ERRORLEXICO                           {fprintf(yyout, "\n SE DETECTO UN ERROR LEXICO: %s \n", $<texto>1);}
 ;
 
 /*EXPRESIONES*/
@@ -204,13 +205,13 @@ expPrimaria:    ID                      {fprintf(yyout, "Identificador = %s  en 
 nombreTipo: tipoDato | STRUCT | TYPEDEF | UNION | ENUM
 ;
 
-tipoDato: CHAR           {tipodato = strdup($<texto>1);}
+tipoDato: CHAR          {tipodato = strdup($<texto>1);}
         |INT            {tipodato = strdup($<texto>1);}
         |FLOAT          {tipodato = strdup($<texto>1);}
         |LONG           {tipodato = strdup($<texto>1);}
         |SHORT          {tipodato = strdup($<texto>1);}
         |SIGNED         {tipodato = strdup($<texto>1);}
-        |UNSIGNED        {tipodato = strdup($<texto>1);}
+        |UNSIGNED       {tipodato = strdup($<texto>1);}
         |VOID           {tipodato = strdup($<texto>1);}
         |ENUM           {tipodato = strdup($<texto>1);}
         |DOUBLE         {tipodato = strdup($<texto>1);}
@@ -297,10 +298,10 @@ sentSalto:      RETURN expresionOP ';'                        {fprintf(yyout,"Se
                 | CONTINUE ';'                                {fprintf(yyout, "Se utiliza el Continue en la linea %d\n", yylineno);}
                 | BREAK ';'                                   {fprintf(yyout,"Se utiliza el Break en la linea %d\n", yylineno);}
                 | GOTO IDENTIFICADOR ';'                      {fprintf(yyout,"Se utiliza el Goto en la linea %d\n", yylineno);}
-                |GOTO error                                     {fprintf(yyout, "ERROR SINTACTICO EN EL GOTO, mal identificador en la linea %d\n", yylineno);}
-                |BREAK error                                    {fprintf(yyout, "ERROR SINTACTICO EN EL BREAK, falta ; en la linea %d\n", yylineno);}
-                | CONTINUE error                                {fprintf(yyout, "ERROR SINTACTICO EN EL CONTINUE, falta ; en la linea %d\n", yylineno);}
-                |RETURN error                                   {fprintf(yyout, "ERROR SINTACTICO EN EL RETURN, falta ; en la linea %d\n", yylineno);}
+                |GOTO error                                   {fprintf(yyout, "ERROR SINTACTICO EN EL GOTO, mal identificador en la linea %d\n", yylineno);}
+                |BREAK error                                  {fprintf(yyout, "ERROR SINTACTICO EN EL BREAK, falta ; en la linea %d\n", yylineno);}
+                | CONTINUE error                              {fprintf(yyout, "ERROR SINTACTICO EN EL CONTINUE, falta ; en la linea %d\n", yylineno);}
+                |RETURN error                                 {fprintf(yyout, "ERROR SINTACTICO EN EL RETURN, falta ; en la linea %d\n", yylineno);}
 ;
 
 expresionOP: /* na de na */
@@ -316,8 +317,16 @@ declaracion: declaracionVariablesSimples
             | declaracionFunciones
 ;
 
-declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {fprintf(yyout,"se declaro una variable de tipo %s llamada %s en la linea %d\n", tipodato,nombre, yylineno);}
-                                | error                         {fprintf(yyout,"Falta el ; en la declaracion en la linea %d\n", yylineno); } 
+declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {if(agregarVariable(nombre, tipodato)) 
+                                                                        printf("se declaro una variable de tipo %s llamada %s en la linea %d\n", tipodato,nombre, yylineno);
+                                                                else{
+                                                                        printf("que queres declarar papichulo? ya existe eso\n");
+                                                                        agregarError("que queres declarar papichulo? ya existe eso", "semantico", yylineno)
+                                                                        
+                                                                }}
+                                | error                         {fprintf(yyout,"Falta el ; en la declaracion en la linea %d\n", yylineno);
+                                                                        agregarError("te olvidaste el ; en la linea %d capoeira", "sintactico", yylineno);
+                                                                         } 
 ;
 
 listaVariablesSimples: variableSimple       
@@ -355,17 +364,16 @@ opcionReferencia: /* vacio */
                   | '&'
 ;
 
-definicionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')' sentencia   {fprintf(yyout,"se define una funcion de tipo %s llamada %s\n",tipodato, $<texto>2);}
-                        |error {fprintf(yyout,"ERROR AL DEFINIR LA FUNCION\n");}
+definicionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')' sentencia   {
+        fprintf(yyout,"se define una funcion de tipo %s llamada %s\n",tipodato, $<texto>2);
+        }
+        |error {fprintf(yyout,"ERROR AL DEFINIR LA FUNCION\n");}
 ;
-
-
 %%
-
 int main (){
-
+ 
   int flag;
-
+  iniciarListas(); //archivo funciones.c
   yyin = fopen("entrada.c", "r");
   yyout = fopen("salida.txt", "w");
 

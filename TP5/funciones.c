@@ -1,13 +1,15 @@
-#include "main.h"
+#include "funciones.h"
 
 // KENI VEL, MARIVEL
 
-int main()
+int iniciarListas()
 {
     listaVariables = list_create();
     listaParametros = list_create();
     listaFunciones = list_create();
-    
+    errores = list_create();
+    /* 
+    //pruebas
     agregarVariable("a","int");
 
     agregarVariable("a","float");
@@ -51,9 +53,12 @@ int main()
     //:3
     //:V
     //:|
+    */
 }
 
-//VARIABLES
+/////////////
+//VARIABLES//
+/////////////
 
 void mostrarVariable(tVariables* variable)
 {
@@ -61,19 +66,20 @@ void mostrarVariable(tVariables* variable)
 }
 tVariables* buscarVariable(char* nombre)
 {   
-    int _nombre_igual(tVariables* variable)
+    int _nombre_igual(tVariables* variable)//vscode es malo pero gcc sape
     {
         return strcmp(variable->nombre,nombre) == 0;
     }
     list_find(listaVariables, (void*) _nombre_igual);
 }
-void agregarVariable(char* nombre, char* tipo)
+int agregarVariable(char* nombre, char* tipo)
 {
     tVariables* temp = buscarVariable(nombre);
 
     if(temp != NULL)
     {
-        printf("ERROR: Ya existe la variable %s :(\n", nombre);
+        //printf("ERROR: Ya existe la variable %s :(\n", nombre);
+        return 0;
     }
     else
     {
@@ -81,9 +87,14 @@ void agregarVariable(char* nombre, char* tipo)
         temp->nombre = nombre;
         temp->tipo = tipo;
         list_add(listaVariables, temp);
+        return 1;
     }
 }
-//FUNCIONES
+
+/////////////
+//FUNCIONES//
+/////////////
+
 void mostrarFuncion(tFunciones* funcion)
 {
     printf("%s ",funcion->nombre);
@@ -94,19 +105,20 @@ void mostrarFuncion(tFunciones* funcion)
 
 tFunciones* buscarFuncion(char* nombre)
 {
-    int _nombre_igual(tFunciones* funcion)
+    int _nombre_igual(tFunciones* funcion) //vscode es malo pero gcc sape
     {
         return strcmp(funcion->nombre, nombre) == 0;
     }
     list_find(listaFunciones, (void*) _nombre_igual);
 }
-void agregarFuncion(char * nombre, t_list* parametros)
+int agregarFuncion(char * nombre, t_list* parametros)
 {
     tFunciones* temp = buscarFuncion(nombre);
 
     if(temp != NULL)
     {
         printf("ERROR: la funcion %s ya esta definida :'( \n", nombre);
+        return 0;
     }
     else
     {
@@ -115,5 +127,18 @@ void agregarFuncion(char * nombre, t_list* parametros)
         temp->parametros = parametros;
         //int cantidad = list_size(temp->parametros);
         list_add(listaFunciones, temp);
+        return 1;
     }
 }
+
+void agregarError(char* mensaje, char* tipo, int linea)
+{
+    tError* error = malloc(sizeof(tError));
+    error->mensaje = mensaje;
+    error->tipo = tipo;
+    error->nroLinea = linea;
+
+    list_add(errores, &error);
+}
+//Al menos un control de tipos de datos en alguna operación binaria
+        

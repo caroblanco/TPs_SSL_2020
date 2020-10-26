@@ -1,5 +1,5 @@
-#ifndef _MAIN_H
-#define _MAIN_H
+#ifndef _FUNCIONES_H
+#define _FUNCIONES_H
 #include "list.c"
 #include <stdlib.h>
 #include <stdio.h>
@@ -22,11 +22,19 @@ typedef struct
 }tFunciones;
 t_list* listaFunciones; //lista de tFunciones
 
+typedef struct 
+{
+    char* mensaje;  // la cagaste papi 
+    char* tipo;     // lexico | sintactico | semantico
+    int nroLinea;   // cantidad de pizzas
+}tError;
+t_list* errores;    // lista de tError
+
 void mostrarVariable(tVariables*);
 void mostrarFuncion(tFunciones*);
 tVariables* buscarVariable(char*);
-void agregarVariable(char*, char* );
+int agregarVariable(char*, char* );
 tFunciones* buscarFuncion(char*);
-void agregarFuncion(char*, t_list*);
-
-#endif
+int agregarFuncion(char*, t_list*);
+void agregarError(char*, char*, int);
+#endif // _FUNCIONES_H
