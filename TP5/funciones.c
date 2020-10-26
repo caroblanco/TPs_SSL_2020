@@ -2,7 +2,7 @@
 
 // KENI VEL, MARIVEL
 
-int iniciarListas()
+void iniciarListas()
 {
     listaVariables = list_create();
     listaParametros = list_create();
@@ -40,7 +40,7 @@ int iniciarListas()
     var3->nombre = c;
     var3->tipo = doble;
     list_add(params, var3);
-    
+    ii
     tFunciones* funcion = malloc(sizeof(tFunciones));
     funcion->nombre = "elpepe";
     funcion->parametros = params;
@@ -55,7 +55,20 @@ int iniciarListas()
     //:|
     */
 }
-
+void mostrarError(tError* error)
+{
+    printf("%s (%s) linea: %d\n", error->mensaje, error->tipo, error->nroLinea);
+}
+void mostrarTutti(void)
+{
+    printf("lasva riables:\n");
+    list_iterate(listaVariables, (void*) mostrarVariable);
+    printf("lasfun ciones:\n");
+    list_iterate(listaFunciones, (void*) mostrarFuncion);
+    printf("lose rrores:\n");
+    list_iterate(errores, (void*) mostrarError);
+    
+}
 /////////////
 //VARIABLES//
 /////////////
@@ -111,6 +124,29 @@ tFunciones* buscarFuncion(char* nombre)
     }
     list_find(listaFunciones, (void*) _nombre_igual);
 }
+
+void nuevaFuncion(char* tipo, char* identificador)
+{
+    identificadorFuncion = identificador;
+    tFunciones* nueva = malloc(sizeof(tFunciones));
+    nueva->tipo = tipo;
+    nueva->nombre = identificador;
+    nueva->parametros = list_create();
+}
+
+void agregarParametro(char* tipo, char* opcional, char* identificador)
+{
+    tFunciones* funcion = buscarFuncion(identificador);
+    if(funcion != NULL)
+    {
+        tVariables* var = malloc(sizeof(tVariables));
+        var->tipo = tipo;
+        var->nombre = identificador;
+        
+        list_add(funcion->parametros, var);
+    }
+}
+
 int agregarFuncion(char * nombre, t_list* parametros)
 {
     tFunciones* temp = buscarFuncion(nombre);
@@ -140,5 +176,3 @@ void agregarError(char* mensaje, char* tipo, int linea)
 
     list_add(errores, &error);
 }
-//Al menos un control de tipos de datos en alguna operación binaria
-        

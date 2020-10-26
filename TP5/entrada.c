@@ -1,7 +1,10 @@
 int a = 23;
 int i = 0;
 
-int main(int var, )
+char* elpepe(char* nombre)
+{
+  return "elpepe";
+}
 if(a >3){
     float z = 5.4;
 }else{

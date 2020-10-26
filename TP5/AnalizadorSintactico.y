@@ -314,15 +314,15 @@ sentAsignacion: IDENTIFICADOR '=' expresion ';'
 
 /*DECLARACIONES*/
 declaracion: declaracionVariablesSimples  
-            | declaracionFunciones
+            | declaracionFunciones ';'
 ;
 
 declaracionVariablesSimples: tipoDato listaVariablesSimples ';' {if(agregarVariable(nombre, tipodato)) 
                                                                         printf("se declaro una variable de tipo %s llamada %s en la linea %d\n", tipodato,nombre, yylineno);
                                                                 else{
                                                                         printf("que queres declarar papichulo? ya existe eso\n");
-                                                                        agregarError("que queres declarar papichulo? ya existe eso", "semantico", yylineno)
-                                                                        
+                                                                        agregarError("que queres declarar papichulo? ya existe eso", "semantico", yylineno);
+   
                                                                 }}
                                 | error                         {fprintf(yyout,"Falta el ; en la declaracion en la linea %d\n", yylineno);
                                                                         agregarError("te olvidaste el ; en la linea %d capoeira", "sintactico", yylineno);
@@ -348,16 +348,19 @@ constante: NUMERO_ENTERO        {fprintf(yyout,"num = %d\n",$<entero>1);}
 ;
 
 //FUNCIONES
-declaracionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')'  {fprintf(yyout,"se declara una funcion de tipo %s llamada %s en la linea %d\n",tipodato, $<texto>2,yylineno);}
+declaracionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')'    {
+                                                                                        nuevaFuncion(tipodato, $<texto>2);
+                                                                                        fprintf(yyout,"se declara una funcion de tipo %s llamada %s en la linea %d\n",tipodato, $<texto>2,yylineno);
+                                                                                }
 ;
 
 opcionArgumentosConTipo:        /* vacio */ 
-                                | tipoDato opcionReferencia IDENTIFICADOR
-                                | tipoDato opcionReferencia IDENTIFICADOR ',' argumentosConTipo 
+                                | tipoDato opcionReferencia IDENTIFICADOR                       {agregarParametro(tipodato, $<texto>2, $<texto>3)}
+                                | tipoDato opcionReferencia IDENTIFICADOR ',' argumentosConTipo {agregarParametro(tipodato, $<texto>2, $<texto>3)}
 ;
 
-argumentosConTipo: tipoDato opcionReferencia IDENTIFICADOR
-                 | tipoDato opcionReferencia IDENTIFICADOR ',' argumentosConTipo
+argumentosConTipo: tipoDato opcionReferencia IDENTIFICADOR                                      {agregarParametro(tipodato, $<texto>2, $<texto>3)}
+                 | tipoDato opcionReferencia IDENTIFICADOR ',' argumentosConTipo                {agregarParametro(tipodato, $<texto>2, $<texto>3)}
 ;
 
 opcionReferencia: /* vacio */
@@ -365,9 +368,11 @@ opcionReferencia: /* vacio */
 ;
 
 definicionFunciones: tipoDato IDENTIFICADOR '(' opcionArgumentosConTipo ')' sentencia   {
+        //nombreDeLaFuncion = "IDENTIFICADOR";
+        //agregarFuncionNuevo(tipoDato, IDENTIFICADOR);
         fprintf(yyout,"se define una funcion de tipo %s llamada %s\n",tipodato, $<texto>2);
         }
-        |error {fprintf(yyout,"ERROR AL DEFINIR LA FUNCION\n");}
+                     |error {fprintf(yyout,"ERROR AL DEFINIR LA FUNCION\n");}
 ;
 %%
 int main (){
@@ -380,11 +385,12 @@ int main (){
   fprintf(yyout,"-------------------REPORTE-------------------\n\n");
   #ifdef BISON_DEBUG
        yydebug = 1;
-    #endif
+  #endif
 
   flag = yyparse ();
-  fprintf(yyout,"\n\n-------------finalizo el analisis----------\n:)");
+  fprintf(yyout,"\n\n-------------finalizo el analisis----------\n=)");
   fclose(yyin);
   fclose(yyout);
+  mostrarTutti(); //archivo funciones.c
   return flag;
 }
