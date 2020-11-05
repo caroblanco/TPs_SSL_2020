@@ -175,7 +175,7 @@ exp_multip:   exp_conversion
 ;
 
 exp_conversion:   exp_unaria
-                | '(' nombre_tipo ')' exp_conversion exp_unaria
+                | '(' nombre_tipo ')' exp_conversion exp_unaria   {printf("ARRANCA LA FN? 178\n");}
 ;
 
 exp_unaria:   exp_sufijo
@@ -183,7 +183,7 @@ exp_unaria:   exp_sufijo
             | OP_DEC exp_unaria           
             | op_unario exp_conversion
             | SIZEOF exp_unaria
-            | SIZEOF '(' nombre_tipo ')'
+            | SIZEOF '(' nombre_tipo ')'                        {printf("ARRANCA LA FN? 186\n");}
 ;
 
 op_unario:   '&'
@@ -196,7 +196,7 @@ op_unario:   '&'
 
 exp_sufijo:   exp_primaria
             | exp_sufijo '[' expresion ']'        
-            | exp_sufijo '(' lista_argumentos ')' 
+            | exp_sufijo '(' lista_argumentos ')'               {printf("ARRANCA LA FN? 199\n");}
             | exp_sufijo '.' ID                   
             | exp_sufijo OP_MIEMBRO_PUNT ID       
             | exp_sufijo OP_INC                   
@@ -209,7 +209,7 @@ lista_argumentos:   exp_asignacion
 
 exp_primaria:   const
               | STRING              
-              | '(' expresion ')'            
+              | '(' expresion ')'                               {printf("ARRANCA LA FN? 212\n");}   
 ;
 
 
@@ -311,11 +311,11 @@ lista_calificadores_tipos:   CALIF_TIPO
                            | lista_calificadores_tipos CALIF_TIPO
 ;
 
-declarador_directo:   ID                                                    {$<valorString>$ = strdup($<valorString>1);}
+declarador_directo:   ID                                                    {$<valorString>$ = strdup($<valorString>1); printf("RECIEN LEI %s\n",$<valorString>1);}
                     | '(' decla ')'                                         {$<valorString>$ = strdup($<valorString>2);}
                     | declarador_directo '[' exp_constante_opc ']'          {$<valorString>$ = strdup($<valorString>1);}
-                    | declarador_directo '(' lista_tipos_param_opc ')'      {$<valorString>$ = strdup($<valorString>1);}
-                    | declarador_directo '(' lista_identificadores_opc ')'  {$<valorString>$ = strdup($<valorString>1);}
+                    | declarador_directo '(' lista_tipos_param_opc ')'      {$<valorString>$ = strdup($<valorString>1); printf("ARRANCA LA FN? 317\n");}
+                    | declarador_directo '(' lista_identificadores_opc ')'  {$<valorString>$ = strdup($<valorString>1); printf("ARRANCA LA FN? 318\n");}
 ;
 
 lista_identificadores_opc:   /* Vacio */
@@ -325,8 +325,8 @@ lista_identificadores_opc:   /* Vacio */
 lista_tipos_param: lista_parametros
 ;
 
-lista_parametros:   declaracion_parametro
-                  | lista_parametros ',' declaracion_parametro
+lista_parametros:   declaracion_parametro                               
+                  | lista_parametros ',' declaracion_parametro           // muy tarde printf("INICIO PARAM FUNCION ? \n");
 ;
 
 declaracion_parametro:   especificadores_declaracion decla
@@ -363,9 +363,9 @@ declarador_abstracto:   puntero
                       | puntero_opc declarador_abstracto_directo
 ;
 
-declarador_abstracto_directo:   '(' declarador_abstracto ')'
+declarador_abstracto_directo:   '(' declarador_abstracto ')'                                    {printf("ARRANCA LA FN? 366\n");}                             
                               | declarador_abstracto_directo_opc '['   exp_constante_opc   ']'
-                              | declarador_abstracto_directo_opc '(' lista_tipos_param_opc ')'
+                              | declarador_abstracto_directo_opc '(' lista_tipos_param_opc ')' // la fn no es por aca rey
 ;
 
 declarador_abstracto_directo_opc:   /* Vacio */

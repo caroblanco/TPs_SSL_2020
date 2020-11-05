@@ -1,7 +1,9 @@
 -------------------REPORTE-------------------
 
 Se encontro la sentencia RETURN
-Se declara la funcion: 'pepita' que devuelve: 'int'
+Se declara la funcion: 'funcionUno' que devuelve: 'int'
+Se encontro la sentencia RETURN
+Se declara la funcion: 'funcionUno' que devuelve: 'int'
 Se encontro la sentencia CONTINUE
 Se encontro la sentencia WHILE
 Se encontro la sentencia BREAK

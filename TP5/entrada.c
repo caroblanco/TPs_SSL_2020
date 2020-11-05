@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int pepita(char a, float l){
-    
+int funcionUno(char a, float l){
+    a += 2;
+    return 1;
+}
+
+int funcionUno(char a, float l){ //debe tirar error
+    a += 2;
     return 1;
 }
 
