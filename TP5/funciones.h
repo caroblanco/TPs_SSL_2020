@@ -30,6 +30,7 @@ typedef struct
 }tError;
 t_list* errores;    // lista de tError
 
+t_list* listaVarTemp;
 char* identificadorFuncion;
 void iniciarListas(void);
 void mostrarVariable(tVariables*);
@@ -37,10 +38,12 @@ void nuevaFuncion(char*, char*);
 void mostrarFuncion(tFunciones*);
 tVariables* buscarVariable(char*);
 int agregarVariable(char*, char* );
+void intentarAgregarVar(char*, char*, int);
 tFunciones* buscarFuncion(char*);
-int agregarFuncion(char*, t_list*);
+int agregarFuncion(char*, char*, t_list*);
 void agregarError(char*, char*, int);
 void mostrarError(tError*);
 void agregarParametro(char*, char*, char*);
 void motrarTutti(void);
+void mostrarLista(t_list*);
 #endif 

@@ -4,6 +4,7 @@
 
 void iniciarListas()
 {
+    listaVarTemp =  list_create();
     listaVariables = list_create();
     listaParametros = list_create();
     listaFunciones = list_create();
@@ -69,13 +70,23 @@ void mostrarTutti(void)
     list_iterate(errores, (void*) mostrarError);
     
 }
+void mostrarLista(t_list* list) 
+{
+    printf("LISTA DE PARAM \n");
+    void _mostrar(char* elem)
+    {
+        printf("%s\n",elem);
+    }
+    list_iterate(list, (void*) _mostrar);
+    printf("\n");
+}
 /////////////
 //VARIABLES//
 /////////////
 
 void mostrarVariable(tVariables* variable)
 {
-    printf("\t %s %s\n", variable->nombre, variable->tipo);
+    printf("\t %s %s\n", variable->tipo, variable->nombre);
 }
 tVariables* buscarVariable(char* nombre)
 {   
@@ -104,15 +115,28 @@ int agregarVariable(char* nombre, char* tipo)
     }
 }
 
+void intentarAgregarVar(char* nombre, char* tipo, int linea)
+{
+    if(agregarVariable(nombre, tipo)) 
+            printf("se declaro una variable de tipo %s llamada %s en la linea %d\n", tipo, nombre, linea);
+    else{
+            printf("que queres declarar papichulo? ya existe eso\n");
+            agregarError("que queres declarar papichulo? ya existe eso", "semantico", linea);
+    }
+}
 /////////////
 //FUNCIONES//
 /////////////
 
 void mostrarFuncion(tFunciones* funcion)
 {
+    printf("%s ",funcion->tipo);
     printf("%s ",funcion->nombre);
     printf("\n");
-    list_iterate(funcion->parametros, (void*) mostrarVariable);
+    if(funcion->parametros != NULL)
+        list_iterate(funcion->parametros, (void*) mostrarVariable);
+    else
+        printf("sin parametros");
     printf("\n");
 }
 
@@ -145,9 +169,9 @@ void agregarParametro(char* tipo, char* opcional, char* identificador)
         
         list_add(funcion->parametros, var);
     }
-}
+}  
 
-int agregarFuncion(char * nombre, t_list* parametros)
+int agregarFuncion(char * nombre, char* retorno, t_list* parametros)
 {
     tFunciones* temp = buscarFuncion(nombre);
 
@@ -160,7 +184,21 @@ int agregarFuncion(char * nombre, t_list* parametros)
     {
         temp = malloc(sizeof(tFunciones));
         temp->nombre = nombre;
-        temp->parametros = parametros;
+        temp->tipo = retorno;
+
+        t_list* losparametros = list_create();
+
+        void _agregar(char* tipo)
+        {
+            tVariables* nuevaVar = malloc(sizeof(tVariables));
+            char* nombre = "sinNombre";
+            nuevaVar->nombre = nombre;
+            nuevaVar->tipo = tipo;
+            list_add(losparametros, nuevaVar);
+        }
+        list_iterate(parametros, (void*) _agregar);
+
+        temp->parametros = losparametros;
         //int cantidad = list_size(temp->parametros);
         list_add(listaFunciones, temp);
         return 1;

@@ -6,3 +6,5 @@ all:
 		move AnalizadorSintactico.exe .. &&\
 		del AnalizadorSintactico.tab.c AnalizadorSintactico.tab.h lex.yy.c
 	cmd /c .\AnalizadorSintactico.exe
+
+	YA PARO EL RUIDO, NO PUEDO FESTEJAR CON USTEDES :(

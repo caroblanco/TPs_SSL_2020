@@ -3,123 +3,139 @@
 %{
     #include <stdio.h>
     #include <stdlib.h>
-    #include <math.h>
     #include <string.h>
     #include "AnalizadorSintactico.tab.h"
 
-    extern FILE* yyin;
+    char* cadenaErronea = NULL;
+    unsigned errorFlag = 0;
+    unsigned cantLineas = 1;
 
+    int printError(char*, int);
+
+    void esError(char* charErroneo){
+        if(cadenaErronea == NULL)
+            cadenaErronea = strdup(charErroneo);
+        else
+        {
+            char * ptr = malloc(strlen(charErroneo) + strlen(cadenaErronea) + 1);
+            strcpy(ptr, cadenaErronea);
+            strcat(ptr, charErroneo);
+            cadenaErronea = strdup(ptr);
+        }
+        errorFlag = 1;
+    } 
+
+    void finalDeError(){
+        if (errorFlag)
+        {
+            printError(cadenaErronea, cantLineas);
+            cadenaErronea = NULL;
+        }
+        errorFlag = 0;
+    }
+
+    int cantidadSaltosDeLinea(char* data){
+        int cant = 0;
+        int i = 0;
+        while(data[i] != '\0')
+        {
+            if(data[i] == '\n')
+                cant++;
+            i++;
+        }
+
+        return cant;
+    }
 %}
 %option yylineno
 
-CARACTERES_PUNTUACION_OPERADORES "."|"+"|"-"|"!"|"*"|"/"|"%"|"["|"]"|"<"|">"|"^"|"?"|"="|","|":"|"{"|"}"|"("|")"|";"|"|"|"^"|"&"
- 
-CONSTANTE_DECIMAL [1-9][0-9]*
-CONSTANTE_OCTAL 0[0-7]*
-CONSTANTE_HEXADECIMAL 0[xX][0-9A-Fa-f]+
-CONSTANTE_REAL   [0-9]+"."[0-9]*([eE](\+|\-)?[0-9]+)?
-CARACTER_LETRAS [a-zA-Z]
-CONSTANTES {CONSTANTE_DECIMAL}|{CONSTANTE_OCTAL}|{CONSTANTE_HEXADECIMAL}|{CONSTANTE_REAL}|{CARACTER_LETRAS}
+CARACT_SIMPLES "+"|"-"|"*"|"/"|"^"|"("|")"|","|";"|"="|"<"|">"|"%"|"&"|"|"|"~"|"!"|"?"|":"|"["|"]"|"{"|"}"|"."
 
-IDENTIFICADOR ({CARACTER_LETRAS}|_)({CARACTER_LETRAS}|[0-9]|_)*
-LITERALCADENA \".+\"
-CARACTER \'.\'
-ESPACIOS [" "|\t]*
+DECIMAL        [0-9]
+OCTAL          [0-7]
+HEXA           [a-fA-F0-9]
+LETRA          [a-zA-Z]
+
+CONST_DECIMAL  [1-9]{DECIMAL}*
+CONST_OCTAL    0{OCTAL}*
+CONST_HEXA     0[xX]{HEXA}+
+CONST_REAL     {DECIMAL}+"."{DECIMAL}+([eE](\+|\-)?{DECIMAL}+)?
+CONST_CHAR     \'.\'
+LITERAL_CADENA \".+\"
+
+TIPOS_DATO    "void"|"char"|"short"|"int"|"long"|"float"|"double"|"signed"|"unsigned"
+CLASE_ALM     "typedef"|"static"|"auto"|"register"|"extern"
+CALIF_TIPO    "const"|"volatile"
+STRUCT_UNION  "struct"|"union"
+
+IDENTIFICADOR ({LETRA}|_)({LETRA}|{DECIMAL}|_)*
+
 COMENTARIO_LINEA "//".*
-COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/  
-KEYWORDS {TIPODATO}|{ESTRUCTURA}|{OTROS}
-TIPODATO char|const|int|float|double|long|short|signed|unsigned|void|enum|struct|typedef|union
-ESTRUCTURA switch|case|break|default|continue|do|while|if|else|for|return|goto
-OTROS volatile|extern|static|auto|register|sizeof
-INCLUDE #include(" ")*((<.+>)|(\".+\"))
-DEFINE #define(" ")*{IDENTIFICADOR}({TOKEN}+)?
-TOKEN {KEYWORDS}|{IDENTIFICADOR}|{CONSTANTES}|{LITERALCADENA}|{CARACTERES_PUNTUACION_OPERADORES}|{ESPACIOS}
+COMENTARIO_BLOQUE "/*"([^*]|\*+[^/])*\*+\/
 
-P_INC "++"
-P_DEC "--"
-DISTINTO "!="
-IGUAL "=="
-AND "&&"
-OR "||"
-DIV_IGUAL "/="
-POR_IGUAL "*="
-MENOS_IGUAL "-="
-MAS_IGUAL "+="
-MENOR_IGUAL "<="
-MAYOR_IGUAL ">="
-MOD_IGUAL "%="
-BIT_SHIFT_R ">>"
-BIT_SHIFT_L "<<"
-FLECHITA "->"
+INCLUDE #include(" ")+(\".+\"|<.+>)
+DEFINE #define(" ")+[^" "|"\n"]+(" ")*.*
 
-
-COMODIN .
-SALTO_DE_LINEA \n
+ESPACIOS       " "|"\t"
+COMODIN        .
 
 %%
 
-{CONSTANTE_DECIMAL}                 { yylval.entero = strtol(yytext, NULL, 10); return NUMERO_ENTERO;    } 
-{CONSTANTE_OCTAL}	                { yylval.entero = strtol(yytext, NULL, 8); return NUMERO_ENTERO;     }
-{CONSTANTE_HEXADECIMAL}	            { yylval.entero = strtol(yytext, NULL, 16); return NUMERO_ENTERO;    }
-{CONSTANTE_REAL}	                { yylval.real = strtof(yytext, NULL); return NUMERO_REAL;            }
-{CARACTER}	                        { return yytext[0];                                                 }
-{LITERALCADENA}                    { yylval.texto = strdup(yytext); return LITERALCADENA;                    }
-"switch"                                {yylval.texto = strdup(yytext); return SWITCH ;}
-"case"                                  {yylval.texto = strdup(yytext); return CASE ;}
-"break"                                 {yylval.texto = strdup(yytext); return BREAK ;}
-"default"                               {yylval.texto = strdup(yytext); return DEFAULT ;}
-"continue"                              {yylval.texto = strdup(yytext); return CONTINUE ;}
-"do"                                    {yylval.texto = strdup(yytext); return DO ;}
-"while"                                 {yylval.texto = strdup(yytext); return WHILE ;}
-"if"                                    {yylval.texto = strdup(yytext); return IF ;}
-"else"                                  {yylval.texto = strdup(yytext); return ELSE ;}
-"for"                                   {yylval.texto = strdup(yytext); return FOR ;}
-"return"                                {yylval.texto = strdup(yytext); return RETURN ;}
-"goto"                                  {yylval.texto = strdup(yytext); return GOTO ;}
-"sizeof"                                {yylval.texto = strdup(yytext); return SIZEOF ;}
-"static"                                {yylval.texto = strdup(yytext); return STATIC ;}
-"extern"                                {yylval.texto = strdup(yytext); return EXTERN ;}
-"const"                                 {yylval.texto = strdup(yytext); return CONST ;}
-"volatile"                              {yylval.texto = strdup(yytext); return VOLATILE ;}
-"struct"                                {yylval.texto = strdup(yytext); return STRUCT ;}
-"union"                                 {yylval.texto = strdup(yytext); return UNION ;}
-"typedef"                               {yylval.texto = strdup(yytext); return TYPEDEF ;}
-"auto"                                  {yylval.texto = strdup(yytext); return AUTO ;}
-"register"                              {yylval.texto = strdup(yytext); return REGISTER ;}
-"char"                                  {yylval.texto = strdup(yytext); return CHAR ;}
-"int"                                   {yylval.texto = strdup(yytext); return INT ;}
-"float"                                 {yylval.texto = strdup(yytext); return FLOAT ;}
-"long"                                  {yylval.texto = strdup(yytext); return LONG ;}
-"short"                                 {yylval.texto = strdup(yytext); return SHORT ;}
-"signed"                                {yylval.texto = strdup(yytext); return SIGNED ;}
-"unsigned"                              {yylval.texto = strdup(yytext); return UNSIGNED ;}
-"void"                                  {yylval.texto = strdup(yytext); return VOID ;}
-"enum"                                  {yylval.texto = strdup(yytext); return ENUM ;}
-"double"                                {yylval.texto = strdup(yytext); return DOUBLE ;}
-{P_INC}                             { return P_INC;                                                     }
-{P_DEC}                             { return P_DEC;                                                     }
-{DISTINTO}                          { return DISTINTO;                                                  }
-{IGUAL}                             { return IGUAL;                                                     }
-{AND}                               { return AND;                                                       }
-{OR}                                { return OR;                                                        }
-{DIV_IGUAL}                         { return DIV_IGUAL;                                                  }
-{POR_IGUAL}                         { return POR_IGUAL;                                                 } 
-{MENOS_IGUAL}                       { return MENOS_IGUAL;                                               }
-{MAS_IGUAL}                         { return MAS_IGUAL;                                                 }
-{MENOR_IGUAL}                       { return MENOR_IGUAL;                                               }
-{MAYOR_IGUAL}                       { return MAYOR_IGUAL;                                               }
-{MOD_IGUAL}                         { return MOD_IGUAL;                                                 }
-{BIT_SHIFT_R}                       { return BIT_SHIFT_R;                                               }
-{BIT_SHIFT_L}                       { return BIT_SHIFT_L;                                               }
-{FLECHITA}                          { return FLECHITA;                                                  } 
-{IDENTIFICADOR}                     { strcpy(yylval.texto, yytext); return IDENTIFICADOR;               }
-{CARACTERES_PUNTUACION_OPERADORES}  { return yytext[0];                                                 }
-{INCLUDE}                           {}
-{DEFINE}                            {}
-{ESPACIOS}+                         {                                                                   }
-{COMENTARIO_LINEA}                  {                                                                   }
-{COMENTARIO_BLOQUE}                 {}
-{SALTO_DE_LINEA}                    { }
-{COMODIN}                           { return ERRORLEXICO;                                                       }
+{CONST_DECIMAL}    {yylval.valorEntero = atoi(yytext); finalDeError(); return NUM_ENTERO;}
+{CONST_HEXA}       {yylval.valorEntero = strtoll(yytext, NULL, 16); finalDeError(); return NUM_ENTERO;}
+{CONST_OCTAL}      {yylval.valorEntero = strtoll(yytext, NULL, 8); finalDeError(); return NUM_ENTERO;}
+{CONST_REAL}       {yylval.valorReal   = atof(yytext); finalDeError(); return NUM_REAL;}
+{CARACT_SIMPLES}   {finalDeError(); return yytext[0];}
+"continue"         {yylval.valorString = strdup(yytext); finalDeError(); return CONTINUE;}
+"break"            {yylval.valorString = strdup(yytext); finalDeError(); return BREAK;}
+{INCLUDE}          {finalDeError();}
+{DEFINE}           {finalDeError();}
+"if"               {yylval.valorString = strdup(yytext); finalDeError(); return IF;}
+"else"             {yylval.valorString = strdup(yytext); finalDeError(); return ELSE;}
+"switch"           {yylval.valorString = strdup(yytext); finalDeError(); return SWITCH;}
+"while"            {yylval.valorString = strdup(yytext); finalDeError(); return WHILE;}
+"do"               {yylval.valorString = strdup(yytext); finalDeError(); return DO;}
+"for"              {yylval.valorString = strdup(yytext); finalDeError(); return FOR;}
+"case"             {yylval.valorString = strdup(yytext); finalDeError(); return CASE;}
+"default"          {yylval.valorString = strdup(yytext); finalDeError(); return DEFAULT;}
+"return"           {yylval.valorString = strdup(yytext); finalDeError(); return RETURN;}
+"goto"             {yylval.valorString = strdup(yytext); finalDeError(); return GOTO;}
+{TIPOS_DATO}       {yylval.valorString = strdup(yytext); finalDeError(); return TIPO_DATO;}
+{CLASE_ALM}        {yylval.valorString = strdup(yytext); finalDeError(); return CLASE_ALM;}
+{CALIF_TIPO}       {yylval.valorString = strdup(yytext); finalDeError(); return CALIF_TIPO;}
+{STRUCT_UNION}     {yylval.valorString = strdup(yytext); finalDeError(); return STRUCT_UNION;}
+"sizeof"           {yylval.valorString = strdup(yytext); finalDeError(); return SIZEOF;}
+"enum"             {yylval.valorString = strdup(yytext); finalDeError(); return ENUM;}
+{IDENTIFICADOR}    {yylval.valorString = strdup(yytext); finalDeError(); return ID;}
+{COMENTARIO_LINEA} {finalDeError();}
+{COMENTARIO_BLOQUE} {cantLineas += cantidadSaltosDeLinea(yytext); finalDeError();}
+"\n"               {cantLineas++;}
+{ESPACIOS}+        {finalDeError();}
+{COMODIN}          {esError(yytext);}
 
+
+{CONST_CHAR}       {yylval.valorString = strdup(yytext); finalDeError(); return CHAR;}
+{LITERAL_CADENA}   {yylval.valorString = strdup(yytext); finalDeError(); return STRING;}
+
+"*="               {finalDeError(); return ASIG_MULT;}
+"/="               {finalDeError(); return ASIG_DIV;}
+"%="               {finalDeError(); return ASIG_MOD;}
+"+="               {finalDeError(); return ASIG_SUMA;}
+"-="               {finalDeError(); return ASIG_RESTA;}
+"<<="              {finalDeError(); return ASIG_DESP_IZQ;}
+">>="              {finalDeError(); return ASIG_DESP_DER;}
+"&="               {finalDeError(); return ASIG_AND_BIN;}
+"^="               {finalDeError(); return ASIG_XOR_BIN;}
+"|="               {finalDeError(); return ASIG_OR_BIN;}
+"++"               {finalDeError(); return OP_INC;}
+"--"               {finalDeError(); return OP_DEC;}
+"=="               {finalDeError(); return OP_IGUALDAD;}
+"!="               {finalDeError(); return OP_DESIGUALDAD;}
+"&&"               {finalDeError(); return OP_AND;}
+"||"               {finalDeError(); return OP_OR;}
+"<="               {finalDeError(); return OP_MENOR_IGUAL;}
+">="               {finalDeError(); return OP_MAYOR_IGUAL;}
+"<<"               {finalDeError(); return OP_DESP_IZQ;}
+">>"               {finalDeError(); return OP_DESP_DER;}
+"->"               {finalDeError(); return OP_MIEMBRO_PUNT;}
 %%
