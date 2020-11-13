@@ -88,7 +88,8 @@ input:   /* vacio */
 ;
 
 line:  /* Vacio */
-      | declaracion ';' {tempVar = NULL; tempPointer = NULL;}
+      | declaracion ';' {tempVar = NULL; tempPointer = NULL;} 
+      | declaracionFunciones
       | sentencia
 ;
 
@@ -175,7 +176,7 @@ exp_multip:   exp_conversion
 ;
 
 exp_conversion:   exp_unaria
-                | '(' nombre_tipo ')' exp_conversion exp_unaria   {printf("ARRANCA LA FN? 178\n");}
+                | '(' nombre_tipo ')' exp_conversion exp_unaria   
 ;
 
 exp_unaria:   exp_sufijo
@@ -183,7 +184,7 @@ exp_unaria:   exp_sufijo
             | OP_DEC exp_unaria           
             | op_unario exp_conversion
             | SIZEOF exp_unaria
-            | SIZEOF '(' nombre_tipo ')'                        {printf("ARRANCA LA FN? 186\n");}
+            | SIZEOF '(' nombre_tipo ')'                        
 ;
 
 op_unario:   '&'
@@ -196,7 +197,7 @@ op_unario:   '&'
 
 exp_sufijo:   exp_primaria
             | exp_sufijo '[' expresion ']'        
-            | exp_sufijo '(' lista_argumentos ')'               {printf("ARRANCA LA FN? 199\n");}
+            | exp_sufijo '(' lista_argumentos ')'               
             | exp_sufijo '.' ID                   
             | exp_sufijo OP_MIEMBRO_PUNT ID       
             | exp_sufijo OP_INC                   
@@ -209,11 +210,19 @@ lista_argumentos:   exp_asignacion
 
 exp_primaria:   const
               | STRING              
-              | '(' expresion ')'                               {printf("ARRANCA LA FN? 212\n");}   
+              | '(' expresion ')'                              
 ;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-declaracion: especificadores_declaracion lista_declaradores
+declaracionFunciones: TIPO_DATO ID '(' lista_parametros ')' ';' {printf("retorno %s\n", $<valorString>1); printf("se ejecuta esta poronga?\n");agregarFuncion($<valorString>2, $<valorString>1, listaVarTemp, yylineno); list_clean(listaVarTemp);}
+
+lista_parametros: TIPO_DATO ID                          {  nuevoParametro($<valorString>2, $<valorString>1); }
+               | lista_parametros ',' TIPO_DATO ID      {  nuevoParametro($<valorString>4, $<valorString>3); }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+declaracion:  especificadores_declaracion lista_declaradores  
 ;
 
 especificadores_declaracion:   CLASE_ALM           especificadores_declaracion_opc  {$<valorString>$ = strdup($<valorString>1);}
@@ -225,8 +234,8 @@ especificadores_declaracion_opc:   /* Vacio */
                                  | especificadores_declaracion
 ;
 
-lista_declaradores:   declarador                        {intentarAgregarVar($<valorString>1,tempVar,yylineno); list_clean(listaVarTemp);}          
-                    | declarador ',' lista_declaradores {intentarAgregarVar($<valorString>1,tempVar,yylineno); list_clean(listaVarTemp);}
+lista_declaradores:   declarador                        {intentarAgregarVar($<valorString>1,tempVar,yylineno); }          
+                    | declarador ',' lista_declaradores {intentarAgregarVar($<valorString>1,tempVar,yylineno); }
 ;
 
 declarador:   decla                   {$<valorString>$ = strdup($<valorString>1);}
@@ -245,12 +254,12 @@ lista_inicializadores:   inicializador
                        | lista_inicializadores ',' inicializador
 ;
 
-especificador_tipo:   TIPO_DATO                   {tempVar = strdup($<valorString>1); printf("tempVar %s\n linea %d", tempVar, yylineno); list_add(listaVarTemp, tempVar);}              
+especificador_tipo:   TIPO_DATO                   {tempVar = strdup($<valorString>1); printf("tempVar %s\n linea %d", tempVar, yylineno);}              
                     | especificador_struct_union
                     | especificador_enum  {/*Sacamos nombre_typedef*/}
 ;
 
-especificador_struct_union:   STRUCT_UNION ID_opc '{' lista_declaradores_struct '}' {/*Hay problemas con el typedef ya que no tiene un identificador final*/}
+especificador_struct_union:   STRUCT_UNION ID_opc '{' lista_declaradores_struct '}' 
                             | STRUCT_UNION ID
 ;
 
@@ -311,11 +320,11 @@ lista_calificadores_tipos:   CALIF_TIPO
                            | lista_calificadores_tipos CALIF_TIPO
 ;
 
-declarador_directo:   ID                                                    {$<valorString>$ = strdup($<valorString>1); printf("RECIEN LEI %s\n",$<valorString>1);}
+declarador_directo:   ID                                                    {$<valorString>$ = strdup($<valorString>1);}
                     | '(' decla ')'                                         {$<valorString>$ = strdup($<valorString>2);}
                     | declarador_directo '[' exp_constante_opc ']'          {$<valorString>$ = strdup($<valorString>1);}
-                    | declarador_directo '(' lista_tipos_param_opc ')'      {$<valorString>$ = strdup($<valorString>1); printf("ARRANCA LA FN? 317\n");}
-                    | declarador_directo '(' lista_identificadores_opc ')'  {$<valorString>$ = strdup($<valorString>1); printf("ARRANCA LA FN? 318\n");}
+                    | declarador_directo '(' lista_tipos_param_opc ')'      {$<valorString>$ = strdup($<valorString>1);}
+                    | declarador_directo '(' lista_identificadores_opc ')'  {$<valorString>$ = strdup($<valorString>1);}
 ;
 
 lista_identificadores_opc:   /* Vacio */
@@ -326,7 +335,7 @@ lista_tipos_param: lista_parametros
 ;
 
 lista_parametros:   declaracion_parametro                               
-                  | lista_parametros ',' declaracion_parametro           // muy tarde printf("INICIO PARAM FUNCION ? \n");
+                  | lista_parametros ',' declaracion_parametro          
 ;
 
 declaracion_parametro:   especificadores_declaracion decla
@@ -385,9 +394,9 @@ sentencia:   sentencia_exp
            | especificadores_declaracion decla sentencia_compuesta  {   printf("agregando funcion %s\n", $<valorString>2); 
                                                                         t_list* nueva = list_duplicate(listaVarTemp);
                                                                         mostrarLista(nueva);
-                                                                        agregarFuncion($<valorString>2, $<valorString>1, nueva);
+                                                                        agregarFuncion($<valorString>2, $<valorString>1, nueva,yylineno);
                                                                         
-                                                                        fprintf(yyout, "Se declara la funcion: \'%s\' que devuelve: \'%s\'\n", $<valorString>2, $<valorString>1);
+                                                                        fprintf(yyout, "Se define la funcion: \'%s\' que devuelve: \'%s\'\n", $<valorString>2, $<valorString>1);
                                                                         }
 ;
 

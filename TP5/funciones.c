@@ -4,6 +4,7 @@
 
 void iniciarListas()
 {
+    listaVar = list_create();
     listaVarTemp =  list_create();
     listaVariables = list_create();
     listaParametros = list_create();
@@ -43,7 +44,7 @@ void iniciarListas()
     list_add(params, var3);
     ii
     tFunciones* funcion = malloc(sizeof(tFunciones));
-    funcion->nombre = "elpepe";
+    funcion->nombre = "elpepe";,
     funcion->parametros = params;
 
     agregarFuncion(funcion->nombre, funcion->parametros);
@@ -55,6 +56,19 @@ void iniciarListas()
     //:V
     //:|
     */
+}
+void nuevoParametro(char* nombre, char* tipo)
+{
+    tVariables* paramTemp = malloc(sizeof(tVariables));
+    int sznombre = strlen(nombre)+1;
+    int sztipo = strlen(tipo)+1;
+    
+    paramTemp->nombre = malloc(sznombre);
+    memcpy(paramTemp->nombre, nombre, sznombre);
+    paramTemp->tipo = malloc(sztipo);
+    memcpy(paramTemp->tipo, tipo, sztipo);
+    printf("agregado %s %s\n",tipo,nombre);
+    list_add(listaVarTemp,paramTemp);
 }
 void mostrarError(tError* error)
 {
@@ -134,7 +148,12 @@ void mostrarFuncion(tFunciones* funcion)
     printf("%s ",funcion->nombre);
     printf("\n");
     if(funcion->parametros != NULL)
-        list_iterate(funcion->parametros, (void*) mostrarVariable);
+    {
+        if(list_size(funcion->parametros) != 0)
+            list_iterate(funcion->parametros, (void*) mostrarVariable);
+        else
+            printf("sin parametros");
+    }
     else
         printf("sin parametros");
     printf("\n");
@@ -170,14 +189,32 @@ void agregarParametro(char* tipo, char* opcional, char* identificador)
         list_add(funcion->parametros, var);
     }
 }  
-
-int agregarFuncion(char * nombre, char* retorno, t_list* parametros)
+int verificarParametros(t_list* parametros)
+{ 
+    int sz = list_size(parametros);
+    int ret = 1;
+    for (int i = 0; i < sz; i++)
+    {
+        tVariables* var = list_get(parametros,i);
+        for(int j = 0; j < sz; j++)
+        {
+            tVariables* var2 = list_get(parametros,j);
+            if(strcmp(var->nombre, var2->nombre) == 0 && j != i)
+            {
+                ret = 0;
+            }
+        }
+    }
+    return ret;
+}
+int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
 {
     tFunciones* temp = buscarFuncion(nombre);
 
     if(temp != NULL)
     {
         printf("ERROR: la funcion %s ya esta definida :'( \n", nombre);
+        agregarError("ya existe funcion con el mismo nombre capo", "SEMANTICO", linea);
         return 0;
     }
     else
@@ -185,23 +222,23 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros)
         temp = malloc(sizeof(tFunciones));
         temp->nombre = nombre;
         temp->tipo = retorno;
+        printf("FUNCION %s, retorno %s\n", temp->nombre, temp->tipo);
+        
+        int c = 1;
 
-        t_list* losparametros = list_create();
-
-        void _agregar(char* tipo)
+        if(verificarParametros(parametros))
         {
-            tVariables* nuevaVar = malloc(sizeof(tVariables));
-            char* nombre = "sinNombre";
-            nuevaVar->nombre = nombre;
-            nuevaVar->tipo = tipo;
-            list_add(losparametros, nuevaVar);
+            temp->parametros = list_duplicate(parametros);
+            //int cantidad = list_size(temp->parametros);
+            list_add(listaFunciones, temp);
+            return 1;
         }
-        list_iterate(parametros, (void*) _agregar);
-
-        temp->parametros = losparametros;
-        //int cantidad = list_size(temp->parametros);
-        list_add(listaFunciones, temp);
-        return 1;
+        else{
+            //agregar a error
+            printf("dos parametros con el mismo nombre\n");
+            agregarError("dos parametros con el mismo nombre capo", "SEMANTICO", linea);
+            return 0;
+        }
     }
 }
 
@@ -212,5 +249,5 @@ void agregarError(char* mensaje, char* tipo, int linea)
     error->tipo = tipo;
     error->nroLinea = linea;
 
-    list_add(errores, &error);
+    list_add(errores, error);
 }

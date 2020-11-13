@@ -1,11 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+int b = 43;
+int b = 42;
 
-int funcionUno(char a, float l){
-    a += 2;
-    return 1;
-}
+int funcion(char a, float a, int c, float laConchaDeTuMadre);
 
+int funcionUno(char tuvi, float eja);
+
+int funcionUno(char tui, float eja);
+
+/*
 int funcionUno(char a, float l){ //debe tirar error
     a += 2;
     return 1;
@@ -36,3 +40,4 @@ int main(){
 
     return 0;
 }
+*/
