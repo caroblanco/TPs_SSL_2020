@@ -1,3 +1,2 @@
 -------------------REPORTE-------------------
 
-Error: syntax error

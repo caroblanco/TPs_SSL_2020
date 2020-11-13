@@ -5,13 +5,11 @@
 #include <ctype.h>
 #include "funciones.c"
 
-
 extern int yylineno;
 #define YYDEBUG 1
 
 int yylex ();
 int yyerror (char*);
-int printError(char*, int);
 
 unsigned count = 0;
 
@@ -73,7 +71,7 @@ char* tempPointer = NULL;
 %token <valorString> DEFAULT
 %token <valorString> RETURN 
 %token <valorString> GOTO
-
+%token <valorString> ERROR
 
 %union {
   int    valorEntero;
@@ -89,8 +87,9 @@ input:   /* vacio */
 
 line:  /* Vacio */
       | declaracion ';' {tempVar = NULL; tempPointer = NULL;} 
-      | declaracionFunciones
+     // | declaracionFunciones
       | sentencia
+      //|ERROR {fprintf(yyout,"se encontro un error lexico: %s",$<valorString>1)}
 ;
 
 const:   NUM_ENTERO
@@ -464,11 +463,6 @@ sentencia_salto:  CONTINUE ';'                                                  
 int yyerror (char *mensaje)  /* Funcion de error */
 {
   fprintf (yyout, "Error: %s\n", mensaje);
-}
-
-int printError(char *mensaje, int linea)
-{
-  fprintf(yyout, "Se encontro la cadena erronea: %s en la linea: %d\n", mensaje, linea);
 }
 
 void main(){ 
