@@ -5,12 +5,6 @@ int b = 42;
 
 int funcion(char a, float a, int c, float laConchaDeTuMadre);
 
-int funcionUno(char tuvi, float eja);
-
-
-int funcionUno(char tui, float eja);
-
-/*
 int funcionUno(char a, float l){ //debe tirar error
     a += 2;
     return 1;
@@ -41,4 +35,3 @@ int main(){
 
     return 0;
 }
-*/

@@ -21,6 +21,14 @@ typedef struct
     t_list* parametros; //lista de tParametros
 }tFunciones;
 t_list* listaFunciones; //lista de tFunciones
+// t_list* listaFuncionesDec;
+// t_list* listaFuncionesDef;
+/*
+NECESITAMOS DOS FUNCIONES DE LISTAS, UNA DE DECLARACION Y UNA DE DEFINICION PARA PODER COMPARAR. ADEMAS, SINO SE METEN
+TODAS LAS FUNCIONES EN LA MISMA Y SE CONFUNDE LA DEC CON LA DEF Y DICE QUE YA ESTA DECLARADA!!!
+ <3 SDS A LA FLIA
+*/
+
 
 typedef struct 
 {

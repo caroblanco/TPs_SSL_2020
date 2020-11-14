@@ -158,10 +158,10 @@ void mostrarFuncion(tFunciones* funcion)
         if(list_size(funcion->parametros) != 0)
             list_iterate(funcion->parametros, (void*) mostrarVariable);
         else
-            printf("ERROR: sin parametros");
+            printf("\tsin parametros");
     }
     else
-        printf("ERROR: sin parametros");
+        printf("\tsin parametros");
     printf("\n");
 }
 
