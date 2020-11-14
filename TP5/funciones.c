@@ -57,6 +57,7 @@ void iniciarListas()
     //:|
     */
 }
+
 void nuevoParametro(char* nombre, char* tipo)
 {
     tVariables* paramTemp = malloc(sizeof(tVariables));
@@ -70,20 +71,23 @@ void nuevoParametro(char* nombre, char* tipo)
     printf("agregado %s %s\n",tipo,nombre);
     list_add(listaVarTemp,paramTemp);
 }
+
 void mostrarError(tError* error)
 {
     printf("%s (%s) linea: %d\n", error->mensaje, error->tipo, error->nroLinea);
 }
+
 void mostrarTutti(void)
 {
-    printf("lasva riables:\n");
+    printf("\nlasva riables:\n");
     list_iterate(listaVariables, (void*) mostrarVariable);
-    printf("lasfun ciones:\n");
+    printf("\nlasfun ciones:\n");
     list_iterate(listaFunciones, (void*) mostrarFuncion);
-    printf("lose rrores:\n");
+    printf("\nlose rrores:\n");
     list_iterate(errores, (void*) mostrarError);
     
 }
+
 void mostrarLista(t_list* list) 
 {
     printf("LISTA DE PARAM \n");
@@ -102,6 +106,7 @@ void mostrarVariable(tVariables* variable)
 {
     printf("\t %s %s\n", variable->tipo, variable->nombre);
 }
+
 tVariables* buscarVariable(char* nombre)
 {   
     int _nombre_igual(tVariables* variable)//vscode es malo pero gcc sape
@@ -110,6 +115,7 @@ tVariables* buscarVariable(char* nombre)
     }
     list_find(listaVariables, (void*) _nombre_igual);
 }
+
 int agregarVariable(char* nombre, char* tipo)
 {
     tVariables* temp = buscarVariable(nombre);
@@ -132,10 +138,10 @@ int agregarVariable(char* nombre, char* tipo)
 void intentarAgregarVar(char* nombre, char* tipo, int linea)
 {
     if(agregarVariable(nombre, tipo)) 
-            printf("se declaro una variable de tipo %s llamada %s en la linea %d\n", tipo, nombre, linea);
+            printf("Se declaro una variable de tipo %s llamada %s en la linea %d\n", tipo, nombre, linea);
     else{
-            printf("que queres declarar papichulo? ya existe eso\n");
-            agregarError("que queres declarar papichulo? ya existe eso", "semantico", linea);
+            printf("ERROR: que queres declarar papichulo? ya existe eso\n");
+            agregarError("ERROR: que queres declarar papichulo? ya existe eso", "semantico", linea);
     }
 }
 /////////////
@@ -152,10 +158,10 @@ void mostrarFuncion(tFunciones* funcion)
         if(list_size(funcion->parametros) != 0)
             list_iterate(funcion->parametros, (void*) mostrarVariable);
         else
-            printf("sin parametros");
+            printf("ERROR: sin parametros");
     }
     else
-        printf("sin parametros");
+        printf("ERROR: sin parametros");
     printf("\n");
 }
 
@@ -189,6 +195,7 @@ void agregarParametro(char* tipo, char* opcional, char* identificador)
         list_add(funcion->parametros, var);
     }
 }  
+
 int verificarParametros(t_list* parametros)
 { 
     int sz = list_size(parametros);
@@ -207,6 +214,7 @@ int verificarParametros(t_list* parametros)
     }
     return ret;
 }
+
 int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
 {
     tFunciones* temp = buscarFuncion(nombre);
@@ -214,7 +222,7 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
     if(temp != NULL)
     {
         printf("ERROR: la funcion %s ya esta definida :'( \n", nombre);
-        agregarError("ya existe funcion con el mismo nombre capo", "SEMANTICO", linea);
+        agregarError("ERROR: ya existe funcion con el mismo nombre capo", "SEMANTICO", linea);
         return 0;
     }
     else
@@ -235,8 +243,8 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
         }
         else{
             //agregar a error
-            printf("dos parametros con el mismo nombre\n");
-            agregarError("dos parametros con el mismo nombre capo", "SEMANTICO", linea);
+            printf("ERROR: dos parametros con el mismo nombre\n");
+            agregarError("ERROR: dos parametros con el mismo nombre capo", "SEMANTICO", linea);
             return 0;
         }
     }

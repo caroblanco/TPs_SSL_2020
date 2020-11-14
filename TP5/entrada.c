@@ -7,6 +7,7 @@ int funcion(char a, float a, int c, float laConchaDeTuMadre);
 
 int funcionUno(char tuvi, float eja);
 
+
 int funcionUno(char tui, float eja);
 
 /*

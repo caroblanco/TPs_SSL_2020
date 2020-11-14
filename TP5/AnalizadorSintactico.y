@@ -4,9 +4,10 @@
 #include <string.h>
 #include <ctype.h>
 #include "funciones.c"
+#define YYDEBUG 1
 
 extern int yylineno;
-#define YYDEBUG 1
+
 
 int yylex ();
 int yyerror (char*);
@@ -18,6 +19,9 @@ FILE* yyout;
 
 char* tempVar = NULL;
 char* tempPointer = NULL;
+char* nombreFuncion = NULL;
+bool esFuncion = 0;
+
 %}
 
 %type <valorString> declarador_directo
@@ -86,8 +90,8 @@ input:   /* vacio */
 ;
 
 line:  /* Vacio */
+      //| declaracionFunciones
       | declaracion ';' {tempVar = NULL; tempPointer = NULL;} 
-     // | declaracionFunciones
       | sentencia
       //|ERROR {fprintf(yyout,"se encontro un error lexico: %s",$<valorString>1)}
 ;
@@ -213,15 +217,16 @@ exp_primaria:   const
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 declaracionFunciones: TIPO_DATO ID '(' lista_parametros ')' ';' {printf("retorno %s\n", $<valorString>1); printf("se ejecuta esta poronga?\n");agregarFuncion($<valorString>2, $<valorString>1, listaVarTemp, yylineno); list_clean(listaVarTemp);}
+*/
 
 lista_parametros: TIPO_DATO ID                          {  nuevoParametro($<valorString>2, $<valorString>1); }
                | lista_parametros ',' TIPO_DATO ID      {  nuevoParametro($<valorString>4, $<valorString>3); }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-declaracion:  especificadores_declaracion lista_declaradores  
+declaracion:  especificadores_declaracion lista_declaradores  {esFuncion = 0;}
 ;
 
 especificadores_declaracion:   CLASE_ALM           especificadores_declaracion_opc  {$<valorString>$ = strdup($<valorString>1);}
@@ -233,7 +238,7 @@ especificadores_declaracion_opc:   /* Vacio */
                                  | especificadores_declaracion
 ;
 
-lista_declaradores:   declarador                        {intentarAgregarVar($<valorString>1,tempVar,yylineno); }          
+lista_declaradores:   declarador                        {if(esFuncion == 1){agregarFuncion(nombreFuncion, tempVar, listaVarTemp, yylineno); list_clean(listaVarTemp);} else{intentarAgregarVar($<valorString>1,tempVar,yylineno);}; }          
                     | declarador ',' lista_declaradores {intentarAgregarVar($<valorString>1,tempVar,yylineno); }
 ;
 
@@ -253,7 +258,7 @@ lista_inicializadores:   inicializador
                        | lista_inicializadores ',' inicializador
 ;
 
-especificador_tipo:   TIPO_DATO                   {tempVar = strdup($<valorString>1); printf("tempVar %s\n linea %d", tempVar, yylineno);}              
+especificador_tipo:   TIPO_DATO                   {tempVar = strdup($<valorString>1);/* printf("tempVar %s\n linea %d", tempVar, yylineno);*/}              
                     | especificador_struct_union
                     | especificador_enum  {/*Sacamos nombre_typedef*/}
 ;
@@ -322,7 +327,7 @@ lista_calificadores_tipos:   CALIF_TIPO
 declarador_directo:   ID                                                    {$<valorString>$ = strdup($<valorString>1);}
                     | '(' decla ')'                                         {$<valorString>$ = strdup($<valorString>2);}
                     | declarador_directo '[' exp_constante_opc ']'          {$<valorString>$ = strdup($<valorString>1);}
-                    | declarador_directo '(' lista_tipos_param_opc ')'      {$<valorString>$ = strdup($<valorString>1);}
+                    | declarador_directo '(' lista_tipos_param_opc ')'      {nombreFuncion = strdup($<valorString>1); esFuncion = 1;} //VER ACA!!!
                     | declarador_directo '(' lista_identificadores_opc ')'  {$<valorString>$ = strdup($<valorString>1);}
 ;
 
@@ -332,11 +337,12 @@ lista_identificadores_opc:   /* Vacio */
 
 lista_tipos_param: lista_parametros
 ;
-
+/*
 lista_parametros:   declaracion_parametro                               
                   | lista_parametros ',' declaracion_parametro          
 ;
 
+*/
 declaracion_parametro:   especificadores_declaracion decla
                        | especificadores_declaracion declarador_abstracto_opc
 ;
@@ -344,6 +350,7 @@ declaracion_parametro:   especificadores_declaracion decla
 declarador_abstracto_opc:   /* Vacio */
                           | declarador_abstracto
 ;
+
 
 lista_identificadores:   ID
                        | lista_identificadores ',' ID
@@ -371,9 +378,9 @@ declarador_abstracto:   puntero
                       | puntero_opc declarador_abstracto_directo
 ;
 
-declarador_abstracto_directo:   '(' declarador_abstracto ')'                                    {printf("ARRANCA LA FN? 366\n");}                             
+declarador_abstracto_directo:   '(' declarador_abstracto ')'                                                                
                               | declarador_abstracto_directo_opc '['   exp_constante_opc   ']'
-                              | declarador_abstracto_directo_opc '(' lista_tipos_param_opc ')' // la fn no es por aca rey
+                              | declarador_abstracto_directo_opc '(' lista_tipos_param_opc ')' 
 ;
 
 declarador_abstracto_directo_opc:   /* Vacio */
@@ -473,7 +480,7 @@ void main(){
         iniciarListas(); 
         fprintf(yyout,"-------------------REPORTE-------------------\n\n");
 
-        #ifdef BISON_DEBUG
+        #ifdef BISON_DEBUG //YYDEBUG para debug
                 yydebug = 1;
         #endif
     
