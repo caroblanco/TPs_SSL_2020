@@ -68,13 +68,13 @@ void nuevoParametro(char* nombre, char* tipo)
     memcpy(paramTemp->nombre, nombre, sznombre);
     paramTemp->tipo = malloc(sztipo);
     memcpy(paramTemp->tipo, tipo, sztipo);
-    printf("agregado %s %s\n",tipo,nombre);
+    printf("parametro: %s %s\n",tipo,nombre);
     list_add(listaVarTemp,paramTemp);
 }
 
 void mostrarError(tError* error)
 {
-    printf("%s (%s) linea: %d\n", error->mensaje, error->tipo, error->nroLinea);
+    printf("%s (%s) en la linea: %d\n", error->mensaje, error->tipo, error->nroLinea);
 }
 
 void mostrarTutti(void)
@@ -90,7 +90,7 @@ void mostrarTutti(void)
 
 void mostrarLista(t_list* list) 
 {
-    printf("LISTA DE PARAM \n");
+    printf("LISTA DE PARAMETROS \n");
     void _mostrar(char* elem)
     {
         printf("%s\n",elem);
@@ -140,8 +140,8 @@ void intentarAgregarVar(char* nombre, char* tipo, int linea)
     if(agregarVariable(nombre, tipo)) 
             printf("Se declaro una variable de tipo %s llamada %s en la linea %d\n", tipo, nombre, linea);
     else{
-            printf("ERROR: que queres declarar papichulo? ya existe eso\n");
-            agregarError("ERROR: que queres declarar papichulo? ya existe eso", "semantico", linea);
+            printf("ERROR: doble declaracion de la variable %s\n",nombre);
+            agregarError("ERROR: doble declaracion de variable", "SEMANTICO", linea);
     }
 }
 /////////////
@@ -222,7 +222,7 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
     if(temp != NULL)
     {
         printf("ERROR: la funcion %s ya esta definida :'( \n", nombre);
-        agregarError("ERROR: ya existe funcion con el mismo nombre capo", "SEMANTICO", linea);
+        agregarError("ERROR: doble declaracion de funcion", "SEMANTICO", linea);
         return 0;
     }
     else
@@ -244,7 +244,7 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
         else{
             //agregar a error
             printf("ERROR: dos parametros con el mismo nombre\n");
-            agregarError("ERROR: dos parametros con el mismo nombre capo", "SEMANTICO", linea);
+            agregarError("ERROR: hay dos parametros con el mismo nombre en la funcion", "SEMANTICO", linea);
             return 0;
         }
     }

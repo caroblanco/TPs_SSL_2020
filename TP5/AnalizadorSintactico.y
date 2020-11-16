@@ -343,9 +343,10 @@ lista_parametros:   declaracion_parametro
 ;
 
 */
+/*
 declaracion_parametro:   especificadores_declaracion decla
                        | especificadores_declaracion declarador_abstracto_opc
-;
+;*/
 
 declarador_abstracto_opc:   /* Vacio */
                           | declarador_abstracto
