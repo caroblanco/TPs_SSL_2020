@@ -220,7 +220,7 @@ int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
     
     int sz = list_size(funcion1->parametros);
     int sz2 = list_size(funcion2->parametros);
-    printf("sz1 => %d |||| sz2 => %d\n", sz, sz2);
+    //printf("sz1 => %d |||| sz2 => %d\n", sz, sz2);
     if(sz != sz2)
     {
         printf("ERROR: distinta cantidad de parametros entre %s (%d) y %s (%d) \n", funcion1->nombre,sz, funcion2->nombre,sz2);
@@ -241,7 +241,7 @@ int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
         }
             
     }
-    printf("todo ok pa\n");
+    //printf("todo ok pa\n");
     return 1;
 }
 int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, int linea)
@@ -264,25 +264,25 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
 
         if(verificarParametros(parametros))
         {
-            printf("verificacion ok\n");
+            //printf("verificacion ok\n");
             if(TIPO == DEF)
             {
                 tFunciones* declaracion = buscarFuncion(nombre, DECL);
                 temp->parametros = list_duplicate(parametros);
                 if(declaracion == NULL)
                 {
-                    printf("declaracion no encontrada, agregando\n");
+                    //printf("declaracion no encontrada, agregando\n");
                     list_add(listaFuncionesDefinidas, temp);
                     list_add(listaFuncionesDeclaradas, temp);
                     return 1;
                 }
                 else
-                    printf("declaracion encontrada\n");
+                    //printf("declaracion encontrada\n");
 
                 
                 if(compararParametros(temp, declaracion))
                 {
-                    printf("comparacion ok\n");
+                    //printf("comparacion ok\n");
                     
                     //int cantidad = list_size(temp->parametros);
                     list_add(listaFuncionesDefinidas, temp);

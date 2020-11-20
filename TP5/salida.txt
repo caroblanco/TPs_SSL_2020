@@ -1,0 +1,11 @@
+-------------------REPORTE-------------------
+
+Se encontro la sentencia RETURN
+Se define la funcion: 'funcionUno' que devuelve: 'int'
+Se encontro la sentencia CONTINUE
+Se encontro la sentencia WHILE
+Se encontro la sentencia BREAK
+Se encontro la sentencia WHILE
+Se encontro la sentencia IF
+Se encontro la sentencia RETURN
+Se define la funcion: 'main' que devuelve: 'int'
