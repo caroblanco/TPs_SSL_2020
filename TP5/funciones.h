@@ -5,6 +5,19 @@
 #include <stdio.h>
 #include <string.h>
 
+typedef enum 
+{
+    DECL,
+    DEF
+} t_fn;
+typedef enum
+{
+    SUMA,
+    RESTA,
+    MULT,
+    DIV,
+    MOD
+} t_op;
 typedef struct
 {
     char* nombre;  
@@ -20,14 +33,8 @@ typedef struct
     char* tipo;
     t_list* parametros; //lista de tParametros
 }tFunciones;
-t_list* listaFunciones; //lista de tFunciones
-// t_list* listaFuncionesDec;
-// t_list* listaFuncionesDef;
-/*
-NECESITAMOS DOS FUNCIONES DE LISTAS, UNA DE DECLARACION Y UNA DE DEFINICION PARA PODER COMPARAR. ADEMAS, SINO SE METEN
-TODAS LAS FUNCIONES EN LA MISMA Y SE CONFUNDE LA DEC CON LA DEF Y DICE QUE YA ESTA DECLARADA!!!
- <3 SDS A LA FLIA
-*/
+t_list* listaFuncionesDeclaradas; //lista de tFunciones
+t_list* listaFuncionesDefinidas;
 
 
 typedef struct 
@@ -50,11 +57,12 @@ void mostrarFuncion(tFunciones*);
 tVariables* buscarVariable(char*);
 int agregarVariable(char*, char* );
 void intentarAgregarVar(char*, char*, int);
-tFunciones* buscarFuncion(char*);
-int agregarFuncion(char*, char*, t_list*,int);
+tFunciones* buscarFuncion(char*, t_fn);
+int agregarFuncion(char*, char*, t_list*,t_fn,int);
 void agregarError(char*, char*, int);
 void mostrarError(tError*);
 void agregarParametro(char*, char*, char*);
-void motrarTutti(void);
+void mostrarTutti(void);
 void mostrarLista(t_list*);
+// int parametrosMismoTipo(char*,char*, t_op);
 #endif 

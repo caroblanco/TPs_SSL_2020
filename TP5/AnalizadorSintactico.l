@@ -5,7 +5,6 @@
     #include <stdlib.h>
     #include <string.h>
     #include "AnalizadorSintactico.tab.h"
-
 %}
 %option yylineno
 
@@ -70,7 +69,7 @@ COMODIN        .
 {COMENTARIO_LINEA} {}
 {COMENTARIO_BLOQUE} {}
 "\n"               {}
-{ESPACIOS}+        {}
+{ESPACIOS}+        {} 
 {COMODIN}          {return ERROR;}
 
 

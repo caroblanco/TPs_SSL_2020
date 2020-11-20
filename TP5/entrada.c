@@ -2,28 +2,33 @@
 #include <stdlib.h>
 int b = 43;
 int b = 42;
+int x = 2; 
+int nivelDeFachaDeEsteTP = b + x;
 
-int funcion(char a, float a, int c, float laConchaDeTuMadre);
+ñ
+// es un error lexico;
 
-int funcionUno(char a, float l){ //debe tirar error
+int funcionUno(char a, float l, int w);
+
+int funcionUno(char a, float l){ //debe tirar error de tipos de parametros
     a += 2;
     return 1;
 }
 
 int main(){
-    int a = 1;
-    char b = 'a';
-    char* c= "Digame usteee, con quien ha venido seniorita";
-    char* d = "Hola, que tal, vengo a presentar una denuncia contra la seniorita carolina blanco por violencia y por abuso de autoridad. no me parece que pueda ser autoritaria por hacer el liveshare. saluda atte el dr ezequiel horowitz licenciado en derecho penal";
-    char* e = "Mira que la carcel de P E L E L E S es en otro convento CAPOOOOOOOOOOOOO";
 
-    if(a){
-        for(;;)
+    char* d = "SSL";
+    char* e = "S.S.L.";
+    int f = 1;
+
+    if(f){
+        while(1)
         {
-            strcpy(c, "hola");
-            while(a < 10){
+            strcpy(d, "hola");
+            while(x < 10)
+            {
                 b += 2;
-                a+= 1;
+                x+= 1;
                 continue;
             }
 
@@ -31,7 +36,7 @@ int main(){
         }
     }
 
-    printf("Cadena: %s", c);
+    printf("Cadena: %s", d);
 
     return 0;
 }

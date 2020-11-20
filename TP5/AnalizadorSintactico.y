@@ -90,10 +90,10 @@ input:   /* vacio */
 ;
 
 line:  /* Vacio */
-      //| declaracionFunciones
-      | declaracion ';' {tempVar = NULL; tempPointer = NULL;} 
+      | declaracion ';' {tempVar = NULL; tempPointer = NULL; esFuncion = 0;} 
       | sentencia
-      //|ERROR {fprintf(yyout,"se encontro un error lexico: %s",$<valorString>1)}
+      | ERROR {agregarError("ERROR: QUE CARACTER ME PONES PINION?","LEXICO",yylineno);}
+      | error {agregarError("ERROR: no se reconoce la estructura","SINTACTICO",yylineno); printf("se encontro un error sintactico\n");}
 ;
 
 const:   NUM_ENTERO
@@ -238,7 +238,7 @@ especificadores_declaracion_opc:   /* Vacio */
                                  | especificadores_declaracion
 ;
 
-lista_declaradores:   declarador                        {if(esFuncion == 1){agregarFuncion(nombreFuncion, tempVar, listaVarTemp, yylineno); list_clean(listaVarTemp);} else{intentarAgregarVar($<valorString>1,tempVar,yylineno);}; }          
+lista_declaradores:   declarador                        {if(esFuncion == 1){agregarFuncion(nombreFuncion, tempVar, listaVarTemp, DECL, yylineno); list_clean(listaVarTemp);} else{intentarAgregarVar($<valorString>1,tempVar,yylineno);}; }          
                     | declarador ',' lista_declaradores {intentarAgregarVar($<valorString>1,tempVar,yylineno); }
 ;
 
@@ -324,11 +324,11 @@ lista_calificadores_tipos:   CALIF_TIPO
                            | lista_calificadores_tipos CALIF_TIPO
 ;
 
-declarador_directo:   ID                                                    {$<valorString>$ = strdup($<valorString>1);}
-                    | '(' decla ')'                                         {$<valorString>$ = strdup($<valorString>2);}
-                    | declarador_directo '[' exp_constante_opc ']'          {$<valorString>$ = strdup($<valorString>1);}
+declarador_directo:   ID                                                    {$<valorString>$ = strdup($<valorString>1); esFuncion = 0;}
+                    | '(' decla ')'                                         {$<valorString>$ = strdup($<valorString>2);esFuncion = 0;}
+                    | declarador_directo '[' exp_constante_opc ']'          {$<valorString>$ = strdup($<valorString>1);esFuncion = 0;}
                     | declarador_directo '(' lista_tipos_param_opc ')'      {nombreFuncion = strdup($<valorString>1); esFuncion = 1;} //VER ACA!!!
-                    | declarador_directo '(' lista_identificadores_opc ')'  {$<valorString>$ = strdup($<valorString>1);}
+                    | declarador_directo '(' lista_identificadores_opc ')'  {$<valorString>$ = strdup($<valorString>1);esFuncion = 0;}
 ;
 
 lista_identificadores_opc:   /* Vacio */
@@ -401,7 +401,7 @@ sentencia:   sentencia_exp
            | especificadores_declaracion decla sentencia_compuesta  {   printf("agregando funcion %s\n", $<valorString>2); 
                                                                         t_list* nueva = list_duplicate(listaVarTemp);
                                                                         mostrarLista(nueva);
-                                                                        agregarFuncion($<valorString>2, $<valorString>1, nueva,yylineno);
+                                                                        agregarFuncion($<valorString>2, $<valorString>1, nueva, DEF, yylineno);
                                                                         
                                                                         fprintf(yyout, "Se define la funcion: \'%s\' que devuelve: \'%s\'\n", $<valorString>2, $<valorString>1);
                                                                         }

@@ -8,54 +8,9 @@ void iniciarListas()
     listaVarTemp =  list_create();
     listaVariables = list_create();
     listaParametros = list_create();
-    listaFunciones = list_create();
+    listaFuncionesDeclaradas = list_create();
+    listaFuncionesDefinidas = list_create();
     errores = list_create();
-    /* 
-    //pruebas
-    agregarVariable("a","int");
-
-    agregarVariable("a","float");
-
-    agregarVariable("b","float");
-    list_iterate(listaVariables, (void*) mostrarVariable);
-    
-    t_list* params = list_create();
-
-    tVariables* var = malloc(sizeof(tVariables));
-    tVariables* var2 = malloc(sizeof(tVariables));
-    tVariables* var3 = malloc(sizeof(tVariables));
-    
-    char* a = "a";
-    char* b = "b";
-    char* c = "c";
-    char* entero = "int";
-    char* doble = "double";
-
-    var->nombre = a;
-    var->tipo = entero;
-    list_add(params, var);
-    
-    var2->nombre = b;
-    var2->tipo = entero;
-    list_add(params, var2);
-    
-    var3->nombre = c;
-    var3->tipo = doble;
-    list_add(params, var3);
-    ii
-    tFunciones* funcion = malloc(sizeof(tFunciones));
-    funcion->nombre = "elpepe";,
-    funcion->parametros = params;
-
-    agregarFuncion(funcion->nombre, funcion->parametros);
-    agregarFuncion(funcion->nombre, funcion->parametros);
-    
-    mostrarFuncion(funcion);
-    //#SantiNosBendijoConLeanTodoPoderoso ♥
-    //:3
-    //:V
-    //:|
-    */
 }
 
 void nuevoParametro(char* nombre, char* tipo)
@@ -79,10 +34,14 @@ void mostrarError(tError* error)
 
 void mostrarTutti(void)
 {
+    printf("\n-------------------------------------------------\n");
     printf("\nlasva riables:\n");
     list_iterate(listaVariables, (void*) mostrarVariable);
-    printf("\nlasfun ciones:\n");
-    list_iterate(listaFunciones, (void*) mostrarFuncion);
+    printf("\nlasfun ciones definidas:\n");
+    list_iterate(listaFuncionesDefinidas, (void*) mostrarFuncion);
+    printf("\nlasfun ciones declaradas:\n");
+    list_iterate(listaFuncionesDeclaradas, (void*) mostrarFuncion);
+    
     printf("\nlose rrores:\n");
     list_iterate(errores, (void*) mostrarError);
     
@@ -95,9 +54,10 @@ void mostrarLista(t_list* list)
     {
         printf("%s\n",elem);
     }
-    list_iterate(list, (void*) _mostrar);
+   list_iterate(list, (void*) _mostrar);
     printf("\n");
 }
+
 /////////////
 //VARIABLES//
 /////////////
@@ -144,6 +104,7 @@ void intentarAgregarVar(char* nombre, char* tipo, int linea)
             agregarError("ERROR: doble declaracion de variable", "SEMANTICO", linea);
     }
 }
+
 /////////////
 //FUNCIONES//
 /////////////
@@ -165,13 +126,16 @@ void mostrarFuncion(tFunciones* funcion)
     printf("\n");
 }
 
-tFunciones* buscarFuncion(char* nombre)
+tFunciones* buscarFuncion(char* nombre, t_fn TIPO)
 {
     int _nombre_igual(tFunciones* funcion) //vscode es malo pero gcc sape
     {
         return strcmp(funcion->nombre, nombre) == 0;
     }
-    list_find(listaFunciones, (void*) _nombre_igual);
+    if(TIPO == DECL)
+        return list_find(listaFuncionesDeclaradas, (void*) _nombre_igual);
+    else if (TIPO == DEF)
+        return list_find(listaFuncionesDefinidas, (void*) _nombre_igual);
 }
 
 void nuevaFuncion(char* tipo, char* identificador)
@@ -183,41 +147,106 @@ void nuevaFuncion(char* tipo, char* identificador)
     nueva->parametros = list_create();
 }
 
-void agregarParametro(char* tipo, char* opcional, char* identificador)
-{
-    tFunciones* funcion = buscarFuncion(identificador);
-    if(funcion != NULL)
-    {
-        tVariables* var = malloc(sizeof(tVariables));
-        var->tipo = tipo;
-        var->nombre = identificador;
+// void agregarParametro(char* tipo, char* opcional, char* identificador)
+// {
+//     tFunciones* funcion = buscarFuncion(identificador);
+//     if(funcion != NULL)
+//     {
+//         tVariables* var = malloc(sizeof(tVariables));
+//         var->tipo = tipo;
+//         var->nombre = identificador;
         
-        list_add(funcion->parametros, var);
-    }
-}  
+//         list_add(funcion->parametros, var);
+//     }
+// }  
 
 int verificarParametros(t_list* parametros)
 { 
     int sz = list_size(parametros);
-    int ret = 1;
+    
+    // printf("VERIFPARAM\nsz %d\n", sz);
+    // if(parametros == NULL){
+    //     printf("param null, laca gaste\n");
+    //     return 0;
+    // }
+    // else
+    //     printf("param encontrados\n");
+    // if(list_size(parametros) == 0){
+    //     printf("no tiene param, laca gaste\n");
+    //     return 0;
+    // }
+    // else
+    //     printf("cant parametros %d", list_size(parametros));
     for (int i = 0; i < sz; i++)
     {
         tVariables* var = list_get(parametros,i);
+        if(var == NULL ){
+            // printf("vari %dnull, laca gaste\n",i);
+            return 0;
+        }
+        else
+            mostrarVariable(var);
+            
         for(int j = 0; j < sz; j++)
         {
             tVariables* var2 = list_get(parametros,j);
+            if(var == NULL ){
+                // printf("varj %d null, laca gaste\n",j);
+                return 0;
+            }
+            else
+                mostrarVariable(var);
             if(strcmp(var->nombre, var2->nombre) == 0 && j != i)
             {
-                ret = 0;
+                // printf("coinciden %s (%d) y %s (%d)\n",var->nombre,i, var2->nombre,j);
+                return 0;
             }
         }
     }
-    return ret;
+    return 1;
 }
-
-int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
+int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
 {
-    tFunciones* temp = buscarFuncion(nombre);
+    if(funcion1->parametros == NULL)
+    {
+        printf("parametros f1 null\n");
+        return 0;
+    }
+    if(funcion2->parametros == NULL)
+    {
+        printf("parametros f2 null\n");
+        return 0;
+    }
+    
+    int sz = list_size(funcion1->parametros);
+    int sz2 = list_size(funcion2->parametros);
+    printf("sz1 => %d |||| sz2 => %d\n", sz, sz2);
+    if(sz != sz2)
+    {
+        printf("ERROR: distinta cantidad de parametros entre %s (%d) y %s (%d) \n", funcion1->nombre,sz, funcion2->nombre,sz2);
+        return 0;
+    }
+        
+    
+    for(int i = 0; i < sz; i++)
+    {
+        tVariables* var = list_get(funcion1->parametros, i);
+        tVariables* var2 = list_get(funcion2->parametros, i);
+        if( strcmp(var->nombre, var2->nombre) != 0 || 
+            strcmp(var->tipo, var2->tipo) != 0)
+        {
+            printf("ERROR: algun tipo o nombre de variable no coincide crack (%d) %s %s vs %s %s\n",
+                i, var->tipo, var->nombre, var2->tipo, var2->nombre );
+            return 0;
+        }
+            
+    }
+    printf("todo ok pa\n");
+    return 1;
+}
+int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, int linea)
+{
+    tFunciones* temp = buscarFuncion(nombre, TIPO);
 
     if(temp != NULL)
     {
@@ -232,14 +261,47 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, int linea)
         temp->tipo = retorno;
         printf("FUNCION %s, retorno %s\n", temp->nombre, temp->tipo);
         
-        int c = 1;
 
         if(verificarParametros(parametros))
         {
-            temp->parametros = list_duplicate(parametros);
-            //int cantidad = list_size(temp->parametros);
-            list_add(listaFunciones, temp);
-            return 1;
+            printf("verificacion ok\n");
+            if(TIPO == DEF)
+            {
+                tFunciones* declaracion = buscarFuncion(nombre, DECL);
+                temp->parametros = list_duplicate(parametros);
+                if(declaracion == NULL)
+                {
+                    printf("declaracion no encontrada, agregando\n");
+                    list_add(listaFuncionesDefinidas, temp);
+                    list_add(listaFuncionesDeclaradas, temp);
+                    return 1;
+                }
+                else
+                    printf("declaracion encontrada\n");
+
+                
+                if(compararParametros(temp, declaracion))
+                {
+                    printf("comparacion ok\n");
+                    
+                    //int cantidad = list_size(temp->parametros);
+                    list_add(listaFuncionesDefinidas, temp);
+
+                    return 1;
+                }
+                printf("capo no coinciden los parametros de la definicion y la declaracion\n");
+                agregarError("ERROR: no coinciden los parametros de la definicion y la declaracion", "SEMANTICO", linea);
+                return 0;
+            }
+            else if(TIPO == DECL)
+            {
+                temp->parametros = list_duplicate(parametros);
+                //int cantidad = list_size(temp->parametros);
+            
+                list_add(listaFuncionesDeclaradas, temp);
+              
+                return 1;
+            }
         }
         else{
             //agregar a error
@@ -259,3 +321,9 @@ void agregarError(char* mensaje, char* tipo, int linea)
 
     list_add(errores, error);
 }
+
+
+// int parametrosMismoTipo(char* operando1, char* operando2, char*tipoDest,t_op op)
+// {
+//     bool sePuedeTodo =  true
+// }
