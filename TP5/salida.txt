@@ -1,5 +1,6 @@
 -------------------REPORTE-------------------
 
+Error: syntax error
 Se encontro la sentencia RETURN
 Se define la funcion: 'funcionUno' que devuelve: 'int'
 Se encontro la sentencia CONTINUE

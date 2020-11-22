@@ -1,10 +1,13 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-float b = 42;
-int x = 2; 
-int nivelDeFachaDeEsteTP = b + 4;
 
+float b = 42;
+char* b 
+int x = 2; 
+
+
+int nivelDeFachaDeEsteTP = b + 4;
 int pepita = 4+4;
 
 int funcionUno(char a, float l, int w);
@@ -13,6 +16,8 @@ int funcionUno(char a, float l){ //debe tirar error de tipos de parametros
     a += 2;
     return 1;
 }
+
+int miFuncion (char w, float p);
 
 int main(){
 
@@ -39,3 +44,5 @@ int main(){
 
     return 0;
 }
+
+ñ

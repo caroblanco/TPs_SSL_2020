@@ -42,7 +42,7 @@ void mostrarTutti(void)
     printf("\n----------------------- REPORTE MUY PIOLA :) -----------------------\n");
     printf("\n--------------------------------------------------------------------\n");
     printf("\n--------------------------------------------------------------------\n");
-    printf("\n\n");
+    //printf("\n\n");
     printf("\nLas variables son:\n");
     list_iterate(listaVariables, (void*) mostrarVariable);
     printf("\nLas funciones definidas son:\n");
@@ -108,7 +108,7 @@ void intentarAgregarVar(char* nombre, char* tipo, int linea)
             printf("Se declaro una variable de tipo %s llamada %s en la linea %d\n", tipo, nombre, linea);
     else{
             printf("ERROR: doble declaracion de la variable %s\n",nombre);
-            agregarError("ERROR: doble declaracion de variable", "SEMANTICO", linea);
+            agregarError("*Doble declaracion de variable", "SEMANTICO", linea);
     }
 }
 
@@ -144,7 +144,7 @@ void mismoTipoParametros(int linea)
     printf("Todos iguales %d\n",todosIguales);
     if(!todosIguales)
     {
-        agregarError("No coinciden los tipos en la suma o resta", "SEMANTICO", linea);
+        agregarError("*No coinciden los tipos en la suma o resta", "SEMANTICO", linea);
     }
     list_clean(listaOperandos);
 }
@@ -271,7 +271,7 @@ int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
     //printf("sz1 => %d |||| sz2 => %d\n", sz, sz2);
     if(sz != sz2)
     {
-        printf("ERROR: distinta cantidad de parametros entre %s (%d) y %s (%d) \n", funcion1->nombre,sz, funcion2->nombre,sz2);
+        printf("*Distinta cantidad de parametros entre %s (%d) y %s (%d) \n", funcion1->nombre,sz, funcion2->nombre,sz2);
         return 0;
     }
         
@@ -283,7 +283,7 @@ int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
         if( strcmp(var->nombre, var2->nombre) != 0 || 
             strcmp(var->tipo, var2->tipo) != 0)
         {
-            printf("ERROR: algun tipo o nombre de variable no coincide crack (%d) %s %s vs %s %s\n",
+            printf("*Algun tipo o nombre de variable no coincide crack (%d) %s %s vs %s %s\n",
                 i, var->tipo, var->nombre, var2->tipo, var2->nombre );
             return 0;
         }
@@ -299,7 +299,7 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
     if(temp != NULL)
     {
         printf("ERROR: la funcion %s ya esta definida :'( \n", nombre);
-        agregarError("ERROR: doble declaracion de funcion", "SEMANTICO", linea);
+        agregarError("*Doble declaracion de funcion", "SEMANTICO", linea);
         return 0;
     }
     else
@@ -338,7 +338,7 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
                     return 1;
                 }
                 printf("No coinciden los parametros de la definicion y la declaracion\n");
-                agregarError("ERROR: no coinciden los parametros de la definicion y la declaracion", "SEMANTICO", linea);
+                agregarError("*No coinciden los parametros de la definicion y la declaracion", "SEMANTICO", linea);
                 return 0;
             }
             else if(TIPO == DECL)
@@ -354,7 +354,7 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
         else{
             //agregar a error
             printf("ERROR: dos parametros con el mismo nombre\n");
-            agregarError("ERROR: hay dos parametros con el mismo nombre en la funcion", "SEMANTICO", linea);
+            agregarError("*Hay dos parametros con el mismo nombre en la funcion", "SEMANTICO", linea);
             return 0;
         }
     }

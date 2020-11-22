@@ -91,7 +91,7 @@ input:   /* vacio */
 line:  /* Vacio */
       | declaracion ';' {tempVar = NULL; tempPointer = NULL; esFuncion = 0;} 
       | sentencia
-      | error {agregarError("ERROR: no se reconoce la estructura","SINTACTICO",yylineno); printf("se encontro un error sintactico\n");}
+      | error {agregarError("*No se reconoce la estructura","SINTACTICO",yylineno); printf("se encontro un error sintactico\n");}
 ;
 
 const:   NUM_ENTERO             {printf("ENTERO %d\n", $<valorEntero>1); char* str = "int"; list_add(listaOperandos, str);}

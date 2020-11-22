@@ -96,5 +96,5 @@ COMODIN        .
 "<<"               { return OP_DESP_IZQ;}
 ">>"               { return OP_DESP_DER;}
 "->"               { return OP_MIEMBRO_PUNT;}
-{COMODIN}          {agregarError("ERROR: QUE CARACTER ME PONES PINION?","LEXICO",yylineno);} //tirate un make caro
+{COMODIN}          {agregarError("*No se reconoce el lexema","LEXICO",yylineno);} //tirate un make caro
 %%
