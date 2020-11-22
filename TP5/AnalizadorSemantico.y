@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include "funciones.c"
+#include "funciones.h"
 #define YYDEBUG 1
 
 extern int yylineno;
@@ -21,7 +21,7 @@ char* tempVar = NULL;
 char* tempPointer = NULL;
 char* nombreFuncion = NULL;
 bool esFuncion = 0;
-
+bool esSuma = 0;
 %}
 
 %type <valorString> declarador_directo
@@ -75,7 +75,6 @@ bool esFuncion = 0;
 %token <valorString> DEFAULT
 %token <valorString> RETURN 
 %token <valorString> GOTO
-%token <valorString> ERROR
 
 %union {
   int    valorEntero;
@@ -92,17 +91,13 @@ input:   /* vacio */
 line:  /* Vacio */
       | declaracion ';' {tempVar = NULL; tempPointer = NULL; esFuncion = 0;} 
       | sentencia
-      | ERROR {agregarError("ERROR: QUE CARACTER ME PONES PINION?","LEXICO",yylineno);}
       | error {agregarError("ERROR: no se reconoce la estructura","SINTACTICO",yylineno); printf("se encontro un error sintactico\n");}
 ;
 
-const:   NUM_ENTERO
-       | NUM_REAL  
-       | CHAR      
-       | const_enum
-;
-
-const_enum: ID 
+const:   NUM_ENTERO             {printf("ENTERO %d\n", $<valorEntero>1); char* str = "int"; list_add(listaOperandos, str);}
+       | NUM_REAL               {printf("FLOAT %f\n", $<valorReal>1); char* str = "float"; list_add(listaOperandos, str);}
+       | CHAR                   {printf("STRING %s\n", $<valorString>1); char* str = "char*"; list_add(listaOperandos, str);}
+       | ID                     {printf("ID %s\n", $<valorString>1); agregarOperando($<valorString>1);}      
 ;
 
 expresion:   exp_asignacion
@@ -168,13 +163,13 @@ exp_desp:   exp_aditiva
 ;
 
 exp_aditiva:   exp_multip
-             | exp_aditiva '+' exp_multip   
-             | exp_aditiva '-' exp_multip   
+             | exp_aditiva '+' exp_multip               {printf("suma detectada\n"); mismoTipoParametros(yylineno);} 
+             | exp_aditiva '-' exp_multip               {printf("resta detectada\n"); mismoTipoParametros(yylineno);} 
 ;
 
 exp_multip:   exp_conversion
-            | exp_multip '*' exp_conversion   
-            | exp_multip '/' exp_conversion   
+            | exp_multip '*' exp_conversion             {printf("multiplicacion detectada\n"); mismoTipoParametros(yylineno);}
+            | exp_multip '/' exp_conversion             {printf("division detectada\n"); mismoTipoParametros(yylineno);}
             | exp_multip '%' exp_conversion   
 ;
 
@@ -183,7 +178,7 @@ exp_conversion:   exp_unaria
 ;
 
 exp_unaria:   exp_sufijo
-            | OP_INC exp_unaria           
+            | OP_INC exp_unaria                    
             | OP_DEC exp_unaria           
             | op_unario exp_conversion
             | SIZEOF exp_unaria
@@ -211,15 +206,12 @@ lista_argumentos:   exp_asignacion
                   | lista_argumentos ',' exp_asignacion
 ;
 
-exp_primaria:   const
-              | STRING              
+exp_primaria:   const                   //{printf("const %s\n", $<valorString>1);}
+              | STRING                  
               | '(' expresion ')'                              
 ;
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-declaracionFunciones: TIPO_DATO ID '(' lista_parametros ')' ';' {printf("retorno %s\n", $<valorString>1); printf("se ejecuta esta poronga?\n");agregarFuncion($<valorString>2, $<valorString>1, listaVarTemp, yylineno); list_clean(listaVarTemp);}
-*/
 
 lista_parametros: TIPO_DATO ID                          {  nuevoParametro($<valorString>2, $<valorString>1); }
                | lista_parametros ',' TIPO_DATO ID      {  nuevoParametro($<valorString>4, $<valorString>3); }
@@ -402,7 +394,7 @@ sentencia:   sentencia_exp
                                                                         t_list* nueva = list_duplicate(listaVarTemp);
                                                                         mostrarLista(nueva);
                                                                         agregarFuncion($<valorString>2, $<valorString>1, nueva, DEF, yylineno);
-                                                                        
+                                                                        list_clean(listaVarTemp);
                                                                         fprintf(yyout, "Se define la funcion: \'%s\' que devuelve: \'%s\'\n", $<valorString>2, $<valorString>1);
                                                                         }
 ;

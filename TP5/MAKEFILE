@@ -1,7 +1,16 @@
-all:
+FLEX = AnalizadorSemantico.l
+SIN = AnalizadorSemantico.y
+SRC = funciones.c list.c 
+SEM = AnalizadorSemantico.tab.c lex.yy.c
+SEM_H = AnalizadorSemantico.tab.h
+OUT = AnalizadorSemantico.exe 
+
+default:
+	bison -d $(SIN) &&\
+	flex $(FLEX) &&\
+	gcc $(SRC) $(SEM) -o $(OUT) &&\
+	del $(SEM) $(SEM_H)
+	cmd /c .\$(OUT)
 	
-	bison -d AnalizadorSintactico.y &&\
-	flex AnalizadorSintactico.l &&\
-	gcc AnalizadorSintactico.tab.c lex.yy.c -o AnalizadorSintactico.exe &&\
-	del AnalizadorSintactico.tab.c AnalizadorSintactico.tab.h lex.yy.c
-	cmd /c .\AnalizadorSintactico.exe
+	@echo Como este mensaje salio del makefile debe ser el mejor tp
+all: default

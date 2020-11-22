@@ -1,12 +1,11 @@
+
 #include <stdio.h>
 #include <stdlib.h>
-int b = 43;
-int b = 42;
+float b = 42;
 int x = 2; 
-int nivelDeFachaDeEsteTP = b + x;
+int nivelDeFachaDeEsteTP = b + 4;
 
-ñ
-// es un error lexico;
+int pepita = 4+4;
 
 int funcionUno(char a, float l, int w);
 

@@ -4,7 +4,9 @@
     #include <stdio.h>
     #include <stdlib.h>
     #include <string.h>
-    #include "AnalizadorSintactico.tab.h"
+    #include "AnalizadorSemantico.tab.h"
+    #include "funciones.h"
+    
 %}
 %option yylineno
 
@@ -70,9 +72,6 @@ COMODIN        .
 {COMENTARIO_BLOQUE} {}
 "\n"               {}
 {ESPACIOS}+        {} 
-{COMODIN}          {return ERROR;}
-
-
 {CONST_CHAR}       {yylval.valorString = strdup(yytext);  return CHAR;}
 {LITERAL_CADENA}   {yylval.valorString = strdup(yytext);  return STRING;}
 
@@ -97,4 +96,5 @@ COMODIN        .
 "<<"               { return OP_DESP_IZQ;}
 ">>"               { return OP_DESP_DER;}
 "->"               { return OP_MIEMBRO_PUNT;}
+{COMODIN}          {agregarError("ERROR: QUE CARACTER ME PONES PINION?","LEXICO",yylineno);} //tirate un make caro
 %%

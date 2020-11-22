@@ -8,6 +8,7 @@ void iniciarListas()
     listaVarTemp =  list_create();
     listaVariables = list_create();
     listaParametros = list_create();
+    listaOperandos = list_create();
     listaFuncionesDeclaradas = list_create();
     listaFuncionesDefinidas = list_create();
     errores = list_create();
@@ -34,17 +35,19 @@ void mostrarError(tError* error)
 
 void mostrarTutti(void)
 {
-    printf("\n-------------------------------------------------\n");
-    printf("\nlasva riables:\n");
+    for(int i = 0; i < 50; i++)
+        printf("\n");
+    printf("\n----------------------- REPORTE MUY PIOLA :) -----------------------\n");
+    printf("\n----------------------- REPORTE MUY PIOLA :) -----------------------\n");
+    printf("\nLas variables son:\n");
     list_iterate(listaVariables, (void*) mostrarVariable);
-    printf("\nlasfun ciones definidas:\n");
+    printf("\nLas funciones definidas son:\n");
     list_iterate(listaFuncionesDefinidas, (void*) mostrarFuncion);
-    printf("\nlasfun ciones declaradas:\n");
+    printf("\nLas funciones declaradas son:\n");
     list_iterate(listaFuncionesDeclaradas, (void*) mostrarFuncion);
-    
-    printf("\nlose rrores:\n");
+    printf("\nLos errores son:\n");
     list_iterate(errores, (void*) mostrarError);
-    
+    printf("\n\n");
 }
 
 void mostrarLista(t_list* list) 
@@ -105,6 +108,43 @@ void intentarAgregarVar(char* nombre, char* tipo, int linea)
     }
 }
 
+void agregarOperando(char* nombre)
+{
+    tVariables* temp = buscarVariable(nombre);
+    if(temp == NULL){
+        printf("No encontrado %s\n", nombre);
+        return;
+    }
+    printf("Agregando %s \n", temp->tipo); 
+    list_add(listaOperandos, temp->tipo);
+}
+
+void mismoTipoParametros(int linea)
+{
+    int todosIguales = 1;
+    int sz = list_size(listaOperandos);
+    if(sz == 0 )
+    {
+        printf("Lista vacia\n");
+        return;
+    }
+
+    for(int i = 0; i < sz -1 ; i++)
+    {
+        char* temp1 = list_get(listaOperandos, i);
+        char* temp2 = list_get(listaOperandos, i+1);
+         
+        todosIguales &= strcmp(temp1, temp2) == 0;
+    }
+
+    printf("Todos iguales %d\n",todosIguales);
+    if(!todosIguales)
+    {
+        agregarError("No coinciden los tipos en la suma o resta", "SEMANTICO", linea);
+    }
+    list_clean(listaOperandos);
+}
+
 /////////////
 //FUNCIONES//
 /////////////
@@ -113,16 +153,19 @@ void mostrarFuncion(tFunciones* funcion)
 {
     printf("%s ",funcion->tipo);
     printf("%s ",funcion->nombre);
-    printf("\n");
+    
     if(funcion->parametros != NULL)
     {
-        if(list_size(funcion->parametros) != 0)
+        int sz = list_size(funcion->parametros);
+        if(sz != 0)
+        {
+            printf("(CANTIDAD PARAMETROS %d)\n", sz);
             list_iterate(funcion->parametros, (void*) mostrarVariable);
-        else
-            printf("\tsin parametros");
+        }else
+            printf("\n\tSin parametros");
     }
     else
-        printf("\tsin parametros");
+        printf("\tSin parametros");
     printf("\n");
 }
 
@@ -205,16 +248,17 @@ int verificarParametros(t_list* parametros)
     }
     return 1;
 }
+
 int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
 {
     if(funcion1->parametros == NULL)
     {
-        printf("parametros f1 null\n");
+        printf("Parametros f1 null\n");
         return 0;
     }
     if(funcion2->parametros == NULL)
     {
-        printf("parametros f2 null\n");
+        printf("Parametros f2 null\n");
         return 0;
     }
     
@@ -289,7 +333,7 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
 
                     return 1;
                 }
-                printf("capo no coinciden los parametros de la definicion y la declaracion\n");
+                printf("No coinciden los parametros de la definicion y la declaracion\n");
                 agregarError("ERROR: no coinciden los parametros de la definicion y la declaracion", "SEMANTICO", linea);
                 return 0;
             }

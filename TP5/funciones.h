@@ -1,10 +1,10 @@
 #ifndef _FUNCIONES_H
 #define _FUNCIONES_H
-#include "list.c"
+#include "list.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-
+#include <conio.h>
 typedef enum 
 {
     DECL,
@@ -47,6 +47,7 @@ t_list* errores;    // lista de tError
 
 t_list* listaVarTemp;
 t_list* listaVar;
+t_list* listaOperandos;
 char* identificadorFuncion;
 void iniciarListas(void);
 void mostrarVariable(tVariables*);
@@ -59,6 +60,8 @@ int agregarVariable(char*, char* );
 void intentarAgregarVar(char*, char*, int);
 tFunciones* buscarFuncion(char*, t_fn);
 int agregarFuncion(char*, char*, t_list*,t_fn,int);
+void agregarOperando(char*);
+void mismoTipoParametros(int);
 void agregarError(char*, char*, int);
 void mostrarError(tError*);
 void agregarParametro(char*, char*, char*);
