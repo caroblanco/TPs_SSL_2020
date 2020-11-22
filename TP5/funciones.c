@@ -37,8 +37,12 @@ void mostrarTutti(void)
 {
     for(int i = 0; i < 50; i++)
         printf("\n");
+    printf("\n--------------------------------------------------------------------\n");
+    printf("\n--------------------------------------------------------------------\n");
     printf("\n----------------------- REPORTE MUY PIOLA :) -----------------------\n");
-    printf("\n----------------------- REPORTE MUY PIOLA :) -----------------------\n");
+    printf("\n--------------------------------------------------------------------\n");
+    printf("\n--------------------------------------------------------------------\n");
+    printf("\n\n");
     printf("\nLas variables son:\n");
     list_iterate(listaVariables, (void*) mostrarVariable);
     printf("\nLas funciones definidas son:\n");
