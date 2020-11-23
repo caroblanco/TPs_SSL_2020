@@ -211,13 +211,6 @@ exp_primaria:   const                   //{printf("const %s\n", $<valorString>1)
               | '(' expresion ')'                              
 ;
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-lista_parametros: TIPO_DATO ID                          {  nuevoParametro($<valorString>2, $<valorString>1); }
-               | lista_parametros ',' TIPO_DATO ID      {  nuevoParametro($<valorString>4, $<valorString>3); }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 declaracion:  especificadores_declaracion lista_declaradores  {esFuncion = 0;}
 ;
 
@@ -329,16 +322,10 @@ lista_identificadores_opc:   /* Vacio */
 
 lista_tipos_param: lista_parametros
 ;
-/*
-lista_parametros:   declaracion_parametro                               
-                  | lista_parametros ',' declaracion_parametro          
-;
 
-*/
-/*
-declaracion_parametro:   especificadores_declaracion decla
-                       | especificadores_declaracion declarador_abstracto_opc
-;*/
+lista_parametros: TIPO_DATO ID                          {  nuevoParametro($<valorString>2, $<valorString>1); }
+               | lista_parametros ',' TIPO_DATO ID      {  nuevoParametro($<valorString>4, $<valorString>3); }
+;
 
 declarador_abstracto_opc:   /* Vacio */
                           | declarador_abstracto
@@ -392,7 +379,7 @@ sentencia:   sentencia_exp
            | sentencia_salto
            | especificadores_declaracion decla sentencia_compuesta  {   printf("agregando funcion %s\n", $<valorString>2); 
                                                                         t_list* nueva = list_duplicate(listaVarTemp);
-                                                                        mostrarLista(nueva);
+                                                                        //mostrarLista(nueva);
                                                                         agregarFuncion($<valorString>2, $<valorString>1, nueva, DEF, yylineno);
                                                                         list_clean(listaVarTemp);
                                                                         fprintf(yyout, "Se define la funcion: \'%s\' que devuelve: \'%s\'\n", $<valorString>2, $<valorString>1);

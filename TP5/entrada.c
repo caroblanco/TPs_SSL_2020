@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 float b = 42;
-char* b 
+char* b //error doble declaracion y falta ";"
 int x = 2; 
 
 
@@ -45,4 +45,4 @@ int main(){
     return 0;
 }
 
-ñ
+ñ //error lexico

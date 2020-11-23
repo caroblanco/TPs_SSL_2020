@@ -1,6 +1,8 @@
 #include "funciones.h"
 
-// KENI VEL, MARIVEL
+/////////////
+//GENERALES//
+/////////////
 
 void iniciarListas()
 {
@@ -12,20 +14,6 @@ void iniciarListas()
     listaFuncionesDeclaradas = list_create();
     listaFuncionesDefinidas = list_create();
     errores = list_create();
-}
-
-void nuevoParametro(char* nombre, char* tipo)
-{
-    tVariables* paramTemp = malloc(sizeof(tVariables));
-    int sznombre = strlen(nombre)+1;
-    int sztipo = strlen(tipo)+1;
-    
-    paramTemp->nombre = malloc(sznombre);
-    memcpy(paramTemp->nombre, nombre, sznombre);
-    paramTemp->tipo = malloc(sztipo);
-    memcpy(paramTemp->tipo, tipo, sztipo);
-    printf("parametro: %s %s\n",tipo,nombre);
-    list_add(listaVarTemp,paramTemp);
 }
 
 void mostrarError(tError* error)
@@ -42,7 +30,6 @@ void mostrarTutti(void)
     printf("\n----------------------- REPORTE MUY PIOLA :) -----------------------\n");
     printf("\n--------------------------------------------------------------------\n");
     printf("\n--------------------------------------------------------------------\n");
-    //printf("\n\n");
     printf("\nLas variables son:\n");
     list_iterate(listaVariables, (void*) mostrarVariable);
     printf("\nLas funciones definidas son:\n");
@@ -63,6 +50,16 @@ void mostrarLista(t_list* list)
     }
    list_iterate(list, (void*) _mostrar);
     printf("\n");
+}
+
+void agregarError(char* mensaje, char* tipo, int linea)
+{
+    tError* error = malloc(sizeof(tError));
+    error->mensaje = mensaje;
+    error->tipo = tipo;
+    error->nroLinea = linea;
+
+    list_add(errores, error);
 }
 
 /////////////
@@ -112,6 +109,29 @@ void intentarAgregarVar(char* nombre, char* tipo, int linea)
     }
 }
 
+//////////////
+//PARAMETROS//
+//////////////
+
+void nuevoParametro(char* nombre, char* tipo)
+{
+    tVariables* paramTemp = malloc(sizeof(tVariables));
+    int sznombre = strlen(nombre)+1;
+    int sztipo = strlen(tipo)+1;
+    
+    paramTemp->nombre = malloc(sznombre);
+    memcpy(paramTemp->nombre, nombre, sznombre);
+    paramTemp->tipo = malloc(sztipo);
+    memcpy(paramTemp->tipo, tipo, sztipo);
+    printf("parametro: %s %s\n",tipo,nombre);
+    list_add(listaVarTemp,paramTemp);
+}
+
+
+///////////////
+///OPERANDOS///
+///////////////
+
 void agregarOperando(char* nombre)
 {
     tVariables* temp = buscarVariable(nombre);
@@ -144,9 +164,95 @@ void mismoTipoParametros(int linea)
     printf("Todos iguales %d\n",todosIguales);
     if(!todosIguales)
     {
-        agregarError("*No coinciden los tipos en la suma o resta", "SEMANTICO", linea);
+        agregarError("*No coinciden los tipos en la operacion binaria", "SEMANTICO", linea);
     }
     list_clean(listaOperandos);
+}
+
+int verificarParametros(t_list* parametros)
+{ 
+    int sz = list_size(parametros);
+    
+    // printf("VERIFPARAM\nsz %d\n", sz);
+    // if(parametros == NULL){
+    //     printf("param null, laca gaste\n");
+    //     return 0;
+    // }
+    // else
+    //     printf("param encontrados\n");
+    // if(list_size(parametros) == 0){
+    //     printf("no tiene param, laca gaste\n");
+    //     return 0;
+    // }
+    // else
+    //     printf("cant parametros %d", list_size(parametros));
+    for (int i = 0; i < sz; i++)
+    {
+        tVariables* var = list_get(parametros,i);
+        if(var == NULL ){
+            // printf("vari %dnull, laca gaste\n",i);
+            return 0;
+        }
+        else
+            mostrarVariable(var);
+            
+        for(int j = 0; j < sz; j++)
+        {
+            tVariables* var2 = list_get(parametros,j);
+            if(var == NULL ){
+                // printf("varj %d null, laca gaste\n",j);
+                return 0;
+            }
+            //else
+                //mostrarVariable(var);
+            if(strcmp(var->nombre, var2->nombre) == 0 && j != i)
+            {
+                // printf("coinciden %s (%d) y %s (%d)\n",var->nombre,i, var2->nombre,j);
+                return 0;
+            }
+        }
+    }
+    return 1;
+}
+
+int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
+{
+    if(funcion1->parametros == NULL)
+    {
+        printf("Parametros f1 null\n");
+        return 0;
+    }
+    if(funcion2->parametros == NULL)
+    {
+        printf("Parametros f2 null\n");
+        return 0;
+    }
+    
+    int sz = list_size(funcion1->parametros);
+    int sz2 = list_size(funcion2->parametros);
+    //printf("sz1 => %d |||| sz2 => %d\n", sz, sz2);
+    if(sz != sz2)
+    {
+        printf("ERROR: distinta cantidad de parametros entre %s (%d) y %s (%d) \n", funcion1->nombre,sz, funcion2->nombre,sz2);
+        return 0;
+    }
+        
+    
+    for(int i = 0; i < sz; i++)
+    {
+        tVariables* var = list_get(funcion1->parametros, i);
+        tVariables* var2 = list_get(funcion2->parametros, i);
+        if( strcmp(var->nombre, var2->nombre) != 0 || 
+            strcmp(var->tipo, var2->tipo) != 0)
+        {
+            printf("ERROR: Algun tipo o nombre de variable no coincide crack (%d) %s %s vs %s %s\n",
+                i, var->tipo, var->nombre, var2->tipo, var2->nombre );
+            return 0;
+        }
+            
+    }
+    //printf("todo ok pa\n");
+    return 1;
 }
 
 /////////////
@@ -194,104 +300,6 @@ void nuevaFuncion(char* tipo, char* identificador)
     nueva->parametros = list_create();
 }
 
-// void agregarParametro(char* tipo, char* opcional, char* identificador)
-// {
-//     tFunciones* funcion = buscarFuncion(identificador);
-//     if(funcion != NULL)
-//     {
-//         tVariables* var = malloc(sizeof(tVariables));
-//         var->tipo = tipo;
-//         var->nombre = identificador;
-        
-//         list_add(funcion->parametros, var);
-//     }
-// }  
-
-int verificarParametros(t_list* parametros)
-{ 
-    int sz = list_size(parametros);
-    
-    // printf("VERIFPARAM\nsz %d\n", sz);
-    // if(parametros == NULL){
-    //     printf("param null, laca gaste\n");
-    //     return 0;
-    // }
-    // else
-    //     printf("param encontrados\n");
-    // if(list_size(parametros) == 0){
-    //     printf("no tiene param, laca gaste\n");
-    //     return 0;
-    // }
-    // else
-    //     printf("cant parametros %d", list_size(parametros));
-    for (int i = 0; i < sz; i++)
-    {
-        tVariables* var = list_get(parametros,i);
-        if(var == NULL ){
-            // printf("vari %dnull, laca gaste\n",i);
-            return 0;
-        }
-        else
-            mostrarVariable(var);
-            
-        for(int j = 0; j < sz; j++)
-        {
-            tVariables* var2 = list_get(parametros,j);
-            if(var == NULL ){
-                // printf("varj %d null, laca gaste\n",j);
-                return 0;
-            }
-            else
-                mostrarVariable(var);
-            if(strcmp(var->nombre, var2->nombre) == 0 && j != i)
-            {
-                // printf("coinciden %s (%d) y %s (%d)\n",var->nombre,i, var2->nombre,j);
-                return 0;
-            }
-        }
-    }
-    return 1;
-}
-
-int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
-{
-    if(funcion1->parametros == NULL)
-    {
-        printf("Parametros f1 null\n");
-        return 0;
-    }
-    if(funcion2->parametros == NULL)
-    {
-        printf("Parametros f2 null\n");
-        return 0;
-    }
-    
-    int sz = list_size(funcion1->parametros);
-    int sz2 = list_size(funcion2->parametros);
-    //printf("sz1 => %d |||| sz2 => %d\n", sz, sz2);
-    if(sz != sz2)
-    {
-        printf("*Distinta cantidad de parametros entre %s (%d) y %s (%d) \n", funcion1->nombre,sz, funcion2->nombre,sz2);
-        return 0;
-    }
-        
-    
-    for(int i = 0; i < sz; i++)
-    {
-        tVariables* var = list_get(funcion1->parametros, i);
-        tVariables* var2 = list_get(funcion2->parametros, i);
-        if( strcmp(var->nombre, var2->nombre) != 0 || 
-            strcmp(var->tipo, var2->tipo) != 0)
-        {
-            printf("*Algun tipo o nombre de variable no coincide crack (%d) %s %s vs %s %s\n",
-                i, var->tipo, var->nombre, var2->tipo, var2->nombre );
-            return 0;
-        }
-            
-    }
-    //printf("todo ok pa\n");
-    return 1;
-}
 int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, int linea)
 {
     tFunciones* temp = buscarFuncion(nombre, TIPO);
@@ -327,7 +335,6 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
                 else
                     //printf("declaracion encontrada\n");
 
-                
                 if(compararParametros(temp, declaracion))
                 {
                     //printf("comparacion ok\n");
@@ -344,7 +351,6 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
             else if(TIPO == DECL)
             {
                 temp->parametros = list_duplicate(parametros);
-                //int cantidad = list_size(temp->parametros);
             
                 list_add(listaFuncionesDeclaradas, temp);
               
@@ -352,7 +358,6 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
             }
         }
         else{
-            //agregar a error
             printf("ERROR: dos parametros con el mismo nombre\n");
             agregarError("*Hay dos parametros con el mismo nombre en la funcion", "SEMANTICO", linea);
             return 0;
@@ -360,18 +365,3 @@ int agregarFuncion(char * nombre, char* retorno, t_list* parametros, t_fn TIPO, 
     }
 }
 
-void agregarError(char* mensaje, char* tipo, int linea)
-{
-    tError* error = malloc(sizeof(tError));
-    error->mensaje = mensaje;
-    error->tipo = tipo;
-    error->nroLinea = linea;
-
-    list_add(errores, error);
-}
-
-
-// int parametrosMismoTipo(char* operando1, char* operando2, char*tipoDest,t_op op)
-// {
-//     bool sePuedeTodo =  true
-// }

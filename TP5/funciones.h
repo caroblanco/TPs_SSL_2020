@@ -24,7 +24,6 @@ typedef struct
     char* tipo;
 }tVariables;
 t_list* listaVariables; //lista de tVariables
-
 t_list* listaParametros; //lista de tVariables
 
 typedef struct
@@ -33,15 +32,15 @@ typedef struct
     char* tipo;
     t_list* parametros; //lista de tParametros
 }tFunciones;
-t_list* listaFuncionesDeclaradas; //lista de tFunciones
+t_list* listaFuncionesDeclaradas; 
 t_list* listaFuncionesDefinidas;
 
 
 typedef struct 
 {
-    char* mensaje;  // la cagaste papi 
+    char* mensaje;  
     char* tipo;     // lexico | sintactico | semantico
-    int nroLinea;   // cantidad de pizzas
+    int nroLinea;   
 }tError;
 t_list* errores;    // lista de tError
 
@@ -67,5 +66,4 @@ void mostrarError(tError*);
 void agregarParametro(char*, char*, char*);
 void mostrarTutti(void);
 void mostrarLista(t_list*);
-// int parametrosMismoTipo(char*,char*, t_op);
 #endif 
