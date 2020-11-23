@@ -161,11 +161,15 @@ void mismoTipoParametros(int linea)
         todosIguales &= strcmp(temp1, temp2) == 0;
     }
 
-    printf("Todos iguales %d\n",todosIguales);
     if(!todosIguales)
     {
+        printf("No coinciden los tipos de la operacion\n",todosIguales);
         agregarError("*No coinciden los tipos en la operacion binaria", "SEMANTICO", linea);
+    }else
+    {
+        printf("Coinciden los tipos de la operacion\n",todosIguales);
     }
+    
     list_clean(listaOperandos);
 }
 
