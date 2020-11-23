@@ -18,7 +18,6 @@ FILE* yyin;
 FILE* yyout;
 
 char* tempVar = NULL;
-char* tempPointer = NULL;
 char* nombreFuncion = NULL;
 bool esFuncion = 0;
 bool esSuma = 0;
@@ -89,7 +88,7 @@ input:   /* vacio */
 ;
 
 line:  /* Vacio */
-      | declaracion ';' {tempVar = NULL; tempPointer = NULL; esFuncion = 0;} 
+      | declaracion ';' {tempVar = NULL;  esFuncion = 0;} 
       | sentencia
       | error {agregarError("*No se reconoce la estructura","SINTACTICO",yylineno); printf("se encontro un error sintactico\n");}
 ;
@@ -245,7 +244,7 @@ lista_inicializadores:   inicializador
 
 especificador_tipo:   TIPO_DATO                   {tempVar = strdup($<valorString>1);/* printf("tempVar %s\n linea %d", tempVar, yylineno);*/}              
                     | especificador_struct_union
-                    | especificador_enum  {/*Sacamos nombre_typedef*/}
+                    | especificador_enum  
 ;
 
 especificador_struct_union:   STRUCT_UNION ID_opc '{' lista_declaradores_struct '}' 
@@ -465,8 +464,7 @@ void main(){
         #endif
     
         yyparse();
-        
-//////
+ 
         mostrarTutti(); //archivo funciones.c
         fclose(yyin);
         fclose(yyout);

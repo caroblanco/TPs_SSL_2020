@@ -127,52 +127,6 @@ void nuevoParametro(char* nombre, char* tipo)
     list_add(listaVarTemp,paramTemp);
 }
 
-
-///////////////
-///OPERANDOS///
-///////////////
-
-void agregarOperando(char* nombre)
-{
-    tVariables* temp = buscarVariable(nombre);
-    if(temp == NULL){
-        printf("No encontrado %s\n", nombre);
-        return;
-    }
-    printf("Agregando %s \n", temp->tipo); 
-    list_add(listaOperandos, temp->tipo);
-}
-
-void mismoTipoParametros(int linea)
-{
-    int todosIguales = 1;
-    int sz = list_size(listaOperandos);
-    if(sz == 0 )
-    {
-        printf("Lista vacia\n");
-        return;
-    }
-
-    for(int i = 0; i < sz -1 ; i++)
-    {
-        char* temp1 = list_get(listaOperandos, i);
-        char* temp2 = list_get(listaOperandos, i+1);
-         
-        todosIguales &= strcmp(temp1, temp2) == 0;
-    }
-
-    if(!todosIguales)
-    {
-        printf("No coinciden los tipos de la operacion\n",todosIguales);
-        agregarError("*No coinciden los tipos en la operacion binaria", "SEMANTICO", linea);
-    }else
-    {
-        printf("Coinciden los tipos de la operacion\n",todosIguales);
-    }
-    
-    list_clean(listaOperandos);
-}
-
 int verificarParametros(t_list* parametros)
 { 
     int sz = list_size(parametros);
@@ -249,7 +203,7 @@ int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
         if( strcmp(var->nombre, var2->nombre) != 0 || 
             strcmp(var->tipo, var2->tipo) != 0)
         {
-            printf("ERROR: Algun tipo o nombre de variable no coincide crack (%d) %s %s vs %s %s\n",
+            printf("ERROR: Algun tipo o nombre de variable no coincide (%d) %s %s vs %s %s\n",
                 i, var->tipo, var->nombre, var2->tipo, var2->nombre );
             return 0;
         }
@@ -257,6 +211,52 @@ int compararParametros(tFunciones* funcion1, tFunciones* funcion2)
     }
     //printf("todo ok pa\n");
     return 1;
+}
+
+
+///////////////
+///OPERANDOS///
+///////////////
+
+void agregarOperando(char* nombre)
+{
+    tVariables* temp = buscarVariable(nombre);
+    if(temp == NULL){
+        printf("No encontrado %s\n", nombre);
+        return;
+    }
+    printf("Agregando %s \n", temp->tipo); 
+    list_add(listaOperandos, temp->tipo);
+}
+
+void mismoTipoParametros(int linea)
+{
+    int todosIguales = 1;
+    int sz = list_size(listaOperandos);
+    if(sz == 0 )
+    {
+        printf("Lista vacia\n");
+        return;
+    }
+
+    for(int i = 0; i < sz -1 ; i++)
+    {
+        char* temp1 = list_get(listaOperandos, i);
+        char* temp2 = list_get(listaOperandos, i+1);
+         
+        todosIguales &= strcmp(temp1, temp2) == 0;
+    }
+
+    if(!todosIguales)
+    {
+        printf("ERROR: No coinciden los tipos de la operacion\n",todosIguales);
+        agregarError("*No coinciden los tipos en la operacion binaria", "SEMANTICO", linea);
+    }else
+    {
+        printf("Coinciden los tipos de la operacion\n",todosIguales);
+    }
+    
+    list_clean(listaOperandos);
 }
 
 /////////////
